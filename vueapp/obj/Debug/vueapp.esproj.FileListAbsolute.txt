@@ -1,0 +1,4 @@
+E:\Dokumenty\Billennium\Przychodnia\vueapp\obj\Debug\vueapp.esproj.SuggestedBindingRedirects.cache
+E:\Dokumenty\Billennium\Przychodnia\vueapp\obj\Debug\vueapp.esproj.CoreCompileInputs.cache
+C:\Users\ADRIAN\source\repos\Kubson908\Billennium_Team_Project\vueapp\obj\Debug\vueapp.esproj.SuggestedBindingRedirects.cache
+C:\Users\ADRIAN\source\repos\Kubson908\Billennium_Team_Project\vueapp\obj\Debug\vueapp.esproj.CoreCompileInputs.cache

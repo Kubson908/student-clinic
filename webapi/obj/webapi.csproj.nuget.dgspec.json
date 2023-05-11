@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Dokumenty\\Billennium\\Przychodnia\\webapi\\webapi.csproj": {}
+    "C:\\Users\\ADRIAN\\source\\repos\\Kubson908\\Billennium_Team_Project\\webapi\\webapi.csproj": {}
   },
   "projects": {
-    "E:\\Dokumenty\\Billennium\\Przychodnia\\webapi\\webapi.csproj": {
+    "C:\\Users\\ADRIAN\\source\\repos\\Kubson908\\Billennium_Team_Project\\webapi\\webapi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Dokumenty\\Billennium\\Przychodnia\\webapi\\webapi.csproj",
+        "projectUniqueName": "C:\\Users\\ADRIAN\\source\\repos\\Kubson908\\Billennium_Team_Project\\webapi\\webapi.csproj",
         "projectName": "webapi",
-        "projectPath": "E:\\Dokumenty\\Billennium\\Przychodnia\\webapi\\webapi.csproj",
-        "packagesPath": "C:\\Users\\karol\\.nuget\\packages\\",
-        "outputPath": "E:\\Dokumenty\\Billennium\\Przychodnia\\webapi\\obj\\",
+        "projectPath": "C:\\Users\\ADRIAN\\source\\repos\\Kubson908\\Billennium_Team_Project\\webapi\\webapi.csproj",
+        "packagesPath": "C:\\Users\\ADRIAN\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ADRIAN\\source\\repos\\Kubson908\\Billennium_Team_Project\\webapi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\karol\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADRIAN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -68,7 +68,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     }
