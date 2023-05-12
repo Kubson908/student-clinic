@@ -21,3 +21,6 @@ pnpm-debug.log*
 *.ntvs*
 *.njsproj
 *.sw?
+
+/obj
+/bin
