@@ -1,16 +1,27 @@
 {
   "version": 2,
-  "dgSpecHash": "WveGsG4epZmpMYHwNyT9m4v/ifLpE4bCrQpHUkI3W44ZqaSm3mlvcEqbMWr7rLC4C3rVfXaoq2jm6ceCIWA9ig==",
-  "success": true,
-  "projectFilePath": "C:\\Users\\ADRIAN\\source\\repos\\Kubson908\\Billennium_Team_Project\\webapi\\webapi.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\ADRIAN\\.nuget\\packages\\microsoft.aspnetcore.openapi\\7.0.4\\microsoft.aspnetcore.openapi.7.0.4.nupkg.sha512",
-    "C:\\Users\\ADRIAN\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
-    "C:\\Users\\ADRIAN\\.nuget\\packages\\microsoft.openapi\\1.4.3\\microsoft.openapi.1.4.3.nupkg.sha512",
-    "C:\\Users\\ADRIAN\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
-    "C:\\Users\\ADRIAN\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
-    "C:\\Users\\ADRIAN\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
-    "C:\\Users\\ADRIAN\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.4.0\\swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512"
-  ],
-  "logs": []
+  "dgSpecHash": "N9NAo8wE6IU4GqnWb/nOLNb3tOz2atr1e+If+vBT9kI1ftc9GdQjWKGLOyPLi8OKqHdqRpDuiMOg+zSULlVN2A==",
+  "success": false,
+  "projectFilePath": "C:\\Users\\Jakub\\Documents\\Billennium\\webapi\\webapi.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1101",
+      "level": "Error",
+      "message": "Nie można znaleźć pakietu Microsoft.AspNetCore.OpenApi. W źródłach nie istnieją pakiety z tym identyfikatorem: C:\\Program Files\\dotnet\\library-packs, Microsoft Visual Studio Offline Packages",
+      "libraryId": "Microsoft.AspNetCore.OpenApi",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
+    {
+      "code": "NU1101",
+      "level": "Error",
+      "message": "Nie można znaleźć pakietu Swashbuckle.AspNetCore. W źródłach nie istnieją pakiety z tym identyfikatorem: C:\\Program Files\\dotnet\\library-packs, Microsoft Visual Studio Offline Packages",
+      "libraryId": "Swashbuckle.AspNetCore",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    }
+  ]
 }
