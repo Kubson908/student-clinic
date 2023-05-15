@@ -1,12 +1,14 @@
 <script setup>
     import NavBar from "./components/NavBar.vue"
     import FooterBar from "./components/FooterBar.vue"
+    import AppointmentList from "./components/AppointmentList.vue"
 
 </script>
 
 <template>
     <v-app class="v-theme--light">
         <NavBar />
+        <AppointmentList />
         <FooterBar />
     </v-app>
 </template>
