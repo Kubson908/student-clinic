@@ -21,14 +21,15 @@ const submit = async (data: SubmitEvent) => {
     alert(
       `E-mail: ${email.value}\nHasło: ${pass.value}\nZapamiętaj mnie: ${
         remember_me.value ? "Tak" : "Nie"
-      }`
-    );
+      }`);
+    form_reset.value?.reset();
+    form_login.value?.reset();
   }
   if (reset && reset.valid) {
     alert(`E-mail: ${email_reset.value}`);
+    form_reset.value?.reset();
+    form_login.value?.reset();
   }
-  form_reset.value?.reset();
-  form_login.value?.reset();
 };
 
 const emailRules = [
