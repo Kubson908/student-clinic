@@ -13,19 +13,20 @@ namespace webapi.Models
         public Specialization Specialization { get; set; }
         public string? Symptoms { get; set; }
         public string? Medicines { get; set; }
+        public string? Recommendations { get; set; }
 
         //Navigation Properties
         [Required]
         [ForeignKey("Patient")]
         public int PatientId { get; set; }
-        public virtual Patient Patient { get; set; }
+        public Patient? Patient { get; set; }
 
         [ForeignKey("Doctor")]
-        public int DoctorId { get; set; }
-        public virtual Worker? Doctor { get; set; }
+        public int? DoctorId { get; set; }
+        public Worker? Doctor { get; set; }
 
         [ForeignKey("ControlAppointment")]
         public int? AppointmentId { get; set; }
-        public virtual Appointment? ControlAppointment { get; set; }
+        public Appointment? ControlAppointment { get; set; }
     }
 }
