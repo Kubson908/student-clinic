@@ -9,9 +9,9 @@ namespace webapi.Controllers
     [ApiController]
     public class AppointmentController : Controller
     {
-        private readonly ClinicDbContext _db;
+        private readonly ApplicationDbContext _db;
         
-        public AppointmentController(ClinicDbContext db)
+        public AppointmentController(ApplicationDbContext db)
         {
             _db = db;
         }

@@ -11,8 +11,8 @@ namespace webapi.Controllers
     [ApiController]
     public class PatientController : Controller
     {
-        private readonly ClinicDbContext _db;
-        public PatientController(ClinicDbContext db)
+        private readonly ApplicationDbContext _db;
+        public PatientController(ApplicationDbContext db)
         {
             _db = db;
         }

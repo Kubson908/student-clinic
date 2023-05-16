@@ -9,9 +9,9 @@ namespace webapi.Controllers
     [ApiController]
     public class WorkerController : Controller
     {
-        private readonly ClinicDbContext _db;
+        private readonly ApplicationDbContext _db;
         
-        public WorkerController(ClinicDbContext db)
+        public WorkerController(ApplicationDbContext db)
         {
             _db = db;
         }
