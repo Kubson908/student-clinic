@@ -1,27 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using webapi.Data;
-using webapi.Models;
+using Przychodnia.Webapi.Data;
+using Przychodnia.Webapi.Models;
 
-namespace webapi.Controllers
+namespace Przychodnia.Webapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WorkerController : Controller
+    public class EmployeeController : Controller
     {
         private readonly ApplicationDbContext _db;
         
-        public WorkerController(ApplicationDbContext db)
+        public EmployeeController(ApplicationDbContext db)
         {
             _db = db;
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(Worker), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IEnumerable<Worker>> Get() => await _db.Workers.ToListAsync();
+        public async Task<IEnumerable<Employee>> Get() => await _db.Workers.ToListAsync();
 
-        [ProducesResponseType(typeof(Worker), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

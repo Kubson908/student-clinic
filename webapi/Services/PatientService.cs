@@ -1,24 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Przychodnia.Shared;
+using Przychodnia.Webapi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace Przychodnia.Webapi.Services
 {
-    public interface IUserService
+    public class PatientService : IUserService
     {
-        Task<UserManagerResponse> RegisterUserAsync(RegisterDto dto);
-        Task<UserManagerResponse> LoginUserAsync(LoginDto dto);
-    }
-
-    public class UserService : IUserService
-    {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<Patient> _userManager;
         private readonly IConfiguration _configuration;
 
-        public UserService(UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public PatientService(UserManager<Patient> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
@@ -36,13 +31,18 @@ namespace Przychodnia.Webapi.Services
                     IsSuccess = false,
                 };
 
-            var identityUser = new IdentityUser
+            var patient = new Patient
             {
                 Email = dto.Email,
                 UserName = dto.Email,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                PhoneNumber = dto.PhoneNumber,
+                DateOfBirth = dto.DateOfBirth,
+                Pesel = dto.Pesel
             };
 
-            var result = await _userManager.CreateAsync(identityUser, dto.Password);
+            var result = await _userManager.CreateAsync(patient, dto.Password);
 
             if (result.Succeeded)
             {
@@ -91,9 +91,11 @@ namespace Przychodnia.Webapi.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Jakis klucz szyfrujacy"));
 
             var token = new JwtSecurityToken(
+                issuer: "/localhost",
+                audience: "/localhost",
                 claims: claims,
                 expires: DateTime.Now.AddDays(30),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));

@@ -2,13 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
-using webapi.Data;
-using webapi.Models;
+using Przychodnia.Webapi.Data;
+using Przychodnia.Webapi.Models;
+using Microsoft.AspNetCore.Authorization;
 
-namespace webapi.Controllers
+namespace Przychodnia.Webapi.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PatientController : Controller
     {
         private readonly ApplicationDbContext _db;

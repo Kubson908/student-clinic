@@ -1,17 +1,11 @@
-using webapi.Data;
+using Przychodnia.Webapi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Przychodnia.Webapi.Services;
+using Przychodnia.Webapi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,13 +15,24 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(
-    builder.Configuration.GetConnectionString("SqlServer")
-    ));
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
+
+var connectionString = builder.Configuration.GetConnectionString("SqlServer") 
+    ?? throw new InvalidOperationException("Connection string 'SqlServer' not found.");
+builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddIdentityCore<Patient>().AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+builder.Services.AddIdentityCore<Worker>().AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+/*builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();*/
 builder.Services.AddRazorPages();
+/*builder.Configuration.AddJsonFile("./appsettings.json");*/
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -37,6 +42,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
     options.Password.RequiredUniqueChars = 1;
+    options.Password.RequireNonAlphanumeric = false;
 
     // Lockout settings.
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
@@ -45,7 +51,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
     // User settings.
     options.User.AllowedUserNameCharacters =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
 
@@ -57,14 +63,18 @@ builder.Services.AddAuthentication(auth =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        /*ValidateIssuer = true,
+        ValidateIssuer = true,
+        ValidIssuer = "/localhost",
         ValidateAudience = true,
-        ValidAudience = ""*/
+        ValidAudience = "/localhost",
         RequireExpirationTime = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Tego klucza se u¿yjemy i chuj")),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Jakis klucz szyfrujacy")),
         ValidateIssuerSigningKey = true,
     };
 });
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, PatientService>();
 
 var app = builder.Build();
 

@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace webapi.Migrations
+namespace Przychodnia.Webapi.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDB : Migration
+    public partial class UpdateIdentity : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,45 +48,6 @@ namespace webapi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Patients",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DateOfBirth = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Pesel = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Patients", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Workers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Surname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DateOfBirth = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Specialization = table.Column<int>(type: "int", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Pesel = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Workers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -135,8 +96,8 @@ namespace webapi.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -180,8 +141,8 @@ namespace webapi.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -190,6 +151,49 @@ namespace webapi.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Patients",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateOfBirth = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Pesel = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Patients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Patients_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Workers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateOfBirth = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Specialization = table.Column<int>(type: "int", nullable: false),
+                    Pesel = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Workers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Workers_AspNetUsers_Id",
+                        column: x => x.Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -206,8 +210,8 @@ namespace webapi.Migrations
                     Symptoms = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Medicines = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Recommendations = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PatientId = table.Column<int>(type: "int", nullable: false),
-                    DoctorId = table.Column<int>(type: "int", nullable: true),
+                    PatientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DoctorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     AppointmentId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>

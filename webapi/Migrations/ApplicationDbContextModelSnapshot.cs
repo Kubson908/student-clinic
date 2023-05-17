@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using webapi.Data;
+using Przychodnia.Webapi.Data;
 
 #nullable disable
 
-namespace webapi.Migrations
+namespace Przychodnia.Webapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -137,6 +137,8 @@ namespace webapi.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -167,10 +169,12 @@ namespace webapi.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -207,10 +211,12 @@ namespace webapi.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -220,7 +226,7 @@ namespace webapi.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("webapi.Models.Appointment", b =>
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Appointment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -234,14 +240,15 @@ namespace webapi.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DoctorId")
-                        .HasColumnType("int");
+                    b.Property<string>("DoctorId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Medicines")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PatientId")
-                        .HasColumnType("int");
+                    b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Recommendations")
                         .HasColumnType("nvarchar(max)");
@@ -263,27 +270,19 @@ namespace webapi.Migrations
                     b.ToTable("Appointments");
                 });
 
-            modelBuilder.Entity("webapi.Models.Patient", b =>
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Patient", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.Property<string>("DateOfBirth")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -292,41 +291,22 @@ namespace webapi.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Patients");
+                    b.ToTable("Patients", (string)null);
                 });
 
-            modelBuilder.Entity("webapi.Models.Worker", b =>
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Worker", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.Property<string>("DateOfBirth")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -334,22 +314,11 @@ namespace webapi.Migrations
                         .IsRequired()
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
 
                     b.Property<int>("Specialization")
                         .HasColumnType("int");
 
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Workers");
+                    b.ToTable("Workers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -403,17 +372,17 @@ namespace webapi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("webapi.Models.Appointment", b =>
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Appointment", b =>
                 {
-                    b.HasOne("webapi.Models.Appointment", "ControlAppointment")
+                    b.HasOne("Przychodnia.Webapi.Models.Appointment", "ControlAppointment")
                         .WithMany()
                         .HasForeignKey("AppointmentId");
 
-                    b.HasOne("webapi.Models.Worker", "Doctor")
+                    b.HasOne("Przychodnia.Webapi.Models.Worker", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId");
 
-                    b.HasOne("webapi.Models.Patient", "Patient")
+                    b.HasOne("Przychodnia.Webapi.Models.Patient", "Patient")
                         .WithMany("Appointments")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -426,7 +395,25 @@ namespace webapi.Migrations
                     b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("webapi.Models.Patient", b =>
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Patient", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithOne()
+                        .HasForeignKey("Przychodnia.Webapi.Models.Patient", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Worker", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithOne()
+                        .HasForeignKey("Przychodnia.Webapi.Models.Worker", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Patient", b =>
                 {
                     b.Navigation("Appointments");
                 });

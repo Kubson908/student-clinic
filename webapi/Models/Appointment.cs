@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace webapi.Models
+namespace Przychodnia.Webapi.Models
 {
     public class Appointment
     {
@@ -18,11 +18,11 @@ namespace webapi.Models
         //Navigation Properties
         [Required]
         [ForeignKey("Patient")]
-        public int PatientId { get; set; }
+        public string PatientId { get; set; }
         public Patient? Patient { get; set; }
 
         [ForeignKey("Doctor")]
-        public int? DoctorId { get; set; }
+        public string? DoctorId { get; set; }
         public Worker? Doctor { get; set; }
 
         [ForeignKey("ControlAppointment")]

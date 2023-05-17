@@ -3,8 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Przychodnia.Webapi.Models
 {
-    public class Patient : IdentityUser
+    public class Worker : IdentityUser
     { 
+
         [Required]
         public string FirstName { get; set; }
 
@@ -13,13 +14,18 @@ namespace Przychodnia.Webapi.Models
 
         [Required]
         public string DateOfBirth { get; set; }
-    
+
+        [Required]
+        public Specialization Specialization { get; set; }
+        
         [Required]
         [StringLength(11)]
         public string Pesel { get; set; }
 
-        //Navigation Properties
-        public List<Appointment> Appointments { get; set; } = new List<Appointment>();
+    }
 
+    public enum Specialization
+    {
+        Internista, Pulmonolog, Okulista, Gastrolog
     }
 }

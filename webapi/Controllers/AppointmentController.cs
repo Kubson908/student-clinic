@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using webapi.Data;
-using webapi.Models;
+using Przychodnia.Webapi.Data;
+using Przychodnia.Webapi.Models;
 
-namespace webapi.Controllers
+namespace Przychodnia.Webapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
