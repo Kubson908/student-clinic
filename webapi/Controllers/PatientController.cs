@@ -10,7 +10,7 @@ namespace Przychodnia.Webapi.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Employee")]
     public class PatientController : Controller
     {
         private readonly ApplicationDbContext _db;

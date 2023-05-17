@@ -13,7 +13,8 @@ namespace Przychodnia.Webapi.Services
         private readonly UserManager<Patient> _userManager;
         private readonly IConfiguration _configuration;
 
-        public PatientService(UserManager<Patient> userManager, IConfiguration configuration)
+        public PatientService(UserManager<Patient> userManager, 
+            IConfiguration configuration, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _configuration = configuration;
@@ -39,13 +40,15 @@ namespace Przychodnia.Webapi.Services
                 LastName = dto.LastName,
                 PhoneNumber = dto.PhoneNumber,
                 DateOfBirth = dto.DateOfBirth,
-                Pesel = dto.Pesel
+                Pesel = dto.Pesel,
+                EmailConfirmed = true
             };
 
             var result = await _userManager.CreateAsync(patient, dto.Password);
 
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(patient, "Patient");
                 // TODO: Send a confirmation email
 
                 return new UserManagerResponse
@@ -89,6 +92,7 @@ namespace Przychodnia.Webapi.Services
             {
                 new Claim("Email", dto.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, "Patient")
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]));

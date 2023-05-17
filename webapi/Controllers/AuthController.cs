@@ -74,7 +74,7 @@ namespace Przychodnia.Webapi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _patientService.LoginUserAsync(model);
+                var result = await _employeeService.LoginUserAsync(model);
 
                 if (result.IsSuccess)
                     return Ok(result);

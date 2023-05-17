@@ -47,6 +47,7 @@ namespace Przychodnia.Webapi.Services
 
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(employee, "Employee");
                 // TODO: Send a confirmation email
 
                 return new UserManagerResponse
@@ -90,6 +91,7 @@ namespace Przychodnia.Webapi.Services
             {
                 new Claim("Email", dto.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, "Employee")
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]));
