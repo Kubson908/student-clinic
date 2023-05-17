@@ -1,12 +1,17 @@
 <script setup lang="ts">
 //import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+import axios from "axios";
+import {onBeforeMount} from "vue";
+onBeforeMount(async () => {
+  const res = await axios
+    .get(`https://localhost:7042/api/appointment`)
+    .catch((error) => {
+      console.log(error);
+    });
+  console.log(res);
+  }
+)
 </script>
 
 <template>
