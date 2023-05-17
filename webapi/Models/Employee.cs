@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Przychodnia.Shared;
 using System.ComponentModel.DataAnnotations;
 
 namespace Przychodnia.Webapi.Models
 {
-    public class Worker : IdentityUser
+    public class Employee : IdentityUser
     { 
 
         [Required]
@@ -22,10 +23,5 @@ namespace Przychodnia.Webapi.Models
         [StringLength(11)]
         public string Pesel { get; set; }
 
-    }
-
-    public enum Specialization
-    {
-        Internista, Pulmonolog, Okulista, Gastrolog
     }
 }

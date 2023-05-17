@@ -2,7 +2,7 @@
 
 namespace Przychodnia.Shared
 {
-    public class RegisterDto
+    public class RegisterEmployeeDto
     {
         [Required]
         [StringLength(50)]
@@ -36,6 +36,11 @@ namespace Przychodnia.Shared
         [StringLength(12, MinimumLength = 9)]
         public string PhoneNumber { get; set; }
 
+        public Specialization Specialization { get; set; }
     }
 
+    public enum Specialization
+    {
+        Internista, Pulmonolog, Okulista, Gastrolog
+    }
 }

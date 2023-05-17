@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Przychodnia.Webapi.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateIdentity : Migration
+    public partial class updateEmployee : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

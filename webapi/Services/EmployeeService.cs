@@ -8,18 +8,18 @@ using System.Text;
 
 namespace Przychodnia.Webapi.Services
 {
-    public class PatientService : IUserService<RegisterDto, LoginDto>
+    public class EmployeeService : IUserService<RegisterEmployeeDto, LoginDto>
     {
-        private readonly UserManager<Patient> _userManager;
+        private readonly UserManager<Employee> _userManager;
         private readonly IConfiguration _configuration;
 
-        public PatientService(UserManager<Patient> userManager, IConfiguration configuration)
+        public EmployeeService(UserManager<Employee> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
         }
 
-        public async Task<UserManagerResponse> RegisterUserAsync(RegisterDto dto)
+        public async Task<UserManagerResponse> RegisterUserAsync(RegisterEmployeeDto dto)
         {
             if (dto == null)
                 throw new NullReferenceException("Należy wypełnić wymagane pola");
@@ -31,7 +31,7 @@ namespace Przychodnia.Webapi.Services
                     IsSuccess = false,
                 };
 
-            var patient = new Patient
+            var employee = new Employee
             {
                 Email = dto.Email,
                 UserName = dto.Email,
@@ -39,10 +39,11 @@ namespace Przychodnia.Webapi.Services
                 LastName = dto.LastName,
                 PhoneNumber = dto.PhoneNumber,
                 DateOfBirth = dto.DateOfBirth,
-                Pesel = dto.Pesel
+                Pesel = dto.Pesel,
+                Specialization = dto.Specialization,
             };
 
-            var result = await _userManager.CreateAsync(patient, dto.Password);
+            var result = await _userManager.CreateAsync(employee, dto.Password);
 
             if (result.Succeeded)
             {
@@ -57,7 +58,7 @@ namespace Przychodnia.Webapi.Services
 
             return new UserManagerResponse
             {
-                Message = "Nie utworzono użytkownika",
+                Message = "Nie utworzono pracownika",
                 IsSuccess = false,
                 Errors = result.Errors.Select(e => e.Description)
             };
@@ -110,5 +111,6 @@ namespace Przychodnia.Webapi.Services
                 ExpireDate = token.ValidTo
             };
         }
+
     }
 }

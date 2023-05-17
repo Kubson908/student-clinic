@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Przychodnia.Webapi.Services;
 using Przychodnia.Webapi.Models;
+using Przychodnia.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 
 builder.Services.AddIdentityCore<Patient>().AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-builder.Services.AddIdentityCore<Worker>().AddEntityFrameworkStores<ApplicationDbContext>()
+builder.Services.AddIdentityCore<Employee>().AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 /*builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -64,17 +65,18 @@ builder.Services.AddAuthentication(auth =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = "/localhost",
+        ValidIssuer = builder.Configuration["AuthSettings:Issuer"],
         ValidateAudience = true,
-        ValidAudience = "/localhost",
+        ValidAudience = builder.Configuration["AuthSettings:Audience"],
         RequireExpirationTime = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Jakis klucz szyfrujacy")),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AuthSettings:Key"])),
         ValidateIssuerSigningKey = true,
     };
 });
 
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserService, PatientService>();
+builder.Services.AddScoped<IUserService<RegisterDto, LoginDto>, UserService>();
+builder.Services.AddScoped<IUserService<RegisterDto, LoginDto>, PatientService>();
+builder.Services.AddScoped<IUserService<RegisterEmployeeDto, LoginDto>, EmployeeService>();
 
 var app = builder.Build();
 

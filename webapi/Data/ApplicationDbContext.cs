@@ -8,13 +8,13 @@ namespace Przychodnia.Webapi.Data
     {
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Patient> Patients { get; set; }
-        public DbSet<Employee> Workers { get; set; }
+        public DbSet<Employee> Employees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.Entity<Patient>(entity => { entity.ToTable("Patients"); });
-            builder.Entity<Employee>(entity => { entity.ToTable("Workers"); });
+            builder.Entity<Employee>(entity => { entity.ToTable("Employees"); });
         }
 
 

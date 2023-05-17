@@ -7,13 +7,13 @@ using System.Text;
 
 namespace Przychodnia.Webapi.Services
 {
-    public interface IUserService
+    public interface IUserService<R, L>
     {
-        Task<UserManagerResponse> RegisterUserAsync(RegisterDto dto);
-        Task<UserManagerResponse> LoginUserAsync(LoginDto dto);
+        Task<UserManagerResponse> RegisterUserAsync(R dto);
+        Task<UserManagerResponse> LoginUserAsync(L dto);
     }
 
-    public class UserService : IUserService
+    public class UserService : IUserService<RegisterDto, LoginDto>
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;

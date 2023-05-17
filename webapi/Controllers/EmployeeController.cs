@@ -19,14 +19,14 @@ namespace Przychodnia.Webapi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IEnumerable<Employee>> Get() => await _db.Workers.ToListAsync();
+        public async Task<IEnumerable<Employee>> Get() => await _db.Employees.ToListAsync();
 
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var Worker = await _db.Workers.FindAsync(id);
+            var Worker = await _db.Employees.FindAsync(id);
             return Worker == null ? NotFound() : Ok(Worker);
         }
     }

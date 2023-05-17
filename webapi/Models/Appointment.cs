@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Przychodnia.Shared;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Przychodnia.Webapi.Models
@@ -23,7 +24,7 @@ namespace Przychodnia.Webapi.Models
 
         [ForeignKey("Doctor")]
         public string? DoctorId { get; set; }
-        public Worker? Doctor { get; set; }
+        public Employee? Doctor { get; set; }
 
         [ForeignKey("ControlAppointment")]
         public int? AppointmentId { get; set; }

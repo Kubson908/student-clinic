@@ -12,8 +12,8 @@ using Przychodnia.Webapi.Data;
 namespace Przychodnia.Webapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230517111002_UpdateIdentity")]
-    partial class UpdateIdentity
+    [Migration("20230517115817_updateEmployee")]
+    partial class updateEmployee
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -273,31 +273,7 @@ namespace Przychodnia.Webapi.Migrations
                     b.ToTable("Appointments");
                 });
 
-            modelBuilder.Entity("Przychodnia.Webapi.Models.Patient", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<string>("DateOfBirth")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Pesel")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
-
-                    b.ToTable("Patients", (string)null);
-                });
-
-            modelBuilder.Entity("Przychodnia.Webapi.Models.Worker", b =>
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Employee", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -322,6 +298,30 @@ namespace Przychodnia.Webapi.Migrations
                         .HasColumnType("int");
 
                     b.ToTable("Workers", (string)null);
+                });
+
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Patient", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("DateOfBirth")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Pesel")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.ToTable("Patients", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -381,7 +381,7 @@ namespace Przychodnia.Webapi.Migrations
                         .WithMany()
                         .HasForeignKey("AppointmentId");
 
-                    b.HasOne("Przychodnia.Webapi.Models.Worker", "Doctor")
+                    b.HasOne("Przychodnia.Webapi.Models.Employee", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId");
 
@@ -398,20 +398,20 @@ namespace Przychodnia.Webapi.Migrations
                     b.Navigation("Patient");
                 });
 
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Employee", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithOne()
+                        .HasForeignKey("Przychodnia.Webapi.Models.Employee", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Przychodnia.Webapi.Models.Patient", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithOne()
                         .HasForeignKey("Przychodnia.Webapi.Models.Patient", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Przychodnia.Webapi.Models.Worker", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithOne()
-                        .HasForeignKey("Przychodnia.Webapi.Models.Worker", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
