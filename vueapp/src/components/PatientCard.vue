@@ -4,12 +4,9 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import axios from "axios";
 import {onBeforeMount} from "vue";
 onBeforeMount(async () => {
-  const res = await axios
-    .get(`https://localhost:7042/api/appointment`)
-    .catch((error) => {
-      console.log(error);
-    });
-  console.log(res);
+    const res = await axios
+        .get('https://localhost:7042/api/appointment');
+    console.log(res.data);
   }
 )
 </script>
