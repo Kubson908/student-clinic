@@ -30,7 +30,22 @@ namespace Przychodnia.Webapi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IEnumerable<Patient>> Get() => await _db.Patients.ToListAsync();
+        public async Task<IEnumerable<object>> Get()
+        {
+            var result = await _db.Patients.ToListAsync();
+            var patients = result.Select(p => new
+            {
+                p.Id,
+                p.FirstName,
+                p.LastName,
+                p.DateOfBirth,
+                p.Pesel,
+                p.PhoneNumber,
+                p.Email,
+                p.Appointments
+            });
+            return patients;
+        }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
