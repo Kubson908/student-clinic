@@ -1,17 +1,28 @@
 <script setup lang="ts">
+import { onBeforeMount } from "vue";
 import NavBar from "./components/NavBar.vue";
+import { user } from "./main";
 // import FooterBar from "./components/FooterBar.vue";
+
+onBeforeMount(() => {
+  const date = Date.parse(localStorage.getItem("expireDate") as string);
+  console.log(typeof date);
+  if (date < Date.now()) {
+    localStorage.clear();
+    user.name = "Niezalogowany";
+    user.loggedIn = false;
+  }
+});
 </script>
 
 <template>
   <v-app class="v-theme--light">
     <NavBar />
-    <Transition name="details" mode="out-in">
-      <router-view />
-      <!-- <router-view v-slot="{ Component }">
-        <component :is="Component" class="test2" />
-      </router-view> -->
-    </Transition>
+    <router-view v-slot="{ Component }">
+      <Transition name="details" mode="out-in">
+        <component :is="Component"
+      /></Transition>
+    </router-view>
     <!-- <FooterBar class="align-end"/> -->
   </v-app>
 </template>
@@ -34,15 +45,15 @@ import NavBar from "./components/NavBar.vue";
   color: #2c3e50;
   min-height: 100vh !important;
 }
-.details-enter-active .test2 {
-  animation: popup 5s;
+.details-enter-active {
+  animation: popup 0.25s;
 }
-.details-leave-active .test2 {
-  animation: popup 5s reverse;
+.details-leave-active {
+  animation: popup 0.25s reverse;
 }
 .details-enter-active,
 .details-leave-active {
-  transition: opacity 5s ease;
+  transition: opacity 0.25s ease;
 }
 .details-enter-from,
 .details-leave-to {

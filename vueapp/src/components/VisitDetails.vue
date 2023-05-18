@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import VueDatePicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
 // let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
 //   .toISOString()
 //   .substr(0, 10);

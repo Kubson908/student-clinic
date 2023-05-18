@@ -110,7 +110,9 @@ namespace Przychodnia.Webapi.Services
                 Message = "Zalogowano",
                 IsSuccess = true,
                 AccessToken = tokenString,
-                ExpireDate = token.ValidTo
+                ExpireDate = token.ValidTo,
+                User = user.FirstName + " " + user.LastName,
+                Role = "Employee"
             };
         }
 

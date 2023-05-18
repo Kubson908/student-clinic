@@ -138,153 +138,157 @@ const dateRules = [
 </script>
 
 <template>
-  <v-card
-    width="40vw"
-    location="center"
-    elevation="5"
-    class="rounded-lg signup"
-  >
-    <v-card-item>
-      <v-container class="d-flex justify-center align-center">
-        <v-card
-          height="64"
-          width="64"
-          color="#36BFF1"
-          class="d-flex justify-center align-center"
-        >
-          <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
-        </v-card>
-      </v-container>
-      <v-card-title>Zarejestruj się</v-card-title>
-      <v-card-subtitle>Podaj dane rejestracji</v-card-subtitle>
-    </v-card-item>
-    <v-spacer></v-spacer>
-    <v-card-text>
-      <v-form @submit.prevent="submit" ref="form">
-        <div class="cont">
-          <v-row>
-            <v-col class="py-1">
-              <v-text-field
-                type="input"
-                v-model="name"
-                label="Imię"
-                variant="solo"
-                :rules="nameRules"
-                color="blue-darken-2"
-                required
-              >
-              </v-text-field>
-            </v-col>
-            <v-col class="py-1">
-              <v-text-field
-                type="input"
-                v-model="surname"
-                label="Nazwisko"
-                variant="solo"
-                :rules="surnameRules"
-                color="blue-darken-2"
-                required
-              >
-              </v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="py-1">
-              <v-text-field
-                type="Date"
-                label="Data urodzenia"
-                v-model="birth_date"
-                variant="solo"
-                :rules="dateRules"
-                color="blue-darken-2"
-                required
-              >
-              </v-text-field>
-            </v-col>
-            <v-col class="py-1">
-              <v-text-field
-                type="input"
-                label="Pesel"
-                v-model="pesel"
-                variant="solo"
-                :rules="peselRules"
-                color="blue-darken-2"
-                required
-              >
-              </v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="py-1">
-              <v-text-field
-                type="email"
-                label="Email"
-                v-model="email"
-                variant="solo"
-                :rules="emailRules"
-                color="blue-darken-2"
-                required
-              >
-              </v-text-field>
-            </v-col>
-            <v-col class="py-1">
-              <v-text-field
-                type="input"
-                label="Nr telefonu"
-                v-model="phone"
-                variant="solo"
-                :rules="phoneRules"
-                color="blue-darken-2"
-                required
-              >
-              </v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-text-field
-              label="Hasło"
-              v-model="pass"
-              variant="solo"
-              :type="visible ? 'text' : 'password'"
-              :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append-inner="() => (visible = !visible)"
-              :rules="passwordRules"
-              class="px-3 py-1"
-              color="blue-darken-2"
-              required
-            >
-            </v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field
-              label="Powtórz hasło"
-              v-model="rpass"
-              variant="solo"
-              :type="visible2 ? 'text' : 'password'"
-              :append-inner-icon="visible2 ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append-inner="() => (visible2 = !visible2)"
-              :rules="repeatPasswordRules"
-              class="px-3 py-1"
-              height="10px"
-              color="blue-darken-2"
-              required
-            >
-            </v-text-field>
-          </v-row>
-        </div>
-        <v-row justify="center">
-          <v-btn type="submit" color="blue-darken-2" class="mt-2 button"
-            >Zarejestruj się</v-btn
+  <v-row no-gutters>
+    <v-col>
+      <v-card
+        width="40vw"
+        location="center"
+        elevation="5"
+        class="rounded-lg signup"
+      >
+      <v-card-item>
+        <v-container class="d-flex justify-center align-center">
+          <v-card
+            height="64"
+            width="64"
+            color="#36BFF1"
+            class="d-flex justify-center align-center"
           >
-        </v-row>
-        <v-row justify="center">
-          <v-btn variant="text" size="small" class="mt-2 button"
-            >Mam już konto</v-btn
-          >
-        </v-row>
-      </v-form>
-    </v-card-text>
-  </v-card>
+            <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
+          </v-card>
+        </v-container>
+        <v-card-title>Zarejestruj się</v-card-title>
+        <v-card-subtitle>Podaj dane rejestracji</v-card-subtitle>
+      </v-card-item>
+      <v-spacer></v-spacer>
+      <v-card-text>
+        <v-form @submit.prevent="submit" ref="form">
+          <div class="cont">
+            <v-row>
+              <v-col class="py-1">
+                <v-text-field
+                  type="input"
+                  v-model="name"
+                  label="Imię"
+                  variant="solo"
+                  :rules="nameRules"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+              <v-col class="py-1">
+                <v-text-field
+                  type="input"
+                  v-model="surname"
+                  label="Nazwisko"
+                  variant="solo"
+                  :rules="surnameRules"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="py-1">
+                <v-text-field
+                  type="Date"
+                  label="Data urodzenia"
+                  v-model="birth_date"
+                  variant="solo"
+                  :rules="dateRules"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+              <v-col class="py-1">
+                <v-text-field
+                  type="input"
+                  label="Pesel"
+                  v-model="pesel"
+                  variant="solo"
+                  :rules="peselRules"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="py-1">
+                <v-text-field
+                  type="email"
+                  label="Email"
+                  v-model="email"
+                  variant="solo"
+                  :rules="emailRules"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+              <v-col class="py-1">
+                <v-text-field
+                  type="input"
+                  label="Nr telefonu"
+                  v-model="phone"
+                  variant="solo"
+                  :rules="phoneRules"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-text-field
+                label="Hasło"
+                v-model="pass"
+                variant="solo"
+                :type="visible ? 'text' : 'password'"
+                :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append-inner="() => (visible = !visible)"
+                :rules="passwordRules"
+                class="px-3 py-1"
+                color="blue-darken-2"
+                required
+              >
+              </v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field
+                label="Powtórz hasło"
+                v-model="rpass"
+                variant="solo"
+                :type="visible2 ? 'text' : 'password'"
+                :append-inner-icon="visible2 ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append-inner="() => (visible2 = !visible2)"
+                :rules="repeatPasswordRules"
+                class="px-3 py-1"
+                height="10px"
+                color="blue-darken-2"
+                required
+              >
+              </v-text-field>
+            </v-row>
+          </div>
+          <v-row justify="center">
+            <v-btn type="submit" color="blue-darken-2" class="mt-2 button"
+              >Zarejestruj się</v-btn
+            >
+          </v-row>
+          <v-row justify="center">
+            <v-btn variant="text" size="small" class="mt-2 button"
+              >Mam już konto</v-btn
+            >
+          </v-row>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-col>
+</v-row>
 </template>
 
 <style>

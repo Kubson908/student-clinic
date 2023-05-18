@@ -3,6 +3,7 @@ import axios from "axios";
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
 import { prefix } from "../config";
+import { user } from "../main";
 
 const visible = ref(false);
 const form_login = ref<typeof VForm | null>(null);
@@ -22,11 +23,15 @@ const submit = async (data: SubmitEvent) => {
   if (login && login.valid) {
     try {
       const res = await axios.post(`${prefix}/api/auth/login`, {
-        email: email,
-        password: pass, // POPRAWIĆ TO
+        email: email.value,
+        password: pass.value,
       });
-
-      alert(res.data());
+      localStorage.setItem("token", res.data.accessToken);
+      localStorage.setItem("expireDate", res.data.expireDate);
+      localStorage.setItem("user", res.data.user);
+      user.name = res.data.user;
+      user.loggedIn = true;
+      console.log(user);
     } catch (error) {
       console.log(error);
     }

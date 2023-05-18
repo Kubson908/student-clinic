@@ -1,37 +1,32 @@
 <script setup lang="ts">
-//import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+//import { ref } from "vue";
+//const name = ref<string>("");
+//const lastName = ref<string>("");
+//const email = ref<string>("");
+//const pesel = ref<string>("");
+//const phone = ref<string>("");
+//const birthDate = ref<string>("");
+//const specialization = ref<string>("");
 </script>
 
 <template>
   <v-card width="560px" location="center" elevation="5" class="rounded-lg">
     <v-card-item>
-      <v-container class="d-flex justify-center align-center">
-        <v-card
-          height="64"
-          width="64"
-          color="#36BFF1"
-          class="d-flex justify-center align-center"
-        >
-          <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
-        </v-card>
-      </v-container>
-      <v-card-title class="font-weight-bold text-h5" font-size="56">
-        Anuluj wizytę
-      </v-card-title>
-      <v-card-subtitle>Potwierdź anulowanie wizyty</v-card-subtitle>
+      <!-- <v-card-title font-size="32">Twoje dane</v-card-title> -->
+      <p class="font-weight-bold text-h4">Dane lekarza</p>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
       <v-form @submit.prevent>
         <v-container>
           <v-row>
-            <p class="font-weight-bold">Informacje o wizycie</p>
+            <v-col align="center">
+              <v-img height="200" src="https://st2.depositphotos.com/1010683/5848/i/950/depositphotos_58482379-stock-photo-male-asian-doctor.jpg">
+            </v-img>
+            </v-col>
+          </v-row>
+          <v-row>
+            <p class="font-weight-bold">Dane osobowe</p>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
           <v-row>
@@ -39,16 +34,7 @@
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
-              Data wizyty
-            </v-col>
-            <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
-          </v-row>
-          <v-row>
-            <v-col
-              class="font-weight-bold text-blue-darken-1 text-left"
-              cols="4"
-            >
-              Lekarz
+              Imię i nazwisko
             </v-col>
             <v-col class="text-left"> Maciej Kowalczyk </v-col>
           </v-row>
@@ -57,32 +43,41 @@
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
-              Pacjent
+              PESEL
             </v-col>
-            <v-col class="text-left"> Jan Kowalski </v-col>
+            <v-col class="text-left"> 48322349428 </v-col>
           </v-row>
           <v-row>
             <v-col
               cols="4"
               class="font-weight-bold text-blue-darken-1 text-left"
             >
-              Podane objawy
+              Data urodzenia
             </v-col>
-            <v-col class="text-left"> Kaszel, katar, gorączka </v-col>
+            <v-col class="text-left"> 12.05.1979r. </v-col>
           </v-row>
           <v-row>
             <v-col
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
-              Przyjmowane leki
+              Email
             </v-col>
-            <v-col class="text-left"> Riposton </v-col>
+            <v-col class="text-left"> m.kowalczyk@poczta.pl </v-col>
+          </v-row>
+          <v-row>
+            <v-col
+              class="font-weight-bold text-blue-darken-1 text-left"
+              cols="4"
+            >
+              Specjalizacja
+            </v-col>
+            <v-col class="text-left"> Pulmunolog </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
 
-        <v-row justify="center">
+        <v-row justify="start">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
             <v-btn
               variant="outlined"
@@ -92,18 +87,13 @@
             >
               Wstecz
             </v-btn>
-          </v-col>
-          <v-col justify="center" class="text-right">
             <v-btn
-              xs="12"
-              sm="6"
-              md="3"
+              variant="text"
               align-self="center"
-              size="large"
+              size="small"
               class="mt-2 button"
-              color="red-darken-2"
             >
-              Potwierdź
+              Zmień hasło
             </v-btn>
           </v-col>
         </v-row>

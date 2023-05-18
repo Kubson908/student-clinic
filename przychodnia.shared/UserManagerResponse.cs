@@ -7,5 +7,7 @@
         public IEnumerable<string> Errors { get; set; }
         public string? AccessToken { get; set; }
         public DateTime? ExpireDate { get; set; }
+        public string? User { get; set; }
+        public string Role { get; set; }
     }
 }

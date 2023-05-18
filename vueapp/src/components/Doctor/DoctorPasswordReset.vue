@@ -1,16 +1,20 @@
-<script setup lang="ts">
-//import VueDatePicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+<script lang="ts" setup>
+import { ref } from "vue";
+
+const form = ref<HTMLFormElement | null>(null);
+const email = ref<string>("");
+const emailrepeat = ref<string>("");
+
+const submit = async (data: SubmitEvent) => {
+  const valid = ((await data) as any).valid;
+  if (!valid) return;
+  alert(`email: ${email.value}\n`);
+  form.value?.reset();
+};
 </script>
 
 <template>
-  <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+  <v-card width="440px" location="center" elevation="5" class="rounded-lg">
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -22,67 +26,62 @@ import "@vuepic/vue-datepicker/dist/main.css";
           <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
         </v-card>
       </v-container>
-      <v-card-title class="font-weight-bold text-h5" font-size="56">
-        Zresetuj hasło
-      </v-card-title>
-      <v-card-subtitle>Podaj nowe hasło do konta</v-card-subtitle>
+      <v-card-title>Zmień hasło</v-card-title>
+      <v-card-subtitle
+        >Zmień hasło lekarza: imie i nazwisko lekarza</v-card-subtitle>
     </v-card-item>
-    <v-spacer></v-spacer>
     <v-card-text>
-      <v-form @submit.prevent>
-        <v-container>
+      <v-form @submit.prevent="submit" ref="form">
+        <v-row class="mx-4">
           <v-text-field
-            v-model="pass"
+            type="input"
             label="Nowe hasło"
+            v-model="email"
             variant="solo"
-            :type="visible ? 'text' : 'password'"
-            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append-inner="() => (visible = !visible)"
-            :rules="passwordRules"
-            class="py-1"
+            :rules="[(v) => !!v || 'Pole jest wymagane']"
             color="blue-darken-2"
             required
           >
           </v-text-field>
+        </v-row>
+      </v-form>
+    </v-card-text>
+    <v-card-text>
+      <v-form @submit.prevent="submit" ref="form">
+        <v-row class="mx-4">
           <v-text-field
-            v-model="pass"
+            type="input"
             label="Powtórz hasło"
+            v-model="emailrepeat"
             variant="solo"
-            :type="visible ? 'text' : 'password'"
-            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append-inner="() => (visible = !visible)"
-            :rules="passwordRules"
-            class="py-1"
+            :rules="[(v) => !!v || 'Pole jest wymagane']"
             color="blue-darken-2"
             required
           >
           </v-text-field>
-          
-        </v-container>
-
-        <v-row justify="center">
-          <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
-            <v-btn
+        </v-row>
+        <v-row>
+          <v-col cols="auto" class="me-auto">
+            <v-sheet class="pa-2 ma-2">
+              <v-btn 
+              type="submit"
               variant="outlined"
-              size="large"
+              text="blue-darken"
+              color="blue-darken-2"  
               class="mt-2 button"
-              color="blue-darken-2"
-            >
-              Wstecz
-            </v-btn>
+                >Wstecz</v-btn
+              >
+            </v-sheet>
           </v-col>
-          <v-col justify="center" class="text-right">
-            <v-btn
-              xs="12"
-              sm="6"
-              md="3"
-              align-self="center"
-              size="large"
-              class="mt-2 button"
-              color="blue-darken-2"
-            >
-              Potwierdź
-            </v-btn>
+          <v-col cols="auto">
+            <v-sheet class="pa-2 ma-2">
+              <v-btn
+                type="submit"
+                color="blue-darken-2"
+                class="mt-2 button"
+                >Dalej</v-btn
+              >
+            </v-sheet>
           </v-col>
         </v-row>
       </v-form>

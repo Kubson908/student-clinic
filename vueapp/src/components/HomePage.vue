@@ -4,6 +4,8 @@ import HomePageCard from "./HomePageCard.vue";
 <template>
   <v-row no-gutters>
     <v-col>
+  <v-row no-gutters>
+    <v-col>
       <v-carousel
         show-arrows="hover"
         hide-delimiter-background
@@ -295,6 +297,8 @@ import HomePageCard from "./HomePageCard.vue";
   <v-row no-gutters
     ><v-col><v-spacer></v-spacer></v-col
   ></v-row>
+    </v-col>
+    </v-row>
 </template>
 <style>
 .hp-bright {

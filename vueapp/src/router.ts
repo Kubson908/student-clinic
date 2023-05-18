@@ -15,9 +15,14 @@ import PatientCancelVisit from "./components/Patient/PatientCancelVisit.vue";
 import PatientChangePassword from "./components/Patient/ChangePassword.vue";
 import GuestPasswordReset2 from "./components/Guest/GuestPasswordReset2.vue";
 import GuestPasswordReset from "./components/Guest/GuestPasswordReset.vue";
+import DoctorPasswordReset from "./components/Doctor/DoctorPasswordReset.vue";
+import UnauthorizedView from "./components/UnauthorizedView.vue";
+import DoctorDataEdit from "./components/Doctor/DoctorDataEdite.vue";
+import DoctorPage from "./components/DoctorPage.vue"
 
 export const routes: Array<{ path: string; component: Component }> = [
   { path: "/", component: HomePage },
+  { path: "/unauthorized", component: UnauthorizedView },
   { path: "/appointments", component: AppointmentList },
   { path: "/login", component: LoginForm },
   { path: "/signup", component: SignUp },
@@ -27,6 +32,9 @@ export const routes: Array<{ path: string; component: Component }> = [
   { path: "/visitsummary", component: VisitSummary },
   { path: "/patientcard", component: PatientCard },
   { path: "/doctordata", component: DoctorData },
+  { path: "/doctordata/passwordreset", component: DoctorPasswordReset },
+  { path: "/doctor", component: DoctorPage},
+  { path: "/doctor/doctordataedite", component: DoctorDataEdit},
   { path: "/patientdata", component: PatientData },
   { path: "/patientvisitsummary", component: PatientVisitSummary },
   { path: "/patient/cancelvisit", component: PatientCancelVisit },

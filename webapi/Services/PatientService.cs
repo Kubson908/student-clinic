@@ -54,7 +54,7 @@ namespace Przychodnia.Webapi.Services
                 return new UserManagerResponse
                 {
                     Message = "Sukces",
-                    IsSuccess = true
+                    IsSuccess = true,
                 };
             }
 
@@ -101,7 +101,7 @@ namespace Przychodnia.Webapi.Services
                 issuer: _configuration["AuthSettings:Issuer"],
                 audience: _configuration["AuthSettings:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddDays(30),
+                expires: DateTime.Now.AddDays(7),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
             string tokenString = new JwtSecurityTokenHandler().WriteToken(token);
@@ -111,7 +111,9 @@ namespace Przychodnia.Webapi.Services
                 Message = "Zalogowano",
                 IsSuccess = true,
                 AccessToken = tokenString,
-                ExpireDate = token.ValidTo
+                ExpireDate = token.ValidTo,
+                User = user.FirstName + " " + user.LastName,
+                Role = "Patient"
             };
         }
     }
