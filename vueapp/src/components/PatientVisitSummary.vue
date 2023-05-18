@@ -12,21 +12,27 @@ import "@vuepic/vue-datepicker/dist/main.css";
 <template>
   <v-card width="560px" location="center" elevation="5" class="rounded-lg">
     <v-card-item>
-      <!-- <v-card-title font-size="32">Twoje dane</v-card-title> -->
-      <p class="font-weight-bold text-h4">Twoje dane</p>
+      <v-container class="d-flex justify-center align-center">
+        <v-card
+          height="64"
+          width="64"
+          color="#36BFF1"
+          class="d-flex justify-center align-center"
+        >
+          <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
+        </v-card>
+      </v-container>
+      <v-card-title class="font-weight-bold text-h5" font-size="56"
+        >Podsumowanie wizyty</v-card-title
+      >
+      <v-card-subtitle>Sprawdź i zatwierdź dane</v-card-subtitle>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
       <v-form @submit.prevent>
         <v-container>
           <v-row>
-            <v-col align="center">
-              <v-img height="200" src="https://st2.depositphotos.com/1010683/5848/i/950/depositphotos_58482379-stock-photo-male-asian-doctor.jpg">
-            </v-img>
-            </v-col>
-          </v-row>
-          <v-row>
-            <p class="font-weight-bold">Dane osobowe</p>
+            <p class="font-weight-bold">Informacje o wizycie</p>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
           <v-row>
@@ -34,50 +40,41 @@ import "@vuepic/vue-datepicker/dist/main.css";
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
-              Imię i nazwisko
+              Data wizyty
             </v-col>
-            <v-col class="text-left"> Maciej Kowalczyk </v-col>
+            <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
           </v-row>
           <v-row>
             <v-col
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
-              PESEL
+              Specjalista
             </v-col>
-            <v-col class="text-left"> 48322349428 </v-col>
+            <v-col class="text-left"> Internista </v-col>
           </v-row>
           <v-row>
             <v-col
               cols="4"
               class="font-weight-bold text-blue-darken-1 text-left"
             >
-              Data urodzenia
+              Podane objawy
             </v-col>
-            <v-col class="text-left"> 12.05.1979r. </v-col>
+            <v-col class="text-left"> Kaszel, katar, gorączka </v-col>
           </v-row>
           <v-row>
             <v-col
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
-              Email
+              Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> m.kowalczyk@poczta.pl </v-col>
-          </v-row>
-          <v-row>
-            <v-col
-              class="font-weight-bold text-blue-darken-1 text-left"
-              cols="4"
-            >
-              Specjalizacja
-            </v-col>
-            <v-col class="text-left"> Pulmunolog </v-col>
+            <v-col class="text-left"> Riposton </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
 
-        <v-row justify="start">
+        <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
             <v-btn
               variant="outlined"
@@ -87,13 +84,18 @@ import "@vuepic/vue-datepicker/dist/main.css";
             >
               Wstecz
             </v-btn>
+          </v-col>
+          <v-col justify="center" class="text-right">
             <v-btn
-              variant="text"
+              xs="12"
+              sm="6"
+              md="3"
               align-self="center"
-              size="small"
+              size="large"
               class="mt-2 button"
+              color="blue-darken-2"
             >
-              Zmień hasło
+              Zatwierdź
             </v-btn>
           </v-col>
         </v-row>

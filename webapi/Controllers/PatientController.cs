@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -17,14 +15,6 @@ namespace Przychodnia.Webapi.Controllers
         public PatientController(ApplicationDbContext db)
         {
             _db = db;
-        }
-
-        string hashPassword(string password)
-        {
-            var sha = SHA256.Create();
-            var asByteArray = Encoding.Default.GetBytes(password);
-            var hashedPassword = sha.ComputeHash(asByteArray);
-            return Convert.ToBase64String(hashedPassword);
         }
 
         [HttpGet]

@@ -11,7 +11,7 @@ import { User } from "./typings";
 
 const router = VueRouter.createRouter({
   history: VueRouter.createWebHistory(),
-  routes,
+  routes: routes,
 });
 
 export const user: User = {

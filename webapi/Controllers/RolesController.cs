@@ -28,7 +28,7 @@ namespace Przychodnia.Webapi.Controllers
                 return Ok("Added new role");
             }
 
-            return BadRequest("Error");            
+            return BadRequest("Error");
         }
 
     }

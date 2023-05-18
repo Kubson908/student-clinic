@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import axios from "axios";
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
+import { prefix } from "../config";
 
 const visible = ref(false);
 const form_login = ref<typeof VForm | null>(null);
@@ -18,10 +20,22 @@ const submit = async (data: SubmitEvent) => {
   const login = await form_login.value?.validate();
   const reset = await form_reset.value?.validate();
   if (login && login.valid) {
+    try {
+      const res = await axios.post(`${prefix}/api/auth/login`, {
+        email: email,
+        password: pass, // POPRAWIĆ TO
+      });
+
+      alert(res.data());
+    } catch (error) {
+      console.log(error);
+    }
+
     alert(
       `E-mail: ${email.value}\nHasło: ${pass.value}\nZapamiętaj mnie: ${
         remember_me.value ? "Tak" : "Nie"
-      }`);
+      }`
+    );
     form_reset.value?.reset();
     form_login.value?.reset();
   }

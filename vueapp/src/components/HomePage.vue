@@ -2,7 +2,7 @@
 import HomePageCard from "./HomePageCard.vue";
 </script>
 <template>
-  <v-row>
+  <v-row no-gutters>
     <v-col>
       <v-carousel
         show-arrows="hover"
@@ -11,32 +11,32 @@ import HomePageCard from "./HomePageCard.vue";
         class="elevation-6"
       >
         <v-carousel-item>
-          <v-parallax>
-            <v-img cover src="https://cdn.vuetifyjs.com/images/cards/docks.jpg">
-            </v-img>
+          <v-parallax
+            height="100%"
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+          >
           </v-parallax>
         </v-carousel-item>
 
         <v-carousel-item>
-          <v-parallax>
-            <v-img cover src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg">
-            </v-img>
+          <v-parallax
+            height="100%"
+            src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
+          >
           </v-parallax>
         </v-carousel-item>
 
         <v-carousel-item>
-          <v-parallax>
-            <v-img
-              cover
-              src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-            >
-            </v-img>
+          <v-parallax
+            height="100%"
+            src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+          >
           </v-parallax>
         </v-carousel-item>
       </v-carousel>
     </v-col>
   </v-row>
-  <v-row>
+  <v-row no-gutters class="hp-bright py-8">
     <v-col>
       <v-container class="w-75">
         <v-row>
@@ -47,8 +47,8 @@ import HomePageCard from "./HomePageCard.vue";
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="d-flex justify-start">
-            <HomePageCard>
+          <v-col class="d-flex justify-start" md="4" sm="6" cols="12">
+            <HomePageCard class="hp-dark">
               <template v-slot:header>
                 <v-card-title>
                   <p class="text-uppercase">Krótkie</p>
@@ -60,8 +60,13 @@ import HomePageCard from "./HomePageCard.vue";
               elektroniczna obsługa procesu skierowań i zwolnień lekarskich.
             </HomePageCard>
           </v-col>
-          <v-col class="d-flex justify-center">
-            <HomePageCard>
+          <v-col
+            class="d-flex justify-md-center justify-sm-end"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <HomePageCard class="hp-dark">
               <template v-slot:header>
                 <v-card-title>
                   <p class="text-uppercase">Dogodna</p>
@@ -72,8 +77,13 @@ import HomePageCard from "./HomePageCard.vue";
               przystanków autobusowych i tramwajowych.
             </HomePageCard>
           </v-col>
-          <v-col class="d-flex justify-end">
-            <HomePageCard>
+          <v-col
+            class="d-flex justify-md-end justify-sm-start"
+            md="4"
+            sm="6"
+            cols="12"
+          >
+            <HomePageCard class="hp-dark">
               <template v-slot:header>
                 <v-card-title>
                   <p class="text-uppercase">Gabinety</p>
@@ -89,7 +99,7 @@ import HomePageCard from "./HomePageCard.vue";
       </v-container>
     </v-col>
   </v-row>
-  <v-row>
+  <v-row no-gutters class="hp-dark rounded-xl py-8">
     <v-col>
       <v-container class="w-75">
         <v-row>
@@ -98,10 +108,10 @@ import HomePageCard from "./HomePageCard.vue";
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="d-flex justify-start">
-            <HomePageCard>
+          <v-col md="4" sm="6" cols="12" class="d-flex justify-start">
+            <HomePageCard class="hp-bright">
               <template v-slot:header>
-                <v-card-title class="text-uppercase">
+                <v-card-title class="text-uppercase text-wrap">
                   Dr Maciej Kowalczyk
                 </v-card-title>
                 <v-card-subtitle> Pulmonolog </v-card-subtitle>
@@ -111,10 +121,15 @@ import HomePageCard from "./HomePageCard.vue";
               poprawiając jakość życia pacjentów.
             </HomePageCard>
           </v-col>
-          <v-col class="d-flex justify-center">
-            <HomePageCard>
+          <v-col
+            md="4"
+            sm="6"
+            cols="12"
+            class="d-flex justify-md-center justify-sm-end"
+          >
+            <HomePageCard class="hp-bright">
               <template v-slot:header>
-                <v-card-title class="text-uppercase">
+                <v-card-title class="text-uppercase text-wrap">
                   Dr Małgorzata Bęcka
                 </v-card-title>
                 <v-card-subtitle> Okulista </v-card-subtitle>
@@ -124,10 +139,15 @@ import HomePageCard from "./HomePageCard.vue";
               takich jak katarakta, jaskra czy retinopatia cukrzycowa.
             </HomePageCard>
           </v-col>
-          <v-col class="d-flex justify-end">
-            <HomePageCard>
+          <v-col
+            md="4"
+            sm="6"
+            cols="12"
+            class="d-flex justify-md-end justify-sm-start"
+          >
+            <HomePageCard class="hp-bright">
               <template v-slot:header>
-                <v-card-title class="text-uppercase">
+                <v-card-title class="text-uppercase text-wrap">
                   Dr Marcin Mróz
                 </v-card-title>
                 <v-card-subtitle> Internista </v-card-subtitle>
@@ -137,12 +157,16 @@ import HomePageCard from "./HomePageCard.vue";
               empatyczne podejście do pacjentów.
             </HomePageCard>
           </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="d-flex justify-start">
-            <HomePageCard>
+
+          <v-col
+            md="4"
+            sm="6"
+            cols="12"
+            class="d-flex justify-md-start justify-sm-end"
+          >
+            <HomePageCard class="hp-bright">
               <template v-slot:header>
-                <v-card-title class="text-uppercase">
+                <v-card-title class="text-uppercase text-wrap">
                   Dr Anna Malinowska
                 </v-card-title>
                 <v-card-subtitle> Gastrolog </v-card-subtitle>
@@ -152,10 +176,15 @@ import HomePageCard from "./HomePageCard.vue";
               kompleksowe podejście do pacjenta dostosowane do jego potrzeb.
             </HomePageCard>
           </v-col>
-          <v-col class="d-flex justify-center">
-            <HomePageCard>
+          <v-col
+            md="4"
+            sm="6"
+            cols="12"
+            class="d-flex justify-md-center justify-sm-start"
+          >
+            <HomePageCard class="hp-bright">
               <template v-slot:header>
-                <v-card-title class="text-uppercase">
+                <v-card-title class="text-uppercase text-wrap">
                   Dr Artur Mazur
                 </v-card-title>
                 <v-card-subtitle> Internista </v-card-subtitle>
@@ -165,16 +194,15 @@ import HomePageCard from "./HomePageCard.vue";
               pacjentów i zapewnia im kompleksową opiekę medyczną.
             </HomePageCard>
           </v-col>
-          <v-col></v-col>
         </v-row>
       </v-container>
     </v-col>
   </v-row>
-  <v-row>
+  <v-row no-gutters class="hp-bright py-8">
     <v-col>
       <v-container class="w-75">
         <v-row>
-          <v-col>
+          <v-col cols="12" md="6" sm="12">
             <v-row>
               <v-col class="d-flex justify-left">
                 <p class="text-uppercase text-h4">O nas</p>
@@ -182,9 +210,11 @@ import HomePageCard from "./HomePageCard.vue";
             </v-row>
             <v-row>
               <v-col class="d-flex justify-start">
-                <HomePageCard max-width="75%">
+                <HomePageCard min-width="75%" class="hp-dark">
                   <template v-slot:header>
-                    <v-card-title> Działamy od 2023 roku </v-card-title>
+                    <v-card-title class="text-uppercase text-wrap">
+                      Działamy od 2023 roku
+                    </v-card-title>
                   </template>
                   Nasza placówka działa już od ponad 2 miesięcy, zawsze z myślą
                   o zdrowiu i dobrej kondycji naszych pacjentów. Nasza misja to
@@ -198,7 +228,7 @@ import HomePageCard from "./HomePageCard.vue";
               </v-col>
             </v-row>
           </v-col>
-          <v-col class="d-flex child-flex">
+          <v-col md="6" sm="12" cols="12" class="d-flex child-flex">
             <v-img
               class="rounded-lg"
               height="100%"
@@ -210,11 +240,11 @@ import HomePageCard from "./HomePageCard.vue";
       </v-container>
     </v-col>
   </v-row>
-  <v-row>
+  <v-row no-gutters class="hp-dark rounded-xl py-8">
     <v-col>
       <v-container class="w-75">
         <v-row>
-          <v-col>
+          <v-col cols="12" md="6" sm="12">
             <v-row>
               <v-col class="d-flex justify-left">
                 <p class="text-uppercase text-h4">Kontakt</p>
@@ -222,7 +252,7 @@ import HomePageCard from "./HomePageCard.vue";
             </v-row>
             <v-row>
               <v-col class="d-flex justify-start">
-                <HomePageCard min-width="75%">
+                <HomePageCard min-width="75%" class="hp-bright">
                   <p class="font-weight-bold">Skontaktuj się z nami:</p>
                   <p>Studencka przychodnia zdrowia</p>
                   <p>ul. Przykładowa 123</p>
@@ -251,10 +281,9 @@ import HomePageCard from "./HomePageCard.vue";
               </v-col>
             </v-row>
           </v-col>
-          <v-col class="d-flex child-flex">
+          <v-col class="d-flex child-flex" md="6" sm="12" cols="12">
             <v-img
-              class="rounded-lg"
-              height="100%"
+              class="rounded-lg fill-height"
               cover
               src="https://media.istockphoto.com/id/183796231/photo/newer-white-office-building-from-street-view.jpg?s=612x612&w=0&k=20&c=a2zfzSUbsYzj_bmCc_yw2oTK02T7VJhaypehiQg4Htw="
             ></v-img>
@@ -263,5 +292,17 @@ import HomePageCard from "./HomePageCard.vue";
       </v-container>
     </v-col>
   </v-row>
+  <v-row no-gutters
+    ><v-col><v-spacer></v-spacer></v-col
+  ></v-row>
 </template>
-<style></style>
+<style>
+.hp-bright {
+  color: var(--primary) !important;
+  background-color: var(--secondary) !important;
+}
+.hp-dark {
+  color: var(--secondary) !important;
+  background-color: var(--primary) !important;
+}
+</style>
