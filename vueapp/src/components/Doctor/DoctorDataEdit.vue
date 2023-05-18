@@ -72,7 +72,7 @@
             >
               Specjalizacja
             </v-col>
-            <v-col class="text-left"> Pulmunolog </v-col>
+            <v-col class="text-left"> Pulmonolog </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>

@@ -13,7 +13,7 @@ namespace Przychodnia.Webapi.Services
         Task<UserManagerResponse> LoginUserAsync(L dto);
     }
 
-    public class UserService : IUserService<RegisterDto, LoginDto>
+    /*public class UserService : IUserService<RegisterDto, LoginDto>
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
@@ -108,5 +108,5 @@ namespace Przychodnia.Webapi.Services
                 ExpireDate = token.ValidTo
             };
         }
-    }
+    }*/
 }

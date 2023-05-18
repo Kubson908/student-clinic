@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Przychodnia.Shared;
 using Przychodnia.Webapi.Services;
+using System.Net.Mail;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -41,7 +42,12 @@ namespace Przychodnia.Webapi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _patientService.LoginUserAsync(model);
+                var domain = new MailAddress(model.Email).Host;
+
+                var result = new UserManagerResponse();
+
+                if (domain == "przychodnia.com") result = await _employeeService.LoginUserAsync(model);
+                else result = await _patientService.LoginUserAsync(model);
 
                 if (result.IsSuccess)
                     return Ok(result);

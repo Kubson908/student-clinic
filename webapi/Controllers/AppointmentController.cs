@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
@@ -7,6 +8,7 @@ namespace Przychodnia.Webapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Patient")]
     public class AppointmentController : Controller
     {
         private readonly ApplicationDbContext _db;

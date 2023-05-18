@@ -39,7 +39,7 @@ const logout = () => {
         </router-link>
       </v-list>
       <v-list v-if="user.isLoggedIn" color="white" theme="light" nav>
-        <v-list-item prepend-icon="mdi-login" link @click="logout">
+        <v-list-item prepend-icon="mdi-logout" link @click="logout">
           <v-list-item-title>Wyloguj się</v-list-item-title>
         </v-list-item>
       </v-list>

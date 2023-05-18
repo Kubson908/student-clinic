@@ -94,7 +94,7 @@ namespace Przychodnia.Webapi.Services
                 new Claim(ClaimTypes.Role, "Employee")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"] ?? ""));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"] ?? "spare key"));
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["AuthSettings:Issuer"],

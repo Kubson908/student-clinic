@@ -1,26 +1,60 @@
 <script setup lang="ts">
 import DoctorCard from "./DoctorCard.vue";
-const doctors: Array<any> = [{
+const doctors: Array<any> = [
+  {
     id: 1,
     name: "Tomasz Problem",
-},
-{
+    profession: "Pulmonolog",
+  },
+  {
     id: 2,
-    name: "Jan Testowy"
-}];
+    name: "Jan Testowy",
+    profession: "Gastrolog",
+  },
+  {
+    id: 3,
+    name: "Tomasz Problem",
+    profession: "Pulmonolog",
+  },
+  {
+    id: 4,
+    name: "Jan Testowy",
+    profession: "Gastrolog",
+  },
+  {
+    id: 5,
+    name: "Tomasz Problem",
+    profession: "Pulmonolog",
+  },
+];
 </script>
 <template>
   <v-row no-gutters justify="center">
-    <v-col cols="12" sm="6" md="6" align-self="center">
-      <v-card elevation="5" class="rounded-lg" height="70vh">
+    <v-col cols="12" sm="10" md="8" class="py-16" align-self="center">
+      <v-card elevation="5" class="rounded-lg">
         <v-card-item>
-            <v-container class="d-flex justify-center align-center">
+          <v-container class="d-flex justify-center align-center">
             <h1>Lekarze</h1>
           </v-container>
         </v-card-item>
         <v-card-text>
-            <DoctorCard v-for="doctor in doctors" :key="doctor.id">
-            </DoctorCard>
+          <v-row class="pa-8">
+            <v-col
+              v-for="doctor in doctors"
+              :key="doctor.id"
+              cols="12"
+              sm="6"
+              md="4"
+              class="d-flex justify-center"
+            >
+              <DoctorCard
+                img="https://img.favpng.com/24/11/9/physician-medicine-stock-photography-health-care-clinic-png-favpng-U8PcYt9GTDcuyNQMGgUhAhivX.jpg"
+                :doctor="doctor"
+                :disabled="false"
+              >
+              </DoctorCard>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </v-col>

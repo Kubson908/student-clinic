@@ -1,13 +1,11 @@
 <script setup lang="ts">
 //import VueDatePicker from "@vuepic/vue-datepicker";
 import axios from "axios";
-import {onBeforeMount} from "vue";
+import { onBeforeMount } from "vue";
 onBeforeMount(async () => {
-    const res = await axios
-        .get('https://localhost:7042/api/appointment');
-    console.log(res.data);
-  }
-)
+  const res = await axios.get("https://localhost:7042/api/appointment");
+  console.log(res.data);
+});
 </script>
 
 <template>

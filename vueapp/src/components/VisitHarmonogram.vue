@@ -1,28 +1,44 @@
 <script setup lang="ts">
 import Datepicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
+import { computed }  from "vue";
+
+const date = ref(new Date());
+date.value.setHours(0, 0, 0, 0);
+
 const appointments = [
   {
     id: 1,
     patient: "Tomasz Problem",
-    date: "17.03.2023",
+    date: "05/18/2023",
     finished: true,
   },
   {
     id: 2,
     patient: "Andrew Tate",
-    date: "20.05.2023",
+    date: "05/20/2023",
     finished: false,
   },
   {
     id: 3,
     patient: "Greta Thunberg",
-    date: "25.05.2023",
+    date: "05/21/2023",
     finished: false,
   },
 ];
 
-const date = ref(new Date());
+const format = (date: Date) => {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
+const filteredAppointments = computed(() => {
+  return appointments.filter(it=>(new Date(it.date).getTime()==date.value.getTime()));
+})
+
 </script>
 
 <template>
@@ -33,9 +49,11 @@ const date = ref(new Date());
           <v-container class="d-flex justify-center align-center">
             <h1>Harmonogram wizyt</h1>
           </v-container>
-          <v-col xs="12" sm="6" md="6" align-self="center">
-            <Datepicker v-model="date" teleport-center />
+        <v-row no-gutters justify="center">
+          <v-col cols="12" sm="6" md="6">
+            <Datepicker v-model="date" teleport-center :enable-time-picker="false" :format="format" />
           </v-col>
+        </v-row>
         </v-card-item>
 
         <div class="card">
@@ -43,7 +61,7 @@ const date = ref(new Date());
             <v-list-item
               elevation="3"
               class="rounded-lg my-2"
-              v-for="appointment in appointments"
+              v-for="appointment in filteredAppointments"
               :key="appointment.id"
               width="90%"
             >
@@ -51,7 +69,7 @@ const date = ref(new Date());
                 <v-col xs="2" md="4">
                   <v-container class="d-flex flex-1-0 flex-column left">
                     <strong>{{ appointment.patient }}</strong>
-                    {{ appointment.date }}
+                    {{ format(new Date(appointment.date)) }}
                   </v-container>
                 </v-col>
                 <v-col xs="10" md="8">

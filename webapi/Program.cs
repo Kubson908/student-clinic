@@ -74,12 +74,11 @@ builder.Services.AddAuthentication(auth =>
         ValidateAudience = true,
         ValidAudience = builder.Configuration["AuthSettings:Audience"],
         RequireExpirationTime = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AuthSettings:Key"])),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AuthSettings:Key"] ?? "spare key" )),
         ValidateIssuerSigningKey = true,
     };
 });
 
-builder.Services.AddScoped<IUserService<RegisterDto, LoginDto>, UserService>();
 builder.Services.AddScoped<IUserService<RegisterDto, LoginDto>, PatientService>();
 builder.Services.AddScoped<IUserService<RegisterEmployeeDto, LoginDto>, EmployeeService>();
 
@@ -92,7 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+/*app.UseHttpsRedirection();*/  // POTEM ODKOMENTOWA�
 
 app.UseCors("_myAllowSpecificOrigins");
 
