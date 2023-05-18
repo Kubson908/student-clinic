@@ -6,11 +6,10 @@ import { user } from "./main";
 
 onBeforeMount(() => {
   const date = Date.parse(localStorage.getItem("expireDate") as string);
-  console.log(typeof date);
   if (date < Date.now()) {
     localStorage.clear();
     user.name = "Niezalogowany";
-    user.loggedIn = false;
+    user.isLoggedIn = false;
   }
 });
 </script>

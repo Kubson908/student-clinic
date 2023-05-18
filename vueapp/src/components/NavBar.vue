@@ -4,8 +4,8 @@ import { user } from "../main";
 const logout = () => {
   localStorage.clear();
   user.name = "Niezalogowany";
-  user.loggedIn = false;
-}
+  user.isLoggedIn = false;
+};
 </script>
 <template>
   <v-app-bar color="#597EDD" density="compact" theme="dark">
@@ -26,7 +26,7 @@ const logout = () => {
         <v-app-bar-nav-icon v-bind="props" class="icon"> </v-app-bar-nav-icon>
       </template>
 
-      <v-list v-if="!user.loggedIn" color="white" theme="light" nav>
+      <v-list v-if="!user.isLoggedIn" color="white" theme="light" nav>
         <router-link to="/login" custom v-slot="{ navigate }">
           <v-list-item prepend-icon="mdi-login" link @click="navigate">
             <v-list-item-title>Zaloguj</v-list-item-title>
@@ -38,10 +38,10 @@ const logout = () => {
           </v-list-item>
         </router-link>
       </v-list>
-      <v-list v-if="user.loggedIn" color="white" theme="light" nav>
-          <v-list-item prepend-icon="mdi-login" link @click="logout">
-            <v-list-item-title>Wyloguj się</v-list-item-title>
-          </v-list-item>
+      <v-list v-if="user.isLoggedIn" color="white" theme="light" nav>
+        <v-list-item prepend-icon="mdi-login" link @click="logout">
+          <v-list-item-title>Wyloguj się</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-menu>
   </v-app-bar>

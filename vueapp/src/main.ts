@@ -10,23 +10,34 @@ import * as VueRouter from "vue-router";
 import { routes } from "./router";
 import { User } from "./typings";
 
-const router = VueRouter.createRouter({
-  history: VueRouter.createWebHistory(),
-  routes: routes,
-});
-
-// router.beforeEach((to, from) => {
-//   if (!user.loggedIn && to.name !== "Login") {
-//     return { name: "Login" };
-//   }
-//   return false;
-// });
-
 export const user = reactive<User>({
   id: 0,
   name: localStorage.getItem("user") ?? "Niezalogowany",
-  loggedIn: localStorage.getItem("user") ? true : false,
+  isLoggedIn: localStorage.getItem("user") ? true : false,
 });
+
+declare module "vue-router" {
+  interface RouteMeta {
+    roles: Array<string> | null;
+  }
+}
+export const router = VueRouter.createRouter({
+  history: VueRouter.createWebHistory(),
+  routes,
+});
+
+router.beforeEach((to) => {
+  if (
+    to.meta.roles != null &&
+    !to.meta.roles.includes(localStorage.getItem("role") as string)
+  ) {
+    return {
+      path: "/unauthorized",
+      query: { redirect: to.fullPath },
+    };
+  }
+});
+
 const vuetify = createVuetify({
   components,
   directives,

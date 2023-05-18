@@ -2,5 +2,5 @@ export type User = {
   id?: number;
   name?: string;
   role?: string;
-  loggedIn: boolean;
+  isLoggedIn: boolean;
 };

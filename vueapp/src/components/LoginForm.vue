@@ -3,7 +3,7 @@ import axios from "axios";
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
 import { prefix } from "../config";
-import { user } from "../main";
+import { router, user } from "../main";
 
 const visible = ref(false);
 const form_login = ref<typeof VForm | null>(null);
@@ -29,18 +29,17 @@ const submit = async (data: SubmitEvent) => {
       localStorage.setItem("token", res.data.accessToken);
       localStorage.setItem("expireDate", res.data.expireDate);
       localStorage.setItem("user", res.data.user);
+      localStorage.setItem("role", res.data.role);
       user.name = res.data.user;
-      user.loggedIn = true;
+      user.isLoggedIn = true;
       console.log(user);
+
+      router.push("/");
     } catch (error) {
+      alert("Błędny e-mail lub hasło");
       console.log(error);
     }
 
-    alert(
-      `E-mail: ${email.value}\nHasło: ${pass.value}\nZapamiętaj mnie: ${
-        remember_me.value ? "Tak" : "Nie"
-      }`
-    );
     form_reset.value?.reset();
     form_login.value?.reset();
   }

@@ -18,27 +18,31 @@ import GuestPasswordReset from "./components/Guest/GuestPasswordReset.vue";
 import DoctorPasswordReset from "./components/Doctor/DoctorPasswordReset.vue";
 import UnauthorizedView from "./components/UnauthorizedView.vue";
 import DoctorDataEdit from "./components/Doctor/DoctorDataEdite.vue";
-import DoctorPage from "./components/DoctorPage.vue"
+import DoctorPage from "./components/DoctorPage.vue";
 
-export const routes: Array<{ path: string; component: Component }> = [
-  { path: "/", component: HomePage },
-  { path: "/unauthorized", component: UnauthorizedView },
-  { path: "/appointments", component: AppointmentList },
-  { path: "/login", component: LoginForm },
-  { path: "/signup", component: SignUp },
-  { path: "/new_visit", component: NewVisit },
-  { path: "/visit_harmonogram", component: VisitHarmonogram },
-  { path: "/visit", component: VisitDetails },
-  { path: "/visitsummary", component: VisitSummary },
-  { path: "/patientcard", component: PatientCard },
-  { path: "/doctordata", component: DoctorData },
-  { path: "/doctordata/passwordreset", component: DoctorPasswordReset },
-  { path: "/doctor", component: DoctorPage},
-  { path: "/doctor/doctordataedite", component: DoctorDataEdit},
-  { path: "/patientdata", component: PatientData },
-  { path: "/patientvisitsummary", component: PatientVisitSummary },
-  { path: "/patient/cancelvisit", component: PatientCancelVisit },
-  { path: "/patient/changepassword", component: PatientChangePassword },
-  { path: "/guest/passwordreset2", component: GuestPasswordReset2 },
-  { path: "/guest/passwordreset", component: GuestPasswordReset },
+export const routes: Array<{
+  path: string;
+  component: Component;
+  meta: { roles: Array<string> | null};
+}> = [
+  { path: "/", component: HomePage, meta: { roles: null } },
+  { path: "/unauthorized", component: UnauthorizedView, meta: { roles: null } },
+  { path: "/appointments", component: AppointmentList, meta: { roles: ["Patient"] } },
+  { path: "/login", component: LoginForm, meta: { roles: null } },
+  { path: "/signup", component: SignUp, meta: { roles: [""] } },
+  { path: "/new_visit", component: NewVisit, meta: { roles: ["Patient"] } },
+  { path: "/visit_harmonogram", component: VisitHarmonogram, meta: { roles: ["Patient"] } },
+  { path: "/visit", component: VisitDetails, meta: { roles: [""] } },
+  { path: "/visitsummary", component: VisitSummary, meta: { roles: [""] } },
+  { path: "/patientcard", component: PatientCard, meta: { roles: [""] } },
+  { path: "/doctordata", component: DoctorData, meta: { roles: [""] } },
+  { path: "/doctordata/passwordreset", component: DoctorPasswordReset, meta: { roles: [""] } },
+  { path: "/doctor", component: DoctorPage, meta: { roles: [""] } },
+  { path: "/doctor/doctordataedite", component: DoctorDataEdit, meta: { roles: [""] } },
+  { path: "/patientdata", component: PatientData, meta: { roles: [""] } },
+  { path: "/patientvisitsummary", component: PatientVisitSummary, meta: { roles: [""] } },
+  { path: "/patient/cancelvisit", component: PatientCancelVisit, meta: { roles: [""] } },
+  { path: "/patient/changepassword", component: PatientChangePassword, meta: { roles: [""] } },
+  { path: "/guest/passwordreset2", component: GuestPasswordReset2, meta: { roles: [""] } },
+  { path: "/guest/passwordreset", component: GuestPasswordReset, meta: { roles: [""] } },
 ];
