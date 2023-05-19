@@ -21,10 +21,11 @@
       <v-form @submit.prevent>
         <v-select
           label="Wybierz specjalistów"
-          :items="['Internista', 'Pulmunolog', 'Okulista']"
+          :items="['Internista', 'Pulmonolog', 'Okulista']"
+          variant="solo"
         ></v-select>
-        <v-textarea label="Objawy"></v-textarea>
-        <v-textarea label="Stosowane leki"></v-textarea>
+        <v-textarea label="Objawy" variant="solo"></v-textarea>
+        <v-textarea label="Stosowane leki" variant="solo"></v-textarea>
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
             <v-btn

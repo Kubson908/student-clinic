@@ -8,7 +8,7 @@ namespace Przychodnia.Webapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Patient")]
+    /*[Authorize(Roles = "Patient")]*/
     public class AppointmentController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -19,6 +19,7 @@ namespace Przychodnia.Webapi.Controllers
         }
         [HttpGet]
         public async Task<IEnumerable<Appointment>>Get() => await _db.Appointments.ToListAsync();
+
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Appointment), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -29,11 +30,22 @@ namespace Przychodnia.Webapi.Controllers
         
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create(Appointment obj)
+        public async Task<IActionResult> Create([FromBody]Appointment obj)
         {
             await _db.Appointments.AddAsync(obj);
             await _db.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new {id = obj.Id}, obj);
         }
+
+        [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(Appointment), StatusCodes.Status402PaymentRequired)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Patch(int id, [FromBody] Appointment obj)
+        {
+ 
+            return null;
+        }
+
+        
     }
 }

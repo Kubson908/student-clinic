@@ -53,9 +53,12 @@ const disable = (dateString: string) => {
                 </v-col>
                 <v-col xs="10" md="8">
                   <v-container class="right">
+                    <router-link to="/patient/visit_detail">
                     <v-btn color="blue-darken-2" class="mt-2 mx-2 button"
                       >Szczegóły</v-btn
                     >
+                    </router-link>
+                    <router-link to="/patient/cancelvisit">
                     <v-btn
                       :disabled="disable(appointment.date)"
                       variant="outlined"
@@ -64,6 +67,7 @@ const disable = (dateString: string) => {
                     >
                       Anuluj wizytę
                     </v-btn>
+                  </router-link>
                   </v-container>
                 </v-col>
               </v-row>
@@ -80,9 +84,11 @@ const disable = (dateString: string) => {
               class="mt-2 button"
               >Wstecz</v-btn
             >
-            <v-btn width="20%" color="blue-darken-2" class="mt-2 button"
+            <router-link to="/new_visit">
+              <v-btn  color="blue-darken-2" class="mt-2 button"
               >Nowa wizyta</v-btn
-            >
+              >
+          </router-link>
           </div>
         </v-container>
       </v-card>

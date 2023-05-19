@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { user } from "../main";
-
+import { user, router } from "../main";
 const logout = () => {
   localStorage.clear();
   user.name = "Niezalogowany";
   user.isLoggedIn = false;
+  user.role = undefined;
 };
+console.log(router.currentRoute.value)
 </script>
 <template>
   <v-app-bar color="#597EDD" density="compact" theme="dark">
@@ -19,8 +20,37 @@ const logout = () => {
         >
         </v-app-bar-nav-icon
       ></router-link>
+        
+      <div v-if="user.role == 'Patient'">
+        <v-tabs
+        mandatory="false"
+        :model-value="router.currentRoute.value.path"
+        >
+          <router-link to="/appointments" custom v-slot="{ navigate }">
+            <v-tab value="/appointments" @click="navigate">Wizyty</v-tab>
+          </router-link>
+          <router-link to="/patientcard" custom v-slot="{ navigate }">
+            <v-tab value="/patientcard" @click="navigate">Pacjenci</v-tab>
+          </router-link>
+        </v-tabs>
+      </div>
+      <div v-else-if="user.role == 'Employee'">
+        <v-tabs
+        mandatory="false"
+        :model-value="router.currentRoute.value.path"
+        >
+          <router-link to="/appointments" custom v-slot="{ navigate }">
+            <v-tab value="/appointments" @click="navigate">Wizyty</v-tab>
+          </router-link>
+          <router-link to="/patientcard" custom v-slot="{ navigate }">
+            <v-tab value="/patientcard" @click="navigate">Pacjenci</v-tab>
+          </router-link>
+        </v-tabs>
+      </div>
     </template>
-    {{ user.name }}
+      <span class="d-inline-block link">
+        {{ user.name }}
+      </span>
     <v-menu>
       <template v-slot:activator="{ props }">
         <v-app-bar-nav-icon v-bind="props" class="icon"> </v-app-bar-nav-icon>
@@ -54,5 +84,10 @@ const logout = () => {
 }
 .icon {
   color: var(--font-primary-color) !important;
+}
+.link{
+  
+  width: 150px; 
+  color: white;
 }
 </style>

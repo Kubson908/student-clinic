@@ -14,6 +14,7 @@ export const user = reactive<User>({
   id: 0,
   name: localStorage.getItem("user") ?? "Niezalogowany",
   isLoggedIn: localStorage.getItem("user") ? true : false,
+  role: localStorage.getItem("role") ?? undefined
 });
 
 declare module "vue-router" {

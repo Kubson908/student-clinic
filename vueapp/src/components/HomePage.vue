@@ -11,6 +11,7 @@ import HomePageCard from "./HomePageCard.vue";
             hide-delimiter-background
             color="white"
             class="elevation-6"
+            cycle
           >
             <v-carousel-item>
               <v-parallax

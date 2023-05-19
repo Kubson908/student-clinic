@@ -3,6 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Przychodnia.Shared;
 using Przychodnia.Webapi.Services;
 using System.Net.Mail;
+using MimeKit;
+using Microsoft.AspNetCore.Identity;
+using Przychodnia.Webapi.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -12,12 +19,15 @@ namespace Przychodnia.Webapi.Controllers
     {
         private IUserService<RegisterDto, LoginDto> _patientService;
         private IUserService<RegisterEmployeeDto, LoginDto> _employeeService;
+        private UserManager<Patient> _patientManager; 
 
         public AuthController(IUserService<RegisterDto, LoginDto> patientService, 
-            IUserService<RegisterEmployeeDto, LoginDto> employeeService)
+            IUserService<RegisterEmployeeDto, LoginDto> employeeService,
+            UserManager<Patient> patientManager)
         {
             _patientService = patientService;
             _employeeService = employeeService;
+            _patientManager = patientManager;
         }
 
         // /api/auth/register
@@ -89,6 +99,44 @@ namespace Przychodnia.Webapi.Controllers
             }
 
             return BadRequest("Pola nie są poprawne");
+        }
+
+        [HttpPost("Send-Reset-Link")]
+        public async Task<IActionResult> SendResetPasswordLink([FromBody]string email)
+        {
+            if (email == null) return BadRequest("Email is null");
+            var user = await _patientManager.FindByEmailAsync(email);
+            if (user == null) return BadRequest("User not found");
+
+            var token = await _patientManager.GeneratePasswordResetTokenAsync(user);
+
+            UriBuilder baseUri = new UriBuilder("localhost:8080/auth/password-reset");
+            var link = Url.Action("ResetPassword", "Account")
+
+            string mailFrom = "kartinghappywheels@gmail.com";
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Przychodnia Studencka", mailFrom));
+            message.To.Add(new MailboxAddress(email, email));
+            message.Subject = "Reset hasła do konta w przychodni";
+            var body = new BodyBuilder();
+            body.HtmlBody = "<h3>Link do zmiany hasła</h3>" + "<a href =http://" + baseUri + ">" + baseUri + "</a>";
+            message.Body = body.ToMessageBody();
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                client.Connect("smtp.gmail.com", 587, false);
+                client.Authenticate(mailFrom, "affpkqulzykvaima");
+                client.Send(message);
+                client.Disconnect(true);
+            }
+
+            return Ok("Email sent");
+
+        }
+
+        [HttpPost("Reset-Password")]
+        public async Task<IActionResult> ResetPassword([FromBody] string pass)
+        {
+
         }
     }
 }

@@ -18,9 +18,9 @@ onBeforeMount(() => {
   <v-app class="v-theme--light">
     <NavBar />
     <router-view v-slot="{ Component }">
-      <Transition name="details" mode="out-in">
+      <v-fade-transition mode="out-in">
         <component :is="Component"
-      /></Transition>
+      /></v-fade-transition>
     </router-view>
     <!-- <FooterBar class="align-end"/> -->
   </v-app>

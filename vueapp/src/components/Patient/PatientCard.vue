@@ -3,13 +3,13 @@
 import axios from "axios";
 import { onBeforeMount } from "vue";
 onBeforeMount(async () => {
-  const res = await axios.get("https://localhost:7042/api/appointment");
+  const res = await axios.get("http://localhost:7042/api/appointment");
   console.log(res.data);
 });
 </script>
 
 <template>
-  <v-card width="888px" location="center" elevation="5" class="rounded-lg">
+  <v-card width="888px" location="center" elevation="5" class="rounded-lg px-8">
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -109,11 +109,10 @@ onBeforeMount(async () => {
             <v-col class="text-left"> 17.03.2023</v-col>
           </v-row>
         </v-container>
-        <v-row justify="center">
+        <v-row justify="center" class="mt-4">
           <v-col class="text-left">
             <v-btn
               variant="outlined"
-              size="large"
               class="mt-2 button"
               color="blue-darken-2"
             >

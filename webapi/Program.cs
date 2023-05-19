@@ -98,6 +98,14 @@ app.UseCors("_myAllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// configure websocket
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(5)
+};
+
+app.UseWebSockets();
+
 app.MapControllers();
 
 app.Run();
