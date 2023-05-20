@@ -1,5 +1,12 @@
 <script setup lang="ts">
-
+//Wojtek
+//import VueDatePicker from "@vuepic/vue-datepicker";
+// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+//   .toISOString()
+//   .substr(0, 10);
+// let menu = false;
+// let modal = false;
+// let menu2 = false;
 </script>
 
 <template>
@@ -15,7 +22,7 @@
           <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
         </v-card>
       </v-container>
-      <v-card-title font-size="56">Przydziel wizytê</v-card-title>
+      <v-card-title font-size="56">Przydziel wizytÄ™</v-card-title>
       <v-card-subtitle>Wybierz lekarza</v-card-subtitle>
     </v-card-item>
     <v-spacer></v-spacer>
@@ -60,7 +67,7 @@
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> Kaszel, katar, gor¹czka </v-col>
+            <v-col class="text-left"> Kaszel, katar, gorÄ…czka </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -72,9 +79,19 @@
             <v-col class="text-left"> Riposton </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
-          <v-spacer></v-spacer>
+          <!--<v-spacer></v-spacer>-->
+          <v-row>
+            <p class="font-weight-bold">Lekarz</p>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-select label="Wybierz lekarza"
+                :items="['Jan Chomar', 'Grzegorz BrzÄ™czyszczykiewicz']">
+              </v-select>
+            </v-col>
+          </v-row>
         </v-container>
-    
+        
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
             <v-btn

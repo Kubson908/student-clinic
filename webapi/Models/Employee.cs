@@ -8,20 +8,20 @@ namespace Przychodnia.Webapi.Models
     { 
 
         [Required]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
         [Required]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
         [Required]
-        public string DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; } = string.Empty;
 
         [Required]
         public Specialization Specialization { get; set; }
         
         [Required]
         [StringLength(11)]
-        public string Pesel { get; set; }
+        public string Pesel { get; set; } = string.Empty;
 
     }
 }

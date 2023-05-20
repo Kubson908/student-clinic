@@ -21,7 +21,7 @@ namespace Przychodnia.Webapi.Models
         //Navigation Properties
         [Required]
         [ForeignKey("Patient")]
-        public string PatientId { get; set; }
+        public string PatientId { get; set; } = string.Empty;
         public Patient? Patient { get; set; }
 
         [ForeignKey("Doctor")]

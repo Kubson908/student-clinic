@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
+using System.Security.Claims;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -37,15 +38,26 @@ namespace Przychodnia.Webapi.Controllers
             return CreatedAtAction(nameof(GetById), new {id = obj.Id}, obj);
         }
 
-        [HttpPatch("{id}")]
-        [ProducesResponseType(typeof(Appointment), StatusCodes.Status402PaymentRequired)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Patch(int id, [FromBody] Appointment obj)
+        [HttpGet("patient")]
+        public IActionResult GetAppointmentsOfLoggedInUser()
         {
- 
-            return null;
+            string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (id == null) return NotFound("User not found");
+
+            var appointments = _db.Appointments.Where(a => a.PatientId == id).ToList();
+            return Ok(new { appointments = appointments });
+
+            
         }
 
-        
+        /*  [HttpPatch("{id}")]
+          [ProducesResponseType(typeof(Appointment), StatusCodes.Status402PaymentRequired)]
+          [ProducesResponseType(StatusCodes.Status400BadRequest)]
+          public async Task<IActionResult> Patch(int id, [FromBody] Appointment obj)
+          {
+              return Ok(200);
+          }*/
+
+
     }
 }

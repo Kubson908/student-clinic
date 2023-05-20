@@ -22,6 +22,7 @@ import DoctorPage from "./components/Doctor/DoctorPage.vue";
 import DoctorVisitDetails from "./components/Doctor/DoctorVisitDetails.vue";
 import PatientNewVisit from "./components/Patient/PatientNewVisit.vue";
 import VisitAssign from "./components/Doctor/VisitAssign.vue";
+import PatientDataReceptionEdit from "./components/Doctor/PatientDataReceptionEdit.vue";
 
 export const routes: Array<{
   path: string;
@@ -51,4 +52,5 @@ export const routes: Array<{
   { path: "/doctor/doctorvisitdetails", component: DoctorVisitDetails, meta: { roles: null } },
   { path: "/patient/patientnewvisit", component: PatientNewVisit, meta: { roles: null } },
   { path: "/visit_assign", component: VisitAssign, meta: { roles: null } },
+  { path: "/patient_reception_edit", component: PatientDataReceptionEdit, meta: { roles: null } },
 ];
