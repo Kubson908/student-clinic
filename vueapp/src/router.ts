@@ -22,6 +22,10 @@ import DoctorPage from "./components/Doctor/DoctorPage.vue";
 import DoctorVisitDetails from "./components/Doctor/DoctorVisitDetails.vue";
 import PatientNewVisit from "./components/Patient/PatientNewVisit.vue";
 import VisitAssign from "./components/Doctor/VisitAssign.vue";
+import PatientDataReceptionEdit from "./components/Doctor/PatientDataReceptionEdit.vue";
+import AwaitingAppointments from "./components/Staff/AwaitingAppointments.vue";
+import AppointmentStatistics from "./components/Staff/AppointmentStatistics.vue";
+import PatientList from "./components/Staff/PatientList.vue";
 
 export const routes: Array<{
   path: string;
@@ -37,26 +41,6 @@ export const routes: Array<{
   },
   { path: "/login", component: LoginForm, meta: { roles: null } },
   { path: "/signup", component: SignUp, meta: { roles: null } },
-<<<<<<< Updated upstream
-  { path: "/new_visit", component: NewVisit, meta: { roles: ["Patient"] } },
-  { path: "/visit_harmonogram", component: VisitHarmonogram, meta: { roles: ["Patient"] } },
-  { path: "/visit", component: VisitDetails, meta: { roles: null } },
-  { path: "/visitsummary", component: VisitSummary, meta: { roles: [""] } },
-  { path: "/patientcard", component: PatientCard, meta: { roles: null } },
-  { path: "/doctordata", component: DoctorData, meta: { roles: null } },
-  { path: "/doctordata/passwordreset", component: DoctorPasswordReset, meta: { roles: [""] } },
-  { path: "/doctor", component: DoctorPage, meta: { roles: null } },
-  { path: "/doctor/doctordataedit", component: DoctorDataEdit, meta: { roles: null } },
-  { path: "/patientdata", component: PatientData, meta: { roles: [""] } },
-  { path: "/patientvisitsummary", component: PatientVisitSummary, meta: { roles: null } },
-  { path: "/patient/cancelvisit", component: PatientCancelVisit, meta: { roles: [""] } },
-  { path: "/patient/changepassword", component: PatientChangePassword, meta: { roles: [""] } },
-  { path: "/guest/passwordreset2", component: GuestPasswordReset2, meta: { roles: [""] } },
-  { path: "/guest/passwordreset", component: GuestPasswordReset, meta: { roles: [""] } },
-  { path: "/doctor/doctorvisitdetails", component: DoctorVisitDetails, meta: { roles: null } },
-  { path: "/patient/patientnewvisit", component: PatientNewVisit, meta: { roles: null } },
-  { path: "/visit_assign", component: VisitAssign, meta: { roles: null } },
-=======
   { path: "/patient/new_visit", component: NewVisit, meta: { roles: null } },
   {
     path: "/doctor/visit_harmonogram",
@@ -136,7 +120,21 @@ export const routes: Array<{
     component: PatientDataReceptionEdit,
     meta: { roles: null },
   },
->>>>>>> Stashed changes
+  {
+    path: "/staff/awaitingappointments",
+    component: AwaitingAppointments,
+    meta: { roles: null },
+  },
+  {
+    path: "/staff/statistics",
+    component: AppointmentStatistics,
+    meta: { roles: null },
+  },
+  {
+    path: "/staff/patientlist",
+    component: PatientList,
+    meta: { roles: null },
+  },
 ];
 
 // roles: ["Patient"]
