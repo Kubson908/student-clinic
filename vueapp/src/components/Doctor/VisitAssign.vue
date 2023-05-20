@@ -1,5 +1,50 @@
 <script setup lang="ts">
+<<<<<<< Updated upstream
 
+=======
+//Wojtek
+// const appointments = [
+//   {
+//     id: 1,
+//     patient: "Tomasz Problem",
+//     date: "05/18/2023",
+//     symptom: "Ból głowy",
+//     medicines: "Rutinoskorbin"
+//   },
+//   {
+//     id: 2,
+//     patient: "Andrew Tate",
+//     date: "05/20/2023",
+//     symptom: "Ból głowy, kaszel",
+//     medicines: "Gripeks"
+//   },
+//   {
+//     id: 3,
+//     patient: "Greta Thunberg",
+//     date: "05/21/2023",
+//     symptom: "Ból głowy, katar",
+//     medicines: "Rutinoskorbin"
+//   }
+// ];
+// const doctor = [
+//   {
+//     id: 1,
+//     patient: "Adam Jaki",
+//   },
+//   {
+//     id: 2,
+//     patient: "Wiktor Chuj",
+//   }
+// ];
+
+//import VueDatePicker from "@vuepic/vue-datepicker";
+// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+//   .toISOString()
+//   .substr(0, 10);
+// let menu = false;
+// let modal = false;
+// let menu2 = false;
+>>>>>>> Stashed changes
 </script>
 
 <template>

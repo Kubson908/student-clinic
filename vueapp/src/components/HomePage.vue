@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import HomePageCard from "./HomePageCard.vue";
+// Linki do pobrania zdjec z karuzeli
+// https://pixabay.com/pl/illustrations/lekarz-szpital-opieki-zdrowotnej-6701410/
+// https://pixabay.com/pl/photos/test-tube-covid-19-mask-maska-5065426/
+// https://pixabay.com/pl/photos/poziom-cukru-we-krwi-glukometr-r%c4%99ka-3310318/
 </script>
 <template>
   <v-row no-gutters>
@@ -16,7 +20,7 @@ import HomePageCard from "./HomePageCard.vue";
             <v-carousel-item>
               <v-parallax
                 height="100%"
-                src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+                src="https://pixabay.com/get/g8e38cbb871778650e19b901fbbba38c32eda476e809b8bca2d1a7a04ec3bb844deeb19eada7d9603f5b5a240901ce7fa.jpg"
               >
               </v-parallax>
             </v-carousel-item>
@@ -24,7 +28,7 @@ import HomePageCard from "./HomePageCard.vue";
             <v-carousel-item>
               <v-parallax
                 height="100%"
-                src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
+                src="https://pixabay.com/get/g61537867dcb96244f8321803c76a2e57608bfb0ad691997b9ece82ed7ef877a78658dc1711b3e67e09525d6fbdcc8985.jpg"
               >
               </v-parallax>
             </v-carousel-item>
@@ -32,7 +36,7 @@ import HomePageCard from "./HomePageCard.vue";
             <v-carousel-item>
               <v-parallax
                 height="100%"
-                src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+                src="https://w.wallhaven.cc/full/k7/wallhaven-k7e52q.jpg"
               >
               </v-parallax>
             </v-carousel-item>

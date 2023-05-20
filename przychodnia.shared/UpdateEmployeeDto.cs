@@ -10,22 +10,22 @@ namespace Przychodnia.Shared
     public class UpdateEmployeeDto
     {
         [Required]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
         [Required]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
         [Required]
         [StringLength(11)]
-        public string Pesel { get; set; }
+        public string Pesel { get; set; } = string.Empty;
         [Required]
         public Specialization Specialization { get; set; }
         [Required]
         [Phone]
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
         [Required]
         [DataType(DataType.Date)]
-        public string DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; } = string.Empty;
     }
 }

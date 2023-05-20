@@ -280,9 +280,11 @@ const dateRules = [
             >
           </v-row>
           <v-row justify="center">
-            <v-btn variant="text" size="small" class="mt-2 button"
-              >Mam już konto</v-btn
-            >
+            <router-link to="/login" custom v-slot="{ navigate }">
+              <v-btn variant="text" size="small" class="mt-2 button" @click="navigate" role="link">
+                Mam już konto
+              </v-btn>
+            </router-link>
           </v-row>
         </v-form>
       </v-card-text>
