@@ -1,6 +1,6 @@
 <script setup lang="ts">
+// Wojtek 
     import { ref } from "vue";
-    
     const name = ref<string>("");
     const lastName = ref<string>("");
     const email = ref<string>("");

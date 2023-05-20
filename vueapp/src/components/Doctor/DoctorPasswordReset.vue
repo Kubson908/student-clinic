@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-
+//Wojtek
 const form = ref<HTMLFormElement | null>(null);
 const email = ref<string>("");
 const emailrepeat = ref<string>("");

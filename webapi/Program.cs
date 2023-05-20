@@ -113,8 +113,16 @@ var webSocketOptions = new WebSocketOptions
     KeepAliveInterval = TimeSpan.FromMinutes(5)
 };
 
-app.UseWebSockets();
+app.UseWebSockets(webSocketOptions);
 
 app.MapControllers();
 
-app.Run();
+app.Run(/*async (context) =>
+{
+    using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+    var socketFinishetTcs = new TaskCompletionSource<object>();
+
+    BackgroundSocketProcessor.AddSocket(webSocket, socketFinishetTcs);
+
+    await socketFinishedTcs.Task;
+}*/);
