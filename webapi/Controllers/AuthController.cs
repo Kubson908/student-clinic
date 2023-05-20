@@ -111,7 +111,7 @@ namespace Przychodnia.Webapi.Controllers
             var token = await _patientManager.GeneratePasswordResetTokenAsync(user);
 
             UriBuilder baseUri = new UriBuilder("localhost:8080/auth/password-reset");
-            var link = Url.Action("ResetPassword", "Account")
+            baseUri.Query = "query=" + token + "&id=" + user.Id;
 
             string mailFrom = "kartinghappywheels@gmail.com";
             var message = new MimeMessage();
@@ -134,9 +134,15 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         [HttpPost("Reset-Password")]
-        public async Task<IActionResult> ResetPassword([FromBody] string pass)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
+            if (dto.Password == null) return BadRequest("Password is null");
 
+            var user = await _patientManager.FindByIdAsync(dto.Id);
+            if (user == null) return NotFound("User not found");
+            var result = await _patientManager.ResetPasswordAsync(user, dto.Token, dto.Password);
+            if (result.Succeeded) return Ok("Success");
+            return BadRequest("Token is invalid");
         }
     }
 }

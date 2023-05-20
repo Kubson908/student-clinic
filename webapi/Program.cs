@@ -33,8 +33,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(connecti
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddIdentityCore<Patient>().AddDefaultTokenProviders()
-    .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentityCore<Patient>(config =>
+{
+    config.Tokens.PasswordResetTokenProvider = nameof(PasswordResetTokenProvider<Patient>);
+    /*config.Tokens.ProviderMap.Add("CustomPasswordResetToken",
+        new TokenProviderDescriptor(
+            typeof(PasswordResetTokenProvider<Patient>)));
+    config.Tokens.PasswordResetTokenProvider = "CustomPasswordResetToken";*/
+}).AddTokenProvider<PasswordResetTokenProvider<Patient>>(nameof(PasswordResetTokenProvider<Patient>))
+    .AddDefaultTokenProviders().AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddIdentityCore<Employee>().AddDefaultTokenProviders()
     .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -81,6 +89,7 @@ builder.Services.AddAuthentication(auth =>
 
 builder.Services.AddScoped<IUserService<RegisterDto, LoginDto>, PatientService>();
 builder.Services.AddScoped<IUserService<RegisterEmployeeDto, LoginDto>, EmployeeService>();
+builder.Services.AddScoped<PasswordResetTokenProvider<Patient>>();
 
 var app = builder.Build();
 
