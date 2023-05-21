@@ -52,6 +52,27 @@ namespace Przychodnia.Webapi.Controllers
             
         }
 
+        [HttpGet("schedule")]
+        public async Task<IActionResult> GetDoctorSchedule()
+        {
+            string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (id == null) return NotFound("Doctor not found");
+
+            var appointments = await _db.Appointments.Where(a => a.DoctorId == id && 
+                DateOnly.FromDateTime(a.Date) >= DateOnly.FromDateTime(DateTime.Now))
+                .Include(a => a.Patient).Select(a => new {
+                    a.Date,
+                    a.Id,
+                    a.Finished,
+                    a.Medicines,
+                    a.Recommendations,
+                    a.Symptoms,
+                    a.ControlAppointment
+                }).ToListAsync(); // nie działa
+
+            return Ok(appointments);
+        }
+
         /*  [HttpPatch("{id}")]
           [ProducesResponseType(typeof(Appointment), StatusCodes.Status402PaymentRequired)]
           [ProducesResponseType(StatusCodes.Status400BadRequest)]

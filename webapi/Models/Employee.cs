@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Przychodnia.Webapi.Models
 {
     public class Employee : IdentityUser
-    { 
+    {
 
         [Required]
         public string FirstName { get; set; } = string.Empty;
@@ -18,7 +18,7 @@ namespace Przychodnia.Webapi.Models
 
         [Required]
         public Specialization Specialization { get; set; }
-        
+
         [Required]
         [StringLength(11)]
         public string Pesel { get; set; } = string.Empty;
