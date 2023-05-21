@@ -23,8 +23,6 @@ namespace Przychodnia.Webapi.Models
         [ForeignKey("Patient")]
         public string PatientId { get; set; } = string.Empty;
         public virtual Patient? Patient { get; set; }
-        public string PatientId { get; set; } = string.Empty;
-        public virtual Patient? Patient { get; set; }
 
         [ForeignKey("Doctor")]
         public string? DoctorId { get; set; }
