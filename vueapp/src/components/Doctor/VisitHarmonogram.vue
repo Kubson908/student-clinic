@@ -24,7 +24,7 @@ const appointments = [
     patient: "Greta Thunberg",
     date: "05/21/2023",
     finished: false,
-  },
+  }
 ];
 
 const format = (date: Date) => {

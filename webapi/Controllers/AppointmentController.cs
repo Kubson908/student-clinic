@@ -44,7 +44,9 @@ namespace Przychodnia.Webapi.Controllers
             string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (id == null) return NotFound("User not found");
 
-            var appointments = _db.Appointments.Where(a => a.PatientId == id).ToList();
+            var appointments = _db.Patients.Where(p => p.Id == id).Include(p => p.Appointments)
+                .Select(p => p.Appointments.Select(a => new { a.Date, a. Id, a.Finished, 
+                    a.Doctor, a.Medicines, a.Recommendations, a.Symptoms, a.ControlAppointment })).ToList();
             return Ok(new { appointments = appointments });
 
             

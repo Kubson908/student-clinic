@@ -1,21 +1,27 @@
 <script setup lang="ts">
-const appointments = [
-  {
-    id: 1,
-    doctor: "Internista",
-    date: "17.03.2023",
-  },
-  {
-    id: 2,
-    doctor: "Okulista",
-    date: "20.05.2023",
-  },
-  {
-    id: 3,
-    doctor: "Pulmonolog",
-    date: "25.05.2023",
-  },
-];
+import axios from "axios";
+import { onBeforeMount, reactive } from "vue";
+import { Appointments } from "../../typings";
+
+let test = reactive<Appointments>({
+  appointments: [],
+});
+onBeforeMount(async () => {
+  const res = await axios.get("http://localhost:7042/api/Appointment/patient", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  // console.log(res.data.appointments);
+  test.appointments = res.data.appointments[0];
+  console.log(test);
+});
+let getDateFromString = (string: any) => {
+  let date = new Date(string);
+  return `${date.toLocaleDateString("pl-PL", {
+    timeZone: "Africa/Dakar",
+  })} ${date.toLocaleTimeString("pl-PL", { timeZone: "Africa/Dakar" })}`;
+};
 
 const disable = (dateString: string) => {
   let pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
@@ -40,34 +46,45 @@ const disable = (dateString: string) => {
             <v-list-item
               elevation="3"
               class="rounded-lg my-2"
-              v-for="appointment in appointments"
+              v-for="appointment in test.appointments"
               :key="appointment.id"
               width="90%"
             >
               <v-row>
                 <v-col xs="2" md="4">
                   <v-container class="d-flex flex-1-0 flex-column left">
-                    <strong>{{ appointment.doctor }}</strong>
-                    {{ appointment.date }}
+                    <strong>{{ appointment.id }}</strong>
+                    {{ getDateFromString(appointment.date) }}
                   </v-container>
                 </v-col>
                 <v-col xs="10" md="8">
                   <v-container class="right">
-                    <router-link to="/patient/visit_detail">
-                    <v-btn color="blue-darken-2" class="mt-2 mx-2 button"
-                      >Szczegóły</v-btn
-                    >
+                    <router-link to="/visitdetails">
+                      <v-btn color="blue-darken-2" class="mt-2 mx-2 button"
+                        >Szczegóły</v-btn
+                      >
                     </router-link>
-                    <router-link to="/patient/cancelvisit">
+                    <router-link
+                      v-if="!disable(appointment.date)"
+                      to="/patient/cancelvisit"
+                    >
+                      <v-btn
+                        variant="outlined"
+                        color="red-darken-2"
+                        class="mt-2 mx-2 button"
+                      >
+                        Anuluj wizytę
+                      </v-btn>
+                    </router-link>
                     <v-btn
-                      :disabled="disable(appointment.date)"
+                      v-else
+                      disabled
                       variant="outlined"
                       color="red-darken-2"
                       class="mt-2 mx-2 button"
                     >
                       Anuluj wizytę
                     </v-btn>
-                  </router-link>
                   </v-container>
                 </v-col>
               </v-row>
@@ -84,11 +101,11 @@ const disable = (dateString: string) => {
               class="mt-2 button"
               >Wstecz</v-btn
             >
-            <router-link to="/new_visit">
-              <v-btn  color="blue-darken-2" class="mt-2 button"
-              >Nowa wizyta</v-btn
+            <router-link to="/patient/new_visit">
+              <v-btn color="blue-darken-2" class="mt-2 button"
+                >Nowa wizyta</v-btn
               >
-          </router-link>
+            </router-link>
           </div>
         </v-container>
       </v-card>

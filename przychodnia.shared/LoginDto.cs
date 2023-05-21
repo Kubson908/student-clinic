@@ -11,10 +11,10 @@ namespace Przychodnia.Shared
     {
         [Required]
         [StringLength(50)]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [Required]
         [StringLength(50, MinimumLength = 8)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
     }
 }

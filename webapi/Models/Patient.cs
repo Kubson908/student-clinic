@@ -19,7 +19,7 @@ namespace Przychodnia.Webapi.Models
         public string Pesel { get; set; } = string.Empty;
 
         //Navigation Properties
-        public List<Appointment> Appointments { get; set; } = new List<Appointment>();
+        public virtual List<Appointment> Appointments { get; set; } = new List<Appointment>();
 
     }
 }

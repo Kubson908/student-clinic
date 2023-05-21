@@ -270,7 +270,7 @@ namespace Przychodnia.Webapi.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Appointments");
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("Przychodnia.Webapi.Models.Employee", b =>

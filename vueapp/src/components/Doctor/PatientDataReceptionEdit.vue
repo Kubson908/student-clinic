@@ -105,16 +105,18 @@
                                         required>
                           </v-text-field>
                         </v-col>
+                      </v-row>
+                    </v-form>
+                    </v-card-text>
+                    <v-row>
                         <v-col>
                         <v-checkbox
                           v-model="terms"
                           color="blue-darken-2"
-                          label="Alergie"
+                          label="Zweryfikuj"
                         ></v-checkbox>
                         </v-col>
                       </v-row>
-                    </v-form>
-                    </v-card-text>
           </v-container>
 
           <v-row justify="start">
