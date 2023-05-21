@@ -72,7 +72,6 @@ namespace Przychodnia.Webapi.Controllers
 
             return Ok(appointments);
         }
-
         /*  [HttpPatch("{id}")]
           [ProducesResponseType(typeof(Appointment), StatusCodes.Status402PaymentRequired)]
           [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -80,7 +79,5 @@ namespace Przychodnia.Webapi.Controllers
           {
               return Ok(200);
           }*/
-
-
     }
 }

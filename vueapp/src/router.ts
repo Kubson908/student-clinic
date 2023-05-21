@@ -23,6 +23,9 @@ import DoctorVisitDetails from "./components/Doctor/DoctorVisitDetails.vue";
 import PatientNewVisit from "./components/Patient/PatientNewVisit.vue";
 import VisitAssign from "./components/Doctor/VisitAssign.vue";
 import PatientDataReceptionEdit from "./components/Doctor/PatientDataReceptionEdit.vue";
+import AwaitingAppointments from "./components/Staff/AwaitingAppointments.vue";
+import AppointmentStatistics from "./components/Staff/AppointmentStatistics.vue";
+import PatientList from "./components/Staff/PatientList.vue";
 
 export const routes: Array<{
   path: string;
@@ -115,6 +118,21 @@ export const routes: Array<{
   {
     path: "/doctor/patient_reception_edit",
     component: PatientDataReceptionEdit,
+    meta: { roles: null },
+  },
+  {
+    path: "/staff/awaitingappointments",
+    component: AwaitingAppointments,
+    meta: { roles: null },
+  },
+  {
+    path: "/staff/statistics",
+    component: AppointmentStatistics,
+    meta: { roles: null },
+  },
+  {
+    path: "/staff/patientlist",
+    component: PatientList,
     meta: { roles: null },
   },
 ];
