@@ -21,13 +21,10 @@ namespace Przychodnia.Webapi.Models
         //Navigation Properties
         [Required]
         [ForeignKey("Patient")]
-<<<<<<< Updated upstream
-        public string PatientId { get; set; }
-        public Patient? Patient { get; set; }
-=======
         public string PatientId { get; set; } = string.Empty;
         public virtual Patient? Patient { get; set; }
->>>>>>> Stashed changes
+        public string PatientId { get; set; } = string.Empty;
+        public virtual Patient? Patient { get; set; }
 
         [ForeignKey("Doctor")]
         public string? DoctorId { get; set; }
