@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Przychodnia.Shared;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
 using System.Security.Claims;
@@ -59,7 +60,7 @@ namespace Przychodnia.Webapi.Controllers
             if (id == null) return NotFound("Doctor not found");
 
             var appointments = await _db.Appointments.Where(a => a.DoctorId == id && 
-                DateOnly.FromDateTime(a.Date) >= DateOnly.FromDateTime(DateTime.Now))
+                a.Date.Date.CompareTo(DateTime.Now.Date) >= 0)
                 .Include(a => a.Patient).Select(a => new {
                     a.Date,
                     a.Id,
@@ -79,5 +80,29 @@ namespace Przychodnia.Webapi.Controllers
           {
               return Ok(200);
           }*/
+
+        [HttpPatch("update/{id}")]
+
+        public async Task<IActionResult> UpdateAppointment([FromRoute] int id ,[FromBody] UpdateAppointmentDto dto)
+        {
+            if (dto == null) return BadRequest("Object is null");
+
+            var appointment = await _db.Appointments.FindAsync(id);
+            if (appointment == null) return BadRequest("Cannot find appointment");
+
+            foreach(var prop in typeof(Appointment).GetProperties())
+            {
+                var fromProp = typeof(UpdateAppointmentDto).GetProperty(prop.Name);
+                var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;
+                if (toValue != null)
+                {
+                    prop.SetValue(appointment, toValue, null);
+                }
+            }
+            _db.Appointments.Update(appointment);
+           /* _db.Entry(appointment).State = EntityState.Modified;*/ // nie wiem czy to coś daje
+            await _db.SaveChangesAsync();
+            return Ok(_db.Entry(appointment).State);
+        }
     }
 }
