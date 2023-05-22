@@ -3,14 +3,12 @@ import AppointmentList from "./components/Patient/AppointmentList.vue";
 import LoginForm from "./components/Guest/LoginForm.vue";
 import HomePage from "./components/HomePage.vue";
 import { Component } from "vue";
-import NewVisit from "./components/Patient/NewVisit.vue";
 import VisitHarmonogram from "./components/Doctor/VisitHarmonogram.vue";
 import VisitDetails from "./components/Doctor/VisitDetails.vue";
 import VisitSummary from "./components/Doctor/VisitSummary.vue";
 import PatientCard from "./components/Patient/PatientCard.vue";
 import DoctorData from "./components/Doctor/DoctorData.vue";
 import PatientData from "./components/Patient/PatientData.vue";
-import PatientVisitSummary from "./components/Patient/PatientVisitSummary.vue";
 import PatientCancelVisit from "./components/Patient/PatientCancelVisit.vue";
 import PatientChangePassword from "./components/Patient/ChangePassword.vue";
 import GuestPasswordReset2 from "./components/Guest/GuestPasswordReset2.vue";
@@ -20,12 +18,12 @@ import UnauthorizedView from "./components/UnauthorizedView.vue";
 import DoctorDataEdit from "./components/Doctor/DoctorDataEdit.vue";
 import DoctorPage from "./components/Doctor/DoctorPage.vue";
 import DoctorVisitDetails from "./components/Doctor/DoctorVisitDetails.vue";
-import PatientNewVisit from "./components/Patient/PatientNewVisit.vue";
 import VisitAssign from "./components/Doctor/VisitAssign.vue";
 import PatientDataReceptionEdit from "./components/Doctor/PatientDataReceptionEdit.vue";
 import AwaitingAppointments from "./components/Staff/AwaitingAppointments.vue";
 import AppointmentStatistics from "./components/Staff/AppointmentStatistics.vue";
 import PatientList from "./components/Staff/PatientList.vue";
+import NewVisit from "./components/Patient/NewVisit.vue";
 
 export const routes: Array<{
   path: string;
@@ -75,11 +73,7 @@ export const routes: Array<{
     component: PatientData,
     meta: { roles: null },
   },
-  {
-    path: "/patient/patientvisitsummary",
-    component: PatientVisitSummary,
-    meta: { roles: null },
-  },
+
   {
     path: "/patient/cancelvisit",
     component: PatientCancelVisit,
@@ -103,11 +97,6 @@ export const routes: Array<{
   {
     path: "/visitdetails",
     component: DoctorVisitDetails,
-    meta: { roles: null },
-  },
-  {
-    path: "/patient/patientnewvisit",
-    component: PatientNewVisit,
     meta: { roles: null },
   },
   {

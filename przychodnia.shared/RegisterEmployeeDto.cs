@@ -36,7 +36,7 @@ namespace Przychodnia.Shared
         [StringLength(12, MinimumLength = 9)]
         public string PhoneNumber { get; set; } = string.Empty;
 
-        public Specialization Specialization { get; set; }
+        public Specialization? Specialization { get; set; }
     }
 
     public enum Specialization

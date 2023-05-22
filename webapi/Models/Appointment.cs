@@ -14,6 +14,7 @@ namespace Przychodnia.Webapi.Models
         public Specialization Specialization { get; set; }
         public string? Symptoms { get; set; }
         public string? Medicines { get; set; }
+        public string? Diagnosis { get; set; }
         public string? Recommendations { get; set; }
         [Required]
         public bool Finished { get; set; } = false;
