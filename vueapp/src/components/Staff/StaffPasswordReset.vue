@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { onBeforeMount } from "vue";
+import { onBeforeMount} from "vue";
 import axios from "axios";
+import {
+  passwordRules,
+} from "@/validation";
+
 const name = ref<string>("");
-const password = ref<string>("");
+const lastName = ref<string>("");
+const pass = ref<string>("");
 onBeforeMount(async () => {
 const doc = await axios.get(
   `http://localhost:7042/api/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`,
@@ -13,14 +18,27 @@ const doc = await axios.get(
     },
   }
 );
-const data = res.data;
+const data = doc.data;
 name.value = data.firstName;
-
+lastName.value = data.lastName;
 });
+const submitData = async () => {
+  const valid = await form.value.validate();
+  if (!valid) return;
+  try {
+    const res = await axios.patch(
+      `http://localhost:7042/api/Auth/employee-reset-password`,
+      {
+        id: "52e97c43-3a30-49b3-ba28-9b761da64680",
+        token: 
+      }
+    );
+  }
+};
 </script>
 
 <template>
-  <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+  <v-card width="560px" location="center" elevation="5" class="rounded-lg"></v-card>
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -35,11 +53,11 @@ name.value = data.firstName;
       <v-card-title class="font-weight-bold text-h5" font-size="56">
         Zmień hasło
       </v-card-title>
-      <v-card-subtitle>Zmień hasło lekarza: PLACEHOLDER</v-card-subtitle>
+      <v-card-subtitle>Zmień hasło lekarza: {{ name }} {{ lastName }}</v-card-subtitle>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
-      <v-form @submit.prevent>
+      <v-form ref="form">
         <v-container>
           <v-text-field
             v-model="pass"
@@ -93,6 +111,7 @@ name.value = data.firstName;
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="submitData"
             >
               Zapisz
             </v-btn>

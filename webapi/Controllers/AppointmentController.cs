@@ -90,7 +90,29 @@ namespace Przychodnia.Webapi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
-            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id);
+            var appointment = await _db.Appointments.Select(a => new
+            {
+                a.Id,
+                a.Date,
+                a.Finished,
+                Doctor = a.Doctor != null ? new
+                {
+                    a.Doctor.FirstName,
+                    a.Doctor.LastName,
+                    a.Doctor.Specialization
+                } : null,
+                Patient = a.Patient != null ? new
+                {
+                    a.Patient.Id,
+                    a.Patient.FirstName,
+                    a.Patient.LastName,
+                } : null,
+                a.Medicines,
+                a.Symptoms,
+                a.Diagnosis,
+                a.Recommendations,
+                a.ControlAppointment
+            }).FirstOrDefaultAsync(a => a.Id == id);
             return appointment == null ? NotFound() : Ok(appointment);
         }
 

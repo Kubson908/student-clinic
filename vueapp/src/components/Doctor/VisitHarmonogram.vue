@@ -27,10 +27,8 @@ onBeforeMount(async () => {
       },
     }
   );
-  //console.log(res.data);
   appointments = res.data;
-  console.log(appointments);
-  //console.log(new Date(appointments[0].date).toDateString());
+  //console.log(appointments);
 });
 
 const format = (date: Date) => {
@@ -42,9 +40,10 @@ const format = (date: Date) => {
 };
 
 const filteredAppointments = computed(() => {
-  console.log(date.value.toDateString());
+  const d = date.value //Don't question it
+  //console.log(date.value.toDateString());//bez tego nie działa
   return appointments.filter(
-    (it) => new Date(it.date).toDateString() == date.value.toDateString()
+    (it) => new Date(it.date).toDateString() == d.toDateString()
   );
 });
 </script>
@@ -59,12 +58,38 @@ const filteredAppointments = computed(() => {
           </v-container>
           <v-row no-gutters justify="center">
             <v-col cols="12" sm="6" md="6">
-              <Datepicker
+              <DatePicker
+                auto-apply
+                month-picker
+                no-today
                 v-model="date"
                 :teleport="true"
                 :enable-time-picker="false"
-                :format="format"
-              />
+                locale="pl"
+                class="px-8"
+                :clearable="false"
+                ref="picker"
+              >
+                <template #trigger>
+                  <v-text-field
+                    class="pa-0"
+                    variant="solo"
+                    type="text"
+                    readonly
+                    append-inner-icon="mdi-calendar-month"
+                    label="Miesiąc i rok"
+                    :model-value="
+                      date
+                        ? `${
+                            date.getMonth() < 9
+                              ? `0${date.getMonth() + 1}`
+                              : date.getMonth() + 1
+                          }.${date.getMonth()}`
+                        : 'Brak'
+                    "
+                  ></v-text-field>
+                </template>
+              </DatePicker>
             </v-col>
           </v-row>
         </v-card-item>
