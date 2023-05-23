@@ -61,5 +61,6 @@ namespace Przychodnia.Webapi.Controllers
             return BadRequest("Model is not valid");
         }
 
+        // TODO: sprawdzanie dostępności lekarza o konkretnej godzinie (przypisywanie wizyt)
     }
 }

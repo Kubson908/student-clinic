@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace Przychodnia.Shared
 {
-    public class UpdateAppointmentDto
+    public class CreateAppointmentDto
     {
-        public DateTime? Date { get; set; }
-        public Specialization? Specialization { get; set; }
+        [Required]
+        public DateTime Date { get; set; }
+        [Required]
+        public Specialization Specialization { get; set; }
         public string? Symptoms { get; set; }
         public string? Medicines { get; set; }
-        public string? Recommendations { get; set; }
-        public string? Diagnosis { get; set; }
-        public int? AppointmentId { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         // /api/auth/register
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody]RegisterDto model)
         {
             if(ModelState.IsValid)
@@ -47,7 +47,7 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         // /api/auth/login
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody]LoginDto model)
         {
             if (ModelState.IsValid)
@@ -69,7 +69,7 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         // /api/auth/register-employee
-        [HttpPost("Register-Employee")]
+        [HttpPost("register-employee")]
         public async Task<IActionResult> RegisterEmployeeAsync([FromBody] RegisterEmployeeDto model)
         {
             if (ModelState.IsValid)
@@ -85,7 +85,7 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         // /api/auth/login-employee
-        [HttpPost("Login-Employee")]
+        [HttpPost("login-employee")]
         public async Task<IActionResult> LoginEmployeeAsync([FromBody]LoginDto model)
         {
             if (ModelState.IsValid)
@@ -101,7 +101,7 @@ namespace Przychodnia.Webapi.Controllers
             return BadRequest("Pola nie są poprawne");
         }
 
-        [HttpPost("Send-Reset-Link")]
+        [HttpPost("send-reset-link")]
         public async Task<IActionResult> SendResetPasswordLink([FromBody]string email)
         {
             if (email == null) return BadRequest("Email is null");
@@ -133,7 +133,7 @@ namespace Przychodnia.Webapi.Controllers
 
         }
 
-        [HttpPost("Reset-Password")]
+        [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
             if (dto.Password == null) return BadRequest("Password is null");

@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Przychodnia.Webapi.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Employee")]
     public class PatientController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -37,13 +37,33 @@ namespace Przychodnia.Webapi.Controllers
             return patients;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("patient-card")]
         [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetPatientCard([FromBody] string? id )
         {
-            var patient = await _db.Patients.FindAsync(id);
-            return patient == null ? NotFound() : Ok(patient);
+            string? role = HttpContext.User.FindFirstValue(ClaimTypes.Role);
+            string patientId = string.Empty;
+            if (role == "Patient") patientId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            else if (role == "Employee" && id != null) patientId = id;
+            if (patientId == string.Empty) return StatusCode(418);
+            var patient = await _db.Patients.Where(p => p.Id == patientId).Include(p =>  p.Appointments)
+                .Select(p => new
+                {
+                    p.FirstName,
+                    p.LastName,
+                    p.PhoneNumber,
+                    p.Email,
+                    p.Pesel,
+                    p.DateOfBirth,
+                    TreatmentHistory = p.Appointments.Where(a => a.Finished).Select(a => new
+                    {
+                        a.Id,
+                        a.Date,
+                        a.Specialization,
+                    })
+                }).FirstOrDefaultAsync();
+            return patient == null ? NotFound("Patient not found") : Ok(patient);
         }
     }
 }

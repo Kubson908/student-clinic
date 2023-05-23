@@ -17,11 +17,14 @@ namespace Przychodnia.Webapi.Models
         public string DateOfBirth { get; set; } = string.Empty;
 
         [Required]
-        public Specialization Specialization { get; set; }
+        public Specialization? Specialization { get; set; }
 
         [Required]
         [StringLength(11)]
         public string Pesel { get; set; } = string.Empty;
+
+        //Navigation Properties
+        public virtual List<Appointment> Appointments { get; set; } = new List<Appointment>();
 
     }
 }
