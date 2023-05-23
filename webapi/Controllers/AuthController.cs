@@ -20,14 +20,16 @@ namespace Przychodnia.Webapi.Controllers
         private IUserService<RegisterDto, LoginDto> _patientService;
         private IUserService<RegisterEmployeeDto, LoginDto> _employeeService;
         private UserManager<Patient> _patientManager; 
+        private UserManager<Employee> _employeeManager;
 
         public AuthController(IUserService<RegisterDto, LoginDto> patientService, 
             IUserService<RegisterEmployeeDto, LoginDto> employeeService,
-            UserManager<Patient> patientManager)
+            UserManager<Patient> patientManager, UserManager<Employee> employeeManager)
         {
             _patientService = patientService;
             _employeeService = employeeService;
             _patientManager = patientManager;
+            _employeeManager = employeeManager;
         }
 
         // /api/auth/register
@@ -133,7 +135,7 @@ namespace Przychodnia.Webapi.Controllers
 
         }
 
-        [HttpPost("reset-password")]
+        [HttpPatch("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
             if (dto.Password == null) return BadRequest("Password is null");
@@ -141,6 +143,18 @@ namespace Przychodnia.Webapi.Controllers
             var user = await _patientManager.FindByIdAsync(dto.Id);
             if (user == null) return NotFound("User not found");
             var result = await _patientManager.ResetPasswordAsync(user, dto.Token, dto.Password);
+            if (result.Succeeded) return Ok("Success");
+            return BadRequest("Token is invalid");
+        }
+        [HttpPatch("employee-reset-password")]
+        public async Task<IActionResult> ResetEmployeePassword([FromBody] ResetPasswordDto dto)
+        {
+            if (dto.Password == null) return BadRequest("Password is null");
+
+            var user = await _employeeManager.FindByIdAsync(dto.Id);
+            if (user == null) return NotFound("User not found");
+            var token = await _employeeManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _employeeManager.ResetPasswordAsync(user, token, dto.Password);
             if (result.Succeeded) return Ok("Success");
             return BadRequest("Token is invalid");
         }

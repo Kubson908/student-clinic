@@ -24,6 +24,8 @@ import AwaitingAppointments from "./components/Staff/AwaitingAppointments.vue";
 import AppointmentStatistics from "./components/Staff/AppointmentStatistics.vue";
 import PatientList from "./components/Staff/PatientList.vue";
 import NewVisit from "./components/Patient/NewVisit.vue";
+import PatientPasswordReset from "./components/Patient/PasswordReset.vue";
+import StaffPasswordReset from "./components/Staff/StaffPasswordReset.vue";
 
 export const routes: Array<{
   path: string;
@@ -122,6 +124,16 @@ export const routes: Array<{
   {
     path: "/staff/patientlist",
     component: PatientList,
+    meta: { roles: null },
+  },
+  {
+    path: "/patient/passwordreset",
+    component: PatientPasswordReset,
+    meta: { roles: null },
+  },
+  {
+    path: "/staff/passwordreset",
+    component: StaffPasswordReset,
     meta: { roles: null },
   },
 ];

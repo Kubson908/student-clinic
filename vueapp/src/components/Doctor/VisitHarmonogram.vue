@@ -1,31 +1,37 @@
 <script setup lang="ts">
+//Jakub Giecko
 import Datepicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
-import { computed }  from "vue";
+import { computed } from "vue";
+import { onBeforeMount } from "vue";
+import axios from "axios";
 
 const date = ref(new Date());
 date.value.setHours(0, 0, 0, 0);
 
-const appointments = [
-  {
-    id: 1,
-    patient: "Tomasz Problem",
-    date: "05/18/2023",
-    finished: true,
-  },
-  {
-    id: 2,
-    patient: "Andrew Tate",
-    date: "05/20/2023",
-    finished: false,
-  },
-  {
-    id: 3,
-    patient: "Greta Thunberg",
-    date: "05/21/2023",
-    finished: false,
-  }
-];
+interface IApppointment {
+  id: number;
+  finished: boolean;
+  patient: string;
+  date: Date;
+}
+
+var appointments: IApppointment[] = [];
+
+onBeforeMount(async () => {
+  const res = await axios.get(
+    "http://localhost:7042/api/Appointment/schedule",
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+  //console.log(res.data);
+  appointments = res.data;
+  console.log(appointments);
+  //console.log(new Date(appointments[0].date).toDateString());
+});
 
 const format = (date: Date) => {
   const day = date.getDate();
@@ -33,27 +39,34 @@ const format = (date: Date) => {
   const year = date.getFullYear();
 
   return `${day}/${month}/${year}`;
-}
+};
 
 const filteredAppointments = computed(() => {
-  return appointments.filter(it=>(new Date(it.date).getTime()==date.value.getTime()));
-})
-
+  console.log(date.value.toDateString());
+  return appointments.filter(
+    (it) => new Date(it.date).toDateString() == date.value.toDateString()
+  );
+});
 </script>
 
 <template>
-  <v-row justify="center">
+  <v-row justify="center" no-gutters>
     <v-col xs="12" sm="6" md="6" align-self="center">
       <v-card elevation="5" class="rounded-lg" height="70vh">
         <v-card-item>
           <v-container class="d-flex justify-center align-center">
             <h1>Harmonogram wizyt</h1>
           </v-container>
-        <v-row no-gutters justify="center">
-          <v-col cols="12" sm="6" md="6">
-            <Datepicker v-model="date" teleport-center :enable-time-picker="false" :format="format" />
-          </v-col>
-        </v-row>
+          <v-row no-gutters justify="center">
+            <v-col cols="12" sm="6" md="6">
+              <Datepicker
+                v-model="date"
+                :teleport="true"
+                :enable-time-picker="false"
+                :format="format"
+              />
+            </v-col>
+          </v-row>
         </v-card-item>
 
         <div class="card">

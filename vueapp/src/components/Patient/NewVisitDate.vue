@@ -3,8 +3,6 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import { ref, onMounted, computed, watch } from "vue";
 import axios from "axios";
 
-//Do poprawy:
-//przełączanie miesiąca nie zawsze prawidłowo odświeża listę dostępnych dni
 
 const hours = [
   "9:00",
@@ -140,7 +138,7 @@ watch(current_month, (newMonth, oldMonth) => {
                 no-today
                 :hide-offset-dates="true"
                 inline
-                highlight-disabled-days
+                :highlight-disabled-days="true"
                 :disabled-dates="unavailable_dates"
                 auto-apply
                 ref="picker"

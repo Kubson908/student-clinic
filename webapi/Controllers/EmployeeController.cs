@@ -23,14 +23,34 @@ namespace Przychodnia.Webapi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IEnumerable<Employee>> Get() => await _db.Employees.ToListAsync();
+        public async Task<ActionResult<IEnumerable<Employee>>> Get()
+        {
+            var employees = await _db.Employees.Select(e => new
+            {
+                e.Id,
+                e.FirstName,
+                e.LastName,
+                e.Specialization,
+            }).ToListAsync();
+            return Ok(employees);
+        }
 
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById([FromRoute] string id)
         {
-            var Worker = await _db.Employees.FindAsync(id);
+            var Worker = await _db.Employees.Select(e => new
+            {
+                e.Id,
+                e.FirstName,
+                e.LastName,
+                e.Specialization,
+                e.Email,
+                e.PhoneNumber,
+                e.DateOfBirth,
+                e.Pesel
+            }).FirstOrDefaultAsync(e => e.Id == id);
             return Worker == null ? NotFound() : Ok(Worker);
         }
 
@@ -62,5 +82,16 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         // TODO: sprawdzanie dostępności lekarza o konkretnej godzinie (przypisywanie wizyt)
+        [HttpGet("available-doctors")]
+        public async Task<IActionResult> GetAvailableDoctors([FromBody] GetAvailableDoctorsDto dto)
+        {
+            if (dto.Date < DateTime.Now || dto == null) return BadRequest("Model error");
+
+            var doctors = await _db.Employees.Where(e => e.Specialization == dto.Specialization
+                                            && !e.Appointments.Select(a => a.Date).Contains(dto.Date)).ToListAsync();
+
+            /*var test = _db.Employees.Select(e => e.Appointments.Select(a => a.Date));*/
+            return Ok(doctors);
+        }
     }
 }

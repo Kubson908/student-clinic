@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Przychodnia.Shared;
 using Przychodnia.Webapi.Data;
@@ -53,7 +54,7 @@ namespace Przychodnia.Webapi.Controllers
             return Ok(appointments);
         }
 
-        [HttpGet("specialization/{specialization}/year/{year}/month/{month}")] // poprawić żeby zwracało samą datę
+        [HttpGet("specialization/{specialization}/year/{year}/month/{month}")]
         public async Task<IActionResult> GetAvailableDaysInMonth([FromRoute] int year, [FromRoute] int month, [FromRoute] int specialization)
         {
             var slots_week = 16;
@@ -89,7 +90,7 @@ namespace Przychodnia.Webapi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetById(int id)
         {
-            var appointment = await _db.Appointments.FindAsync(id);
+            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id);
             return appointment == null ? NotFound() : Ok(appointment);
         }
 
@@ -148,26 +149,45 @@ namespace Przychodnia.Webapi.Controllers
 
 
         }
-
+        [Authorize(Roles = "Employee")]
         [HttpGet("schedule")]
-        public async Task<IActionResult> GetDoctorSchedule([FromBody] DateOnly date)
+        public async Task<IActionResult> GetDoctorSchedule([FromBody] string? date)
         {
             string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (id == null) return NotFound("Doctor not found");
 
-            var appointments = await _db.Appointments.Where(a => a.DoctorId == id &&
-                a.Date.Date.CompareTo(date) == 0)
-                .Include(a => a.Patient).Select(a => new {
-                    a.Date,
-                    a.Id,
-                    a.Finished,
-                    a.Medicines,
-                    a.Recommendations,
-                    a.Symptoms,
-                    a.ControlAppointment
-                }).ToListAsync(); // chyba działa
-
-            return Ok(appointments);
+            if (id == null) return NotFound("User not found");
+            if (date != null)
+            {
+                DateTime newDate = DateTime.Parse(date);
+                var appointments = await _db.Appointments.Where(a => a.DoctorId == id &&
+                    a.Date.CompareTo(newDate) == 0).Select(a => new
+                    {
+                        Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
+                        a.Date,
+                        a.Id,
+                        a.Finished,
+                        a.Medicines,
+                        a.Recommendations,
+                        a.Symptoms,
+                        a.ControlAppointment
+                    }).ToListAsync(); // chyba działa
+                return Ok(appointments);
+            }
+            else
+            {
+                var appointments = await _db.Appointments.Where(a => a.DoctorId == id).Select(a => new
+                   {
+                       Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
+                       a.Date,
+                       a.Id,
+                       a.Finished,
+                       a.Medicines,
+                       a.Recommendations,
+                       a.Symptoms,
+                       a.ControlAppointment
+                   }).ToListAsync(); // chyba działa
+                return Ok(appointments);
+            }
         }
 
         [HttpPatch("update/{id}")]

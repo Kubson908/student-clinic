@@ -18,9 +18,9 @@ onBeforeMount(async () => {
 });
 let getDateFromString = (string: any) => {
   let date = new Date(string);
-  return `${date.toLocaleDateString("pl-PL", {
-    timeZone: "Africa/Dakar",
-  })} ${date.toLocaleTimeString("pl-PL", { timeZone: "Africa/Dakar" })}`;
+  return `${date.toLocaleDateString("pl-PL")} ${date.toLocaleTimeString(
+    "pl-PL"
+  )}`;
 };
 
 const disable = (dateString: string) => {
