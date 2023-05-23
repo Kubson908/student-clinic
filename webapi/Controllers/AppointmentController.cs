@@ -24,7 +24,32 @@ namespace Przychodnia.Webapi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var appointments = await _db.Appointments.ToListAsync();
+            var appointments = await _db.Appointments.Include(a => a.Doctor ).Include(a => a.Patient)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.Date,
+                    a.Specialization,
+                    a.Symptoms,
+                    a.Medicines,
+                    a.Diagnosis,
+                    a.Recommendations,
+                    a.Finished,
+                    Patient = a.Patient != null ? new
+                    {
+                        a.Patient.Id,
+                        a.Patient.FirstName,
+                        a.Patient.LastName,
+                        a.Patient.DateOfBirth
+                    } : null,
+                    Doctor = a.Doctor != null ? new
+                    {
+                        a.Doctor.Id,
+                        a.Doctor.FirstName,
+                        a.Doctor.LastName,
+                        a.Doctor.Specialization
+                    } : null
+                }).ToListAsync();
             return Ok(appointments);
         }
 
@@ -37,10 +62,11 @@ namespace Przychodnia.Webapi.Controllers
             var appointments_month = (await _db.Appointments
                 .Where(a => a.Date.Year == year && a.Date.Month == month && a.Specialization == (Specialization) specialization)
                 .Select(a => new { a.Specialization, a.Date }).GroupBy(a => a.Date)
-                .Select(g => new { key = g.Key, available = 
+                .Select(g => new { key = DateOnly.FromDateTime(g.Key), available = 
                     g.Key.DayOfWeek == DayOfWeek.Saturday ? g.Count() < slots_saturday*employees_count : 
                     g.Key.DayOfWeek == DayOfWeek.Sunday ? false :
-                    g.Count() < slots_week*employees_count}).ToListAsync()).Where(a => a.available == false);
+                    g.Count() < slots_week*employees_count}).ToListAsync())
+                    .Where(a => a.available == false).Select(a => a.key);
             return Ok(appointments_month);
         }
 
@@ -77,14 +103,14 @@ namespace Przychodnia.Webapi.Controllers
                 || dto.Date.DayOfWeek.Equals(0) || (dto.Date.Hour >= 14
                 || dto.Date.Hour < 9)
                 && dto.Date.DayOfWeek.Equals(6))) return StatusCode(406, "Wrong time");
-
+            DateTime date = new DateTime(dto.Date.Year, dto.Date.Month, dto.Date.Day, dto.Date.Hour, dto.Date.Minute, 0, dto.Date.Kind);
             int employees_count = _db.Employees.Count(emp => emp.Specialization == dto.Specialization);
-            int appointments_count = _db.Appointments.Count(a => a.Date == dto.Date && a.Specialization == dto.Specialization);
+            int appointments_count = _db.Appointments.Count(a => a.Date == date && a.Specialization == dto.Specialization);
             bool available = appointments_count < employees_count;
             if (!available) return StatusCode(406, "Date not available");
             string id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             var appointment = new Appointment();
-            appointment.Date = new DateTime(dto.Date.Year, dto.Date.Month, dto.Date.Day, dto.Date.Hour, dto.Date.Minute, 0, dto.Date.Kind);
+            appointment.Date = date;
             appointment.Specialization = dto.Specialization;
             appointment.Symptoms = dto.Symptoms;
             appointment.Medicines = dto.Medicines;
@@ -107,7 +133,12 @@ namespace Przychodnia.Webapi.Controllers
                     a.Date,
                     a.Id,
                     a.Finished,
-                    a.Doctor,
+                    Doctor = a.Doctor != null ? new
+                    {
+                        a.Doctor.FirstName,
+                        a.Doctor.LastName,
+                        a.Doctor.Specialization
+                    } : null,
                     a.Medicines,
                     a.Recommendations,
                     a.Symptoms,
@@ -158,20 +189,45 @@ namespace Przychodnia.Webapi.Controllers
                     _db.Entry(appointment).Property(prop.Name).IsModified = true;
                 }
             }
-            /*_db.Appointments.Update(appointment);*/
             await _db.SaveChangesAsync();
-            return Ok(_db.Entry(appointment).State);
+            return Ok("Updated");
         }
 
-        /* [HttpPatch("finish/{id}")]
-         public async Task<IActionResult> FinishAppointment([FromRoute] int id, [FromBody] FinishAppointmentDto dto)
-         {
-             if (dto == null) return BadRequest("Object is null");
+        [HttpPatch("assign-appointment/{appointmentId}")]
+        public async Task<IActionResult> AssignAppointment([FromRoute] string appointmentId, [FromBody] string doctorId)
+        {
+            if (doctorId == null) return BadRequest("Doctor id is null");
 
-             var appointment = await _db.Appointments.FindAsync(id);
-             if (appointment == null) return BadRequest("Appointment not found");
+            string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == Int32.Parse(appointmentId));
+            if (appointment == null) return NotFound("Appointment not found");
+            appointment.DoctorId = doctorId;
+            _db.Entry(appointment).Property(p => p.DoctorId).IsModified = true;
+            await _db.SaveChangesAsync();
+            return Ok("Appointment assigned");
+        }
 
-             appointment.Finished = dto.Finished;
-         }*/
+        [HttpPatch("finish/{id}")]
+        public async Task<IActionResult> FinishAppointment([FromRoute] int id, [FromBody] FinishAppointmentDto dto)
+        {
+            Console.Write(dto.Diagnosis);
+            if (dto == null) return BadRequest("Object is null");
+            string? doctorId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var appointment = await _db.Appointments.FindAsync(id);
+            if (appointment == null) return BadRequest("Appointment not found");
+            if (appointment.DoctorId != doctorId) return Unauthorized("Cannot finish this appointment");
+            foreach (var prop in typeof(Appointment).GetProperties())
+            {
+                var fromProp = typeof(FinishAppointmentDto).GetProperty(prop.Name);
+                var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;
+                if (toValue != null)
+                {
+                    prop.SetValue(appointment, toValue, null);
+                    _db.Entry(appointment).Property(prop.Name).IsModified = true;
+                }
+            }
+            await _db.SaveChangesAsync();
+            return Ok("Appointment finished");
+        }
     }
 }

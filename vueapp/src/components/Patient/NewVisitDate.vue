@@ -27,9 +27,10 @@ const hours = [
 
 const select = ref<any>();
 const picker = ref<any>();
-const date = ref<any>();
+const date = ref<any>(new Date());
 const unavailable_hours = ref<Array<string>>([]);
 const unavailable_dates = ref<any>();
+const current_month = ref<number>(date.value.getMonth());
 
 const getUnavailableHours = async () => {
   let token = await localStorage.getItem("token");
@@ -46,12 +47,11 @@ const getUnavailableHours = async () => {
   unavailable_hours.value = res.data;
 };
 
-const getUnavailableDays = async (event: Event) => {
-  console.log(event);
+const getUnavailableDays = async (month: number) => {
   let token = await localStorage.getItem("token");
   let res = await axios.get(
     `http://localhost:7042/api/appointment/specialization/0/year/${date.value.getFullYear()}/month/${
-      date.value.getMonth() + 1
+      month + 1
     }`,
     {
       headers: {
@@ -59,7 +59,6 @@ const getUnavailableDays = async (event: Event) => {
       },
     }
   );
-  console.log(res.data);
   unavailable_dates.value = res.data;
 };
 
@@ -75,9 +74,8 @@ const available_hours = computed(() => {
       ? hours.slice(0, 10)
       : hours
     : null;
-  console.log(total_hours, unavailable_hours.value);
   return total_hours?.filter((hour) => {
-    return !unavailable_hours.value.includes(hour + ":00")
+    return !unavailable_hours.value.includes(hour + ":00");
   });
 });
 
@@ -98,8 +96,13 @@ onMounted(async () => {
 });
 
 watch(date, (newDate, oldDate) => {
-  if (oldDate && oldDate.getDate() != newDate.getDate()) getUnavailableHours();
+  console.log(newDate);
+  if (oldDate && newDate && oldDate.getDate() != newDate.getDate())
+    getUnavailableHours();
   select.value = undefined;
+});
+watch(current_month, (newMonth, oldMonth) => {
+  if (newMonth != oldMonth) getUnavailableDays(newMonth);
 });
 </script>
 
@@ -135,7 +138,9 @@ watch(date, (newDate, oldDate) => {
                 :enable-time-picker="false"
                 :min-date="new Date()"
                 no-today
+                :hide-offset-dates="true"
                 inline
+                highlight-disabled-days
                 :disabled-dates="unavailable_dates"
                 auto-apply
                 ref="picker"
@@ -144,7 +149,7 @@ watch(date, (newDate, oldDate) => {
                 class="justify-center"
                 calendar-class-name="justify-center"
                 calendar-cell-class-name="big-cell text-body-1 rounded-lg"
-                @update-month-year="getUnavailableDays($event)"
+                @update-month-year="current_month = $event.month"
               />
             </v-col>
             <v-col cols="12" class="my-4 d-flex justify-center">
