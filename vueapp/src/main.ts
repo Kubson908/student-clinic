@@ -8,13 +8,19 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import "@mdi/font/css/materialdesignicons.css";
 import * as VueRouter from "vue-router";
 import { routes } from "./router";
-import { User } from "./typings";
+import { User, Snackbar } from "./typings";
 
 export const user = reactive<User>({
   id: 0,
   name: localStorage.getItem("user") ?? "Niezalogowany",
   isLoggedIn: localStorage.getItem("user") ? true : false,
   role: localStorage.getItem("role") ?? undefined,
+});
+
+export const snackbar = reactive<Snackbar>({
+  showing: false,
+  error: false,
+  text: "",
 });
 
 declare module "vue-router" {

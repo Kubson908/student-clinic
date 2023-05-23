@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount } from "vue";
 import NavBar from "./components/NavBar.vue";
-import { user } from "./main";
+import { user, snackbar } from "./main";
 // import FooterBar from "./components/FooterBar.vue";
 
 onBeforeMount(() => {
@@ -23,6 +23,15 @@ onBeforeMount(() => {
       /></v-fade-transition>
     </router-view>
     <!-- <FooterBar class="align-end"/> -->
+    <v-snackbar v-model="snackbar.showing" timeout="3000">
+      {{ snackbar.text }}
+
+      <template v-slot:actions>
+        <v-btn color="blue" variant="text" @click="snackbar.showing = false">
+          Zamknij
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 

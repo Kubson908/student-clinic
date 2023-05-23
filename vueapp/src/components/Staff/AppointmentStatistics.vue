@@ -26,7 +26,7 @@ const data: any = {
 const options: any = {
   responsive: true,
 };
-const date = ref<any>(null);
+const date = ref<any>({month: new Date().getMonth(), year: new Date().getFullYear()});
 const picker = ref<any>(null);
 const selected = ref<string>("Wizyty wg specjalności");
 console.log(date);

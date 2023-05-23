@@ -11,8 +11,7 @@ namespace Przychodnia.Shared
     {
         [Required]
         public string Id { get; set; } = string.Empty;
-        [Required]
-        public string Token { get; set; } = string.Empty;
+        public string? Token { get; set; } = string.Empty;
         [Required]
         [MinLength(8)]
         public string Password { get; set; } = string.Empty;

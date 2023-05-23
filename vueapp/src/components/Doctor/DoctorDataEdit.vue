@@ -2,7 +2,8 @@
 // Wojtek
 import { ref } from "vue";
 import axios from "axios";
-import { onBeforeMount, computed } from "vue";
+import { onBeforeMount } from "vue";
+import { snackbar } from "@/main";
 import {
   nameRules,
   surnameRules,
@@ -19,13 +20,6 @@ const pesel = ref<string>("");
 const phone = ref<string>("");
 const birthDate = ref<string>("");
 const specialization = ref<number>(0);
-const snackbar = ref<boolean>(false);
-const error = ref<boolean>(false);
-const snackbarText = computed(() => {
-  return error.value
-    ? "Wystąpił błąd podczas edycji"
-    : "Pomyślnie zaktualizowano dane";
-});
 
 const form = ref<any>();
 // eslint-disable-next-line
@@ -68,11 +62,13 @@ const submitData = async () => {
         dateOfBirth: birthDate.value,
       }
     );
-    if (res.status === 200) error.value = false;
+    if (res.status === 200) snackbar.error = false;
+    snackbar.text = "Pomyślnie zaktualizowano dane";
   } catch (e) {
-    error.value = true;
+    snackbar.error = true;
+    snackbar.text = "Wystąpił błąd podczas edycji";
   } finally {
-    snackbar.value = true;
+    snackbar.showing = true;
   }
 };
 </script>
@@ -252,15 +248,6 @@ const submitData = async () => {
         </v-row>
       </v-form>
     </v-card-text>
-    <v-snackbar v-model="snackbar" timeout="3000">
-      {{ snackbarText }}
-
-      <template v-slot:actions>
-        <v-btn color="blue" variant="text" @click="snackbar = false">
-          Zamknij
-        </v-btn>
-      </template>
-    </v-snackbar>
   </v-card>
 </template>
 

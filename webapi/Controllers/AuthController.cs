@@ -146,6 +146,7 @@ namespace Przychodnia.Webapi.Controllers
             if (result.Succeeded) return Ok("Success");
             return BadRequest("Token is invalid");
         }
+
         [HttpPatch("employee-reset-password")]
         public async Task<IActionResult> ResetEmployeePassword([FromBody] ResetPasswordDto dto)
         {

@@ -58,38 +58,12 @@ const filteredAppointments = computed(() => {
           </v-container>
           <v-row no-gutters justify="center">
             <v-col cols="12" sm="6" md="6">
-              <DatePicker
-                auto-apply
-                month-picker
-                no-today
+              <Datepicker
                 v-model="date"
                 :teleport="true"
                 :enable-time-picker="false"
-                locale="pl"
-                class="px-8"
-                :clearable="false"
-                ref="picker"
-              >
-                <template #trigger>
-                  <v-text-field
-                    class="pa-0"
-                    variant="solo"
-                    type="text"
-                    readonly
-                    append-inner-icon="mdi-calendar-month"
-                    label="Miesiąc i rok"
-                    :model-value="
-                      date
-                        ? `${
-                            date.getMonth() < 9
-                              ? `0${date.getMonth() + 1}`
-                              : date.getMonth() + 1
-                          }.${date.getMonth()}`
-                        : 'Brak'
-                    "
-                  ></v-text-field>
-                </template>
-              </DatePicker>
+                :format="format"
+              />
             </v-col>
           </v-row>
         </v-card-item>

@@ -48,7 +48,9 @@ builder.Services.AddIdentityCore<Patient>(config =>
 }).AddTokenProvider<PasswordResetTokenProvider<Patient>>(nameof(PasswordResetTokenProvider<Patient>))
     .AddDefaultTokenProviders().AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddIdentityCore<Employee>().AddDefaultTokenProviders()
+builder.Services.AddIdentityCore<Employee>()
+    .AddTokenProvider<PasswordResetTokenProvider<Employee>>(nameof(PasswordResetTokenProvider<Employee>))
+    .AddDefaultTokenProviders()
     .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddRazorPages();

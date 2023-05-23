@@ -117,7 +117,7 @@ export const routes: Array<{
     meta: { roles: null },
   },
   {
-    path: "/staff/statistics",
+    path: "/staff/appointmentstatistics",
     component: AppointmentStatistics,
     meta: { roles: null },
   },
