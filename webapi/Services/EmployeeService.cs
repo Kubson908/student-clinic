@@ -41,12 +41,14 @@ namespace Przychodnia.Webapi.Services
                 DateOfBirth = dto.DateOfBirth,
                 Pesel = dto.Pesel,
                 Specialization = dto.Specialization,
+                EmailConfirmed = true,
             };
 
             var result = await _userManager.CreateAsync(employee, dto.Password);
 
             if (result.Succeeded)
             {
+                if (dto.Specialization == null) await _userManager.AddToRoleAsync(employee, "Staff");
                 await _userManager.AddToRoleAsync(employee, "Employee");
                 // TODO: Send a confirmation email
 
@@ -91,7 +93,8 @@ namespace Przychodnia.Webapi.Services
             {
                 new Claim("Email", dto.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Role, "Employee")
+                new Claim(ClaimTypes.Role, "Employee"),
+                user.Specialization == null ? new Claim(ClaimTypes.Role, "Staff") : null
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"] ?? "spare key"));
@@ -112,7 +115,7 @@ namespace Przychodnia.Webapi.Services
                 AccessToken = tokenString,
                 ExpireDate = token.ValidTo,
                 User = user.FirstName + " " + user.LastName,
-                Role = "Employee"
+                Roles = await _userManager.GetRolesAsync(user)
             };
         }
 

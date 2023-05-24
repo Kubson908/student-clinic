@@ -8,6 +8,6 @@
         public string? AccessToken { get; set; } = string.Empty;
         public DateTime? ExpireDate { get; set; }
         public string? User { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public IList<string> Roles { get; set; } = new List<string>();
     }
 }

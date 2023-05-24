@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { onBeforeMount } from "vue";
-import axios from "axios";
+import { authorized } from "@/main";
 import { passwordRules } from "@/validation";
 import { snackbar } from "@/main";
 
@@ -12,17 +12,13 @@ const passRepeat = ref<string>("");
 const form = ref<any>();
 const visible = ref<boolean>(false);
 const visibleRepeat = ref<boolean>(false);
+const loading = ref<boolean>(false);
 // const props = defineProps({
 // id: Number,
 // });
 onBeforeMount(async () => {
-  const doc = await axios.get(
-    `http://localhost:7042/api/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
+  const doc = await authorized.get(
+    `/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`
   );
   const data = doc.data;
   name.value = data.firstName;
@@ -44,17 +40,26 @@ const submitData = async () => {
   const valid = await form.value.validate();
   if (!valid) return;
   try {
-    const res = await axios.patch(
+    loading.value = true;
+    const res = await authorized.patch(
       `http://localhost:7042/api/auth/employee-reset-password`,
+      
       {
         id: "52e97c43-3a30-49b3-ba28-9b761da64680",
         password: pass.value,
-      }
+      },
     );
-    await console.log(res.data);
-  } catch (e) {
-    console.log(e);
-  } finally {
+    if (res.status === 200) {
+      snackbar.error = false;
+      snackbar.text = "Pomyślnie zmieniono hasło";
+    }
+  } 
+  catch (e) {
+    snackbar.error = true;
+    snackbar.text = "Wystąpił błąd podczas zmiany hasła";
+  } 
+  finally {
+    loading.value = false;
     snackbar.showing = true;
   }
 };
@@ -62,6 +67,14 @@ const submitData = async () => {
 
 <template>
   <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+    <template #loader>
+      <v-progress-linear
+        :active="loading"
+        color="deep-purple"
+        height="4"
+        indeterminate
+      ></v-progress-linear>
+    </template>
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card

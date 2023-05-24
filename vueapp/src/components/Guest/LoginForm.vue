@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import axios from "axios";
+import { unauthorized } from "../../main";
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
-import { prefix } from "../../config";
 import { router, user } from "../../main";
+import { snackbar } from "../../main";
 
 const visible = ref(false);
 const loading = ref<boolean>(false);
@@ -23,13 +23,14 @@ const submit = async (data: SubmitEvent) => {
   await data;
   const login = await form_login.value?.validate();
   const reset = await form_reset.value?.validate();
-  loading.value = true;
   if (login && login.valid) {
     try {
-      const res = await axios.post(`${prefix}/api/auth/login`, {
+      loading.value = true;
+      const res = await unauthorized.post("/auth/login", {
         email: email.value,
         password: pass.value,
       });
+
       localStorage.setItem("token", res.data.accessToken);
       if (remember_me.value)
         localStorage.setItem("expireDate", res.data.expireDate);
@@ -39,18 +40,22 @@ const submit = async (data: SubmitEvent) => {
         localStorage.setItem("expireDate", time.toString());
       }
       localStorage.setItem("user", res.data.user);
-      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("roles", JSON.stringify(res.data.roles));
       user.name = res.data.user;
       user.isLoggedIn = true;
-      user.role = res.data.role;
-      console.log(user);
+      user.roles = res.data.roles;
 
       router.push("/");
-    } catch (error) {
-      alert("Błędny e-mail lub hasło");
-      console.log(error);
+    } catch (error: any) {
+      snackbar.text =
+        error.response && error.response.status == 401
+          ? "Błędny e-mail lub hasło"
+          : "Wystąpił nieznany błąd";
+      snackbar.error = true;
+      snackbar.showing = true;
+    } finally {
+      loading.value = false;
     }
-
     form_reset.value?.reset();
     form_login.value?.reset();
   }
@@ -88,7 +93,7 @@ const passwordRules = [
 </script>
 
 <template>
-  <v-row justify="center" class="mx-2">
+  <v-row no-gutters justify="center" class="mx-2">
     <v-col xs="12" sm="6" md="3" align-self="center">
       <v-card elevation="5" class="rounded-lg" :loading="loading">
         <template v-slot:loader="{ isActive }">

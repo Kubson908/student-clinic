@@ -20,7 +20,7 @@ import HomePageCard from "./HomePageCard.vue";
             <v-carousel-item>
               <v-parallax
                 height="100%"
-                src="https://pixabay.com/get/g8e38cbb871778650e19b901fbbba38c32eda476e809b8bca2d1a7a04ec3bb844deeb19eada7d9603f5b5a240901ce7fa.jpg"
+                src="https://cdn.pixabay.com/photo/2021/10/11/17/37/doctor-6701410_960_720.jpg"
               >
               </v-parallax>
             </v-carousel-item>
@@ -28,7 +28,7 @@ import HomePageCard from "./HomePageCard.vue";
             <v-carousel-item>
               <v-parallax
                 height="100%"
-                src="https://pixabay.com/get/g61537867dcb96244f8321803c76a2e57608bfb0ad691997b9ece82ed7ef877a78658dc1711b3e67e09525d6fbdcc8985.jpg"
+                src="https://cdn.pixabay.com/photo/2020/04/19/20/10/test-tube-5065426_960_720.jpg"
               >
               </v-parallax>
             </v-carousel-item>

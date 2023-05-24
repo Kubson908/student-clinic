@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { ref, onMounted, computed, watch } from "vue";
-import axios from "axios";
-
+import { authorized } from "@/main";
+import { notNull } from "@/validation";
 
 const hours = [
-  "9:00",
-  "9:30",
+  "09:00",
+  "09:30",
   "10:00",
   "10:30",
   "11:00",
@@ -29,40 +29,40 @@ const date = ref<any>(new Date());
 const unavailable_hours = ref<Array<string>>([]);
 const unavailable_dates = ref<any>();
 const current_month = ref<number>(date.value.getMonth());
+const form = ref<any>();
+// eslint-disable-next-line
+defineExpose({
+  date,
+  select,
+});
 
 const getUnavailableHours = async () => {
   let token = await localStorage.getItem("token");
-  let res = await axios.get(
-    `http://localhost:7042/api/appointment/available-hours/${
+  let res = await authorized.get(
+    `/appointment/available-hours/${
       date.value.toISOString().split("T")[0]
-    }/specialization/0`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    }/specialization/0`
   );
   unavailable_hours.value = res.data;
 };
 
 const getUnavailableDays = async (month: number) => {
   let token = await localStorage.getItem("token");
-  let res = await axios.get(
+  let res = await authorized.get(
     `http://localhost:7042/api/appointment/specialization/0/year/${date.value.getFullYear()}/month/${
       month + 1
-    }`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    }`
   );
   unavailable_dates.value = res.data;
 };
 
 // eslint-disable-next-line
 const emit = defineEmits(["page"]);
-const change_page = (arg: number) => {
+const change_page = async (arg: number) => {
+  if (arg > 0) {
+    const valid = ((await form.value.validate()) as any).valid;
+    if (!valid) return;
+  }
   emit("page", arg);
 };
 
@@ -80,15 +80,10 @@ const available_hours = computed(() => {
 onMounted(async () => {
   let token = await localStorage.getItem("token");
   let today = new Date();
-  let res = await axios.get(
+  let res = await authorized.get(
     `http://localhost:7042/api/appointment/specialization/0/year/${today.getFullYear()}/month/${
       today.getMonth() + 1
-    }`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    }`
   );
   unavailable_dates.value = res.data;
 });
@@ -151,14 +146,15 @@ watch(current_month, (newMonth, oldMonth) => {
               />
             </v-col>
             <v-col cols="12" class="my-4 d-flex justify-center">
-              <!-- <VueDatePicker ref="minutesPicker" v-model="time" time-picker :min-time="{ hours: 8, minutes: 59 }" :max-time="{ hours: 16, minutes: 59 }" :start-time="{hours: 0, minutes: 0}" minutes-increment="15" minutes-grid-increment="16" inline auto-apply/> -->
-              <v-select
-                class="w-75"
-                variant="solo"
-                label="Wybierz godzinę"
-                :items="available_hours"
-                v-model="select"
-              ></v-select>
+              <v-form class="w-100" ref="form" validate-on="input">
+                <v-select
+                  variant="solo"
+                  label="Wybierz godzinę"
+                  :items="available_hours"
+                  v-model="select"
+                  :rules="notNull"
+                ></v-select>
+              </v-form>
             </v-col>
           </v-row>
         </v-container>

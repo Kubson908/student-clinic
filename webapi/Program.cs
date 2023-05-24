@@ -8,6 +8,7 @@ using Przychodnia.Webapi.Services;
 using Przychodnia.Webapi.Models;
 using Przychodnia.Shared;
 using System.Text.Json.Serialization;
+using Przychodnia.Webapi.CustomTokenProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,23 +36,20 @@ var connectionString = builder.Configuration.GetConnectionString("SqlServer")
     ?? throw new InvalidOperationException("Connection string 'SqlServer' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedEmail = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddIdentityCore<Patient>(config =>
 {
     config.Tokens.PasswordResetTokenProvider = nameof(PasswordResetTokenProvider<Patient>);
-    /*config.Tokens.ProviderMap.Add("CustomPasswordResetToken",
-        new TokenProviderDescriptor(
-            typeof(PasswordResetTokenProvider<Patient>)));
-    config.Tokens.PasswordResetTokenProvider = "CustomPasswordResetToken";*/
+    config.Tokens.EmailConfirmationTokenProvider = nameof(EmailConfirmationTokenProvider<Patient>);
+    config.SignIn.RequireConfirmedAccount = true;
 }).AddTokenProvider<PasswordResetTokenProvider<Patient>>(nameof(PasswordResetTokenProvider<Patient>))
-    .AddDefaultTokenProviders().AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddTokenProvider<EmailConfirmationTokenProvider<Patient>>(nameof(EmailConfirmationTokenProvider<Patient>))
+    .AddDefaultTokenProviders().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddIdentityCore<Employee>()
     .AddTokenProvider<PasswordResetTokenProvider<Employee>>(nameof(PasswordResetTokenProvider<Employee>))
-    .AddDefaultTokenProviders()
-    .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddDefaultTokenProviders().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddRazorPages();
 
@@ -74,6 +72,8 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.AllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
+
+    options.SignIn.RequireConfirmedEmail = true;
 });
 
 builder.Services.AddAuthentication(auth =>

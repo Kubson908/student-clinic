@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from "axios";
+import { authorized } from "@/main";
 import { onBeforeMount, reactive } from "vue";
 import { Appointments } from "../../typings";
 
@@ -7,11 +7,7 @@ let test = reactive<Appointments>({
   appointments: [],
 });
 onBeforeMount(async () => {
-  const res = await axios.get("http://localhost:7042/api/Appointment/patient", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
+  const res = await authorized.get("/Appointment/patient");
   // console.log(res.data.appointments);
   test.appointments = res.data.appointments[0];
   console.log(test);

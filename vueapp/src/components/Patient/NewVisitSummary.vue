@@ -1,9 +1,14 @@
 <script setup lang="ts">
 // eslint-disable-next-line
-const emit = defineEmits(["page"]);
+const emit = defineEmits(["page", "submit"]);
+// eslint-disable-next-line
+const props = defineProps({
+  data: Object,
+});
 const change_page = (arg: number) => {
   emit("page", arg);
 };
+
 </script>
 
 <template>
@@ -39,7 +44,9 @@ const change_page = (arg: number) => {
             >
               Data wizyty
             </v-col>
-            <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
+            <v-col class="text-left">
+              {{ props.data?.date + ", " + props.data?.hour }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -48,7 +55,7 @@ const change_page = (arg: number) => {
             >
               Specjalista
             </v-col>
-            <v-col class="text-left"> Internista </v-col>
+            <v-col class="text-left"> {{ props.data?.specialization }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -57,7 +64,9 @@ const change_page = (arg: number) => {
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> Kaszel, katar, gorączka </v-col>
+            <v-col class="text-left">
+              {{ props.data?.symptoms ? props.data?.symptoms : "Nie podano" }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -66,7 +75,9 @@ const change_page = (arg: number) => {
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> Riposton </v-col>
+            <v-col class="text-left">
+              {{ props.data?.medicine ? props.data?.medicine : "Nie podano" }}
+            </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
@@ -92,6 +103,7 @@ const change_page = (arg: number) => {
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="emit('submit')"
             >
               Zatwierdź
             </v-btn>

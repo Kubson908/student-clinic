@@ -4,7 +4,16 @@ const logout = () => {
   localStorage.clear();
   user.name = "Niezalogowany";
   user.isLoggedIn = false;
-  user.role = undefined;
+  user.roles = [];
+  router.push("/");
+};
+const checkRole = (roles: string[], role: string) => {
+  roles.forEach(function (value) {
+    if (value == role) {
+      return true;
+    }
+  });
+  return false;
 };
 // console.log(router.currentRoute.value)
 </script>
@@ -21,30 +30,52 @@ const logout = () => {
         </v-app-bar-nav-icon
       ></router-link>
 
-      <div v-if="user.role == 'Patient'">
-        <v-tabs mandatory="false" :model-value="router.currentRoute.value.path">
+      <div v-if="checkRole(user.roles!,'Patient')">
+        <v-tabs
+          :mandatory="false"
+          :model-value="router.currentRoute.value.path"
+        >
           <router-link to="/patient/appointments" custom v-slot="{ navigate }">
-            <v-tab value="/patient/appointments" @click="navigate">Wizyty</v-tab>
+            <v-tab value="/patient/appointments" @click="navigate"
+              >Wizyty</v-tab
+            >
           </router-link>
           <router-link to="/patient/patientcard" custom v-slot="{ navigate }">
-            <v-tab value="/patient/patientcard" @click="navigate">Pacjenci</v-tab>
+            <v-tab value="/patient/patientcard" @click="navigate"
+              >Pacjenci</v-tab
+            >
           </router-link>
         </v-tabs>
       </div>
-      <div v-else-if="user.role == 'Employee'">
-        <v-tabs mandatory="false" :model-value="router.currentRoute.value.path">
+      <div v-else-if="checkRole(user.roles!,'Employee')">
+        <v-tabs
+          :mandatory="false"
+          :model-value="router.currentRoute.value.path"
+        >
           <router-link to="/patient/appointments" custom v-slot="{ navigate }">
-            <v-tab value="/patient/appointments" @click="navigate">Wizyty</v-tab>
+            <v-tab value="/patient/appointments" @click="navigate"
+              >Wizyty</v-tab
+            >
           </router-link>
           <router-link to="/patient/patientcard" custom v-slot="{ navigate }">
-            <v-tab value="/patient/patientcard" @click="navigate">Pacjenci</v-tab>
+            <v-tab value="/patient/patientcard" @click="navigate"
+              >Pacjenci</v-tab
+            >
           </router-link>
         </v-tabs>
       </div>
     </template>
     <span class="d-inline-block link">
       {{ user.name }}
+      <v-app-bar-nav-icon
+        size="30"
+        icon="mdi-account-circle-outline"
+        class="icon"
+        link
+      >
+      </v-app-bar-nav-icon>
     </span>
+
     <v-menu>
       <template v-slot:activator="{ props }">
         <v-app-bar-nav-icon v-bind="props" class="icon"> </v-app-bar-nav-icon>

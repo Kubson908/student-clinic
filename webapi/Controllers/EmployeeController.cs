@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
 using Przychodnia.Shared;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -36,7 +37,7 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] string id)
         {
@@ -51,7 +52,7 @@ namespace Przychodnia.Webapi.Controllers
                 e.DateOfBirth,
                 e.Pesel
             }).FirstOrDefaultAsync(e => e.Id == id);
-            return Worker == null ? NotFound() : Ok(Worker);
+            return Worker == null ? NotFound("Employee not found") : Ok(Worker);
         }
 
         [HttpPatch("update/{id}")]
@@ -82,13 +83,20 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         // TODO: sprawdzanie dostępności lekarza o konkretnej godzinie (przypisywanie wizyt)
+        [Authorize(Roles = "Staff")]
         [HttpGet("available-doctors")]
         public async Task<IActionResult> GetAvailableDoctors([FromBody] GetAvailableDoctorsDto dto)
         {
             if (dto.Date < DateTime.Now || dto == null) return BadRequest("Model error");
 
-            var doctors = await _db.Employees.Where(e => e.Specialization == dto.Specialization
-                                            && !e.Appointments.Select(a => a.Date).Contains(dto.Date)).ToListAsync();
+            var doctors = await _db.Employees.Where(e => e.Specialization == dto.Specialization 
+                && !e.Appointments.Select(a => a.Date).Contains(dto.Date))
+                .Select(d => new
+                {
+                    d.Id,
+                    d.FirstName,
+                    d.LastName,
+                }).ToListAsync();
 
             /*var test = _db.Employees.Select(e => e.Appointments.Select(a => a.Date));*/
             return Ok(doctors);

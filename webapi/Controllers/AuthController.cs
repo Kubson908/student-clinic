@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -32,6 +34,14 @@ namespace Przychodnia.Webapi.Controllers
             _employeeManager = employeeManager;
         }
 
+       /* [HttpPost("send-register-code")]
+        public async Task<IActionResult> SendCode([FromBody] MailAddress email)
+        {
+            if (email == null) return BadRequest("Email is null");
+            var code = _patientManager.Generate
+            
+        }*/
+
         // /api/auth/register
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody]RegisterDto model)
@@ -40,12 +50,24 @@ namespace Przychodnia.Webapi.Controllers
             {
                 var result = await _patientService.RegisterUserAsync(model);
 
-                if (result.IsSuccess) return Ok("Sukces"); // Status code: 200
+                if (result.IsSuccess) return Ok("Succes"); // Status code: 200
 
                 return BadRequest(result);
             }
 
-            return BadRequest("Pola nie są poprawne"); // Status code: 400
+            return BadRequest("Invalid data"); // Status code: 400
+        }
+        // dodać do vue lub przerobić na sms code wysyłany na maila
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
+        {
+            if (dto.Token == null) return BadRequest("Token is null");
+
+            var user = await _patientManager.FindByIdAsync(dto.Id);
+            if (user == null) return NotFound("User not found");
+            var result = await _patientManager.ConfirmEmailAsync(user, dto.Token);
+            if (result.Succeeded) return Ok("Email confirmed");
+            return BadRequest("Invalid token");
         }
 
         // /api/auth/login
@@ -63,11 +85,13 @@ namespace Przychodnia.Webapi.Controllers
 
                 if (result.IsSuccess)
                     return Ok(result);
+                if (!result.Errors.IsNullOrEmpty())
+                    return Unauthorized("Email not confirmed");
 
-                return BadRequest("Błąd logowania");
+                return Unauthorized("Login error");
             }
 
-            return BadRequest("Pola nie są poprawne");
+            return BadRequest("Invalid data");
         }
 
         // /api/auth/register-employee
@@ -142,11 +166,12 @@ namespace Przychodnia.Webapi.Controllers
 
             var user = await _patientManager.FindByIdAsync(dto.Id);
             if (user == null) return NotFound("User not found");
-            var result = await _patientManager.ResetPasswordAsync(user, dto.Token, dto.Password);
+            var result = await _patientManager.ResetPasswordAsync(user, dto.Token ?? "", dto.Password);
             if (result.Succeeded) return Ok("Success");
             return BadRequest("Token is invalid");
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPatch("employee-reset-password")]
         public async Task<IActionResult> ResetEmployeePassword([FromBody] ResetPasswordDto dto)
         {

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onBeforeMount } from "vue";
+import { onBeforeMount, watch } from "vue";
 import NavBar from "./components/NavBar.vue";
 import { user, snackbar } from "./main";
 // import FooterBar from "./components/FooterBar.vue";
+let timeout: any = null;
 
 onBeforeMount(() => {
   const date = Date.parse(localStorage.getItem("expireDate") as string);
@@ -10,6 +11,14 @@ onBeforeMount(() => {
     localStorage.clear();
     user.name = "Niezalogowany";
     user.isLoggedIn = false;
+  }
+});
+watch(() => snackbar.showing, (curr, prev) => {
+  if (!curr && prev) {
+    timeout = setTimeout(() => {
+      snackbar.text = "";
+      snackbar.error = false;
+    }, 2000)
   }
 });
 </script>
@@ -23,11 +32,17 @@ onBeforeMount(() => {
       /></v-fade-transition>
     </router-view>
     <!-- <FooterBar class="align-end"/> -->
-    <v-snackbar v-model="snackbar.showing" timeout="3000">
+    <v-snackbar
+      location="top"
+      class="mt-16"
+      v-model="snackbar.showing"
+      timeout="3000"
+      :color="snackbar.error ? 'error' : 'success'"
+    >
       {{ snackbar.text }}
 
       <template v-slot:actions>
-        <v-btn color="blue" variant="text" @click="snackbar.showing = false">
+        <v-btn variant="text" @click="snackbar.showing = false">
           Zamknij
         </v-btn>
       </template>

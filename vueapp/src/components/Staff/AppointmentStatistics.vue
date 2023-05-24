@@ -26,10 +26,13 @@ const data: any = {
 const options: any = {
   responsive: true,
 };
-const date = ref<any>({month: new Date().getMonth(), year: new Date().getFullYear()});
+const date = ref<any>({
+  month: new Date().getMonth(),
+  year: new Date().getFullYear(),
+});
 const picker = ref<any>(null);
 const selected = ref<string>("Wizyty wg specjalności");
-console.log(date);
+//console.log(date);
 </script>
 <template>
   <v-row justify="center" no-gutters>
@@ -92,13 +95,16 @@ console.log(date);
         <v-card-actions>
           <v-container class="d-flex justify-center bottom pa-0 white">
             <div width="90%" class="space-between pa-4">
-              <v-btn
-                width="20%"
-                variant="outlined"
-                color="blue-darken-2"
-                class="mt-2 button"
-                >Wstecz</v-btn
-              >
+              <router-link to="/doctor/doctorpage" custom v-slot="{ navigate }">
+                <v-btn
+                  width="20%"
+                  variant="outlined"
+                  color="blue-darken-2"
+                  class="mt-2 button"
+                  @click="navigate"
+                  >Wstecz</v-btn
+                >
+              </router-link>
             </div>
           </v-container>
         </v-card-actions>

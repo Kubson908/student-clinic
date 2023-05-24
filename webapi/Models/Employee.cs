@@ -16,7 +16,6 @@ namespace Przychodnia.Webapi.Models
         [Required]
         public string DateOfBirth { get; set; } = string.Empty;
 
-        [Required]
         public Specialization? Specialization { get; set; }
 
         [Required]

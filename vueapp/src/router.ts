@@ -124,7 +124,7 @@ export const routes: Array<{
   {
     path: "/staff/patientlist",
     component: PatientList,
-    meta: { roles: null },
+    meta: { roles: ["Staf", "Employee"] },
   },
   {
     path: "/patient/passwordreset",

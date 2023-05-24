@@ -7,13 +7,10 @@ using System.Threading.Tasks;
 
 namespace Przychodnia.Shared
 {
-    public class ResetPasswordDto
+    public class ConfirmEmailDto
     {
         [Required]
         public string Id { get; set; } = string.Empty;
         public string? Token { get; set; }
-        [Required]
-        [MinLength(8)]
-        public string Password { get; set; } = string.Empty;
     }
 }

@@ -37,6 +37,7 @@ namespace Przychodnia.Webapi.Controllers
             return patients;
         }
 
+        [Authorize(Roles = "Staff, Employee, Patient")]
         [HttpGet("patient-card")]
         [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -44,7 +45,7 @@ namespace Przychodnia.Webapi.Controllers
         {
             string? role = HttpContext.User.FindFirstValue(ClaimTypes.Role);
             string patientId = string.Empty;
-            if (role == "Patient") patientId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            if (role != null && role.Contains("Patient")) patientId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             else if (role == "Employee" && id != null) patientId = id;
             if (patientId == string.Empty) return StatusCode(418);
             var patient = await _db.Patients.Where(p => p.Id == patientId).Include(p =>  p.Appointments)

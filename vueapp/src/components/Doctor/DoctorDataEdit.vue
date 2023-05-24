@@ -1,9 +1,8 @@
 <script setup lang="ts">
 // Wojtek
 import { ref } from "vue";
-import axios from "axios";
+import { authorized, snackbar, specializations } from "@/main";
 import { onBeforeMount } from "vue";
-import { snackbar } from "@/main";
 import {
   nameRules,
   surnameRules,
@@ -20,6 +19,7 @@ const pesel = ref<string>("");
 const phone = ref<string>("");
 const birthDate = ref<string>("");
 const specialization = ref<number>(0);
+const waiting = ref(false);
 
 const form = ref<any>();
 // eslint-disable-next-line
@@ -28,13 +28,8 @@ const props = defineProps({
 });
 //const specialization = ref<string>("");
 onBeforeMount(async () => {
-  const res = await axios.get(
-    `http://localhost:7042/api/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
+  const res = await authorized.get(
+    `http://localhost:7042/api/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`
   );
   const data = res.data;
   name.value = data.firstName;
@@ -50,7 +45,8 @@ const submitData = async () => {
   const valid = await form.value.validate();
   if (!valid) return;
   try {
-    const res = await axios.patch(
+    waiting.value = true;
+    const res = await authorized.patch(
       `http://localhost:7042/api/Employee/update/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`,
       {
         firstName: name.value,
@@ -60,7 +56,7 @@ const submitData = async () => {
         specialization: specialization.value,
         phoneNumber: phone.value,
         dateOfBirth: birthDate.value,
-      }
+      },
     );
     if (res.status === 200) snackbar.error = false;
     snackbar.text = "Pomyślnie zaktualizowano dane";
@@ -68,13 +64,22 @@ const submitData = async () => {
     snackbar.error = true;
     snackbar.text = "Wystąpił błąd podczas edycji";
   } finally {
+    waiting.value = false;
     snackbar.showing = true;
   }
 };
 </script>
 
 <template>
-  <v-card width="560px" location="center" elevation="5" class="rounded-lg mt-6">
+  <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+    <template #loader>
+      <v-progress-linear
+        :active="waiting"
+        color="deep-purple"
+        height="4"
+        indeterminate
+      ></v-progress-linear>
+    </template>
     <v-card-item>
       <!-- <v-card-title font-size="32">Twoje dane</v-card-title> -->
       <p class="font-weight-bold text-h4">Dane lekarza</p>
@@ -188,12 +193,7 @@ const submitData = async () => {
                     v-model="specialization"
                     label="Specjalizacja"
                     :rules="notNull"
-                    :items="[
-                      { value: 0, title: 'Internista' },
-                      { value: 1, title: 'Pulmonolog' },
-                      { value: 2, title: 'Okulista' },
-                      { value: 3, title: 'Gastrolog' },
-                    ]"
+                    :items="specializations"
                     item-title="title"
                     item-value="value"
                   >
@@ -204,46 +204,50 @@ const submitData = async () => {
           </v-card-text>
         </v-container>
 
-        <v-row justify="start">
+        <v-row no-gutters justify="start">
           <v-col cols="auto" class="me-auto">
-            <v-sheet class="pa-2 ma-2">
-              <router-link to="/doctor/doctorpage" custom v-slot="{ navigate }">
-                <v-btn
-                  type="submit"
-                  variant="outlined"
-                  text="blue-darken"
-                  color="blue-darken-2"
-                  class="mt-2 button"
-                  @click="navigate"
-                >
-                  Wstecz
-                </v-btn>
-              </router-link>
-            </v-sheet>
+            <router-link to="/doctor/doctorpage" custom v-slot="{ navigate }">
+              <v-btn
+                type="submit"
+                variant="outlined"
+                text="blue-darken"
+                color="blue-darken-2"
+                class="mt-2 button"
+                @click="navigate"
+              >
+                Wstecz
+              </v-btn>
+            </router-link>
           </v-col>
           <v-col cols="auto">
-            <v-sheet class="pa-2 ma-2">
+            <v-row no-gutters>
               <v-btn
                 type="submit"
                 color="blue-darken-2"
-                class="mt-2 button"
+                class="button"
                 @click="submitData"
               >
                 Zapisz
               </v-btn>
-            </v-sheet>
-            <router-link to="/staff/passwordreset" custom v-slot="{ navigate }">
-              <v-btn
-                variant="text"
-                align-self="center"
-                size="small"
-                color="blue-darken-2"
-                class="button pa-0 ma-0"
-                @click="navigate"
+            </v-row>
+            <v-row no-gutters>
+              <router-link
+                to="/staff/passwordreset"
+                custom
+                v-slot="{ navigate }"
               >
-                Zmień hasło
-              </v-btn>
-            </router-link>
+                <v-btn
+                  variant="text"
+                  align-self="center"
+                  size="small"
+                  color="blue-darken-2"
+                  class="button pa-0 mt-2"
+                  @click="navigate"
+                >
+                  Zmień hasło
+                </v-btn>
+              </router-link>
+            </v-row>
           </v-col>
         </v-row>
       </v-form>

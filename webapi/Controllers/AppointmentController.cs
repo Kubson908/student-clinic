@@ -115,8 +115,8 @@ namespace Przychodnia.Webapi.Controllers
             }).FirstOrDefaultAsync(a => a.Id == id);
             return appointment == null ? NotFound() : Ok(appointment);
         }
-
-        [HttpPost]
+        [Authorize(Roles = "Patient")]
+        [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] CreateAppointmentDto dto)
         {
@@ -126,12 +126,15 @@ namespace Przychodnia.Webapi.Controllers
                 || dto.Date.DayOfWeek.Equals(0) || (dto.Date.Hour >= 14
                 || dto.Date.Hour < 9)
                 && dto.Date.DayOfWeek.Equals(6))) return StatusCode(406, "Wrong time");
+            if (dto.Date.CompareTo(DateTime.Now.AddHours(2)) < 0) return StatusCode(406, "Past date");
             DateTime date = new DateTime(dto.Date.Year, dto.Date.Month, dto.Date.Day, dto.Date.Hour, dto.Date.Minute, 0, dto.Date.Kind);
             int employees_count = _db.Employees.Count(emp => emp.Specialization == dto.Specialization);
             int appointments_count = _db.Appointments.Count(a => a.Date == date && a.Specialization == dto.Specialization);
             bool available = appointments_count < employees_count;
             if (!available) return StatusCode(406, "Date not available");
             string id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            if (_db.Appointments.Any(a => a.Date.CompareTo(date) == 0 && a.PatientId == id))
+                return Conflict("You have already scheduled an appointment for this time.");
             var appointment = new Appointment();
             appointment.Date = date;
             appointment.Specialization = dto.Specialization;
@@ -139,10 +142,24 @@ namespace Przychodnia.Webapi.Controllers
             appointment.Medicines = dto.Medicines;
             appointment.PatientId = id;
 
-
             await _db.Appointments.AddAsync(appointment);
             await _db.SaveChangesAsync();
             return StatusCode(201, "Created");
+        }
+
+        [HttpDelete("cancel-appointment/{id}")]
+        public async Task<IActionResult> CancelAppointment([FromRoute] int id)
+        {
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && a.PatientId == userId);
+            if (appointment != null && (appointment.Date - DateTime.Now).TotalHours >= 24)
+            {
+                await _db.Appointments.Where(a => a.Id == id && a.PatientId == userId).ExecuteDeleteAsync();
+                await _db.SaveChangesAsync();
+                return Ok("Appointment cancelled");
+            } else if (appointment != null && (appointment.Date - DateTime.Now).TotalHours < 24) 
+                return Conflict("The visit can be canceled at least 24 hours before the date");
+            return NotFound("Appointment not found");
         }
 
         [HttpGet("patient")]

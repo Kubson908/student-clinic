@@ -4,7 +4,7 @@ import Datepicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
 import { computed } from "vue";
 import { onBeforeMount } from "vue";
-import axios from "axios";
+import { authorized } from "@/main";
 
 const date = ref(new Date());
 date.value.setHours(0, 0, 0, 0);
@@ -19,13 +19,8 @@ interface IApppointment {
 var appointments: IApppointment[] = [];
 
 onBeforeMount(async () => {
-  const res = await axios.get(
-    "http://localhost:7042/api/Appointment/schedule",
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
+  const res = await authorized.get(
+    "http://localhost:7042/api/Appointment/schedule"
   );
   appointments = res.data;
   //console.log(appointments);
