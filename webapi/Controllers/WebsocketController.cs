@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿/*using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 
 namespace Przychodnia.Webapi.Controllers
 {
-    public class WebsocketController : ControllerBase
+    public class WebsocketControllers : ControllerBase
     {
         public async Task Get()
         {
@@ -42,5 +42,11 @@ namespace Przychodnia.Webapi.Controllers
                 receiveResult.CloseStatusDescription,
                 CancellationToken.None);
         }
+
+        private async Task Send(HttpContext context, WebSocket webSocket)
+        {
+
+        }
     }
 }
+*/

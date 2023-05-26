@@ -9,6 +9,10 @@ using Przychodnia.Webapi.Models;
 using Przychodnia.Shared;
 using System.Text.Json.Serialization;
 using Przychodnia.Webapi.CustomTokenProviders;
+using System.Net.WebSockets;
+using System.Net;
+using Org.BouncyCastle.Tls;
+using Przychodnia.Webapi.Websocket;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -107,7 +111,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-/*app.UseHttpsRedirection();*/  // POTEM ODKOMENTOWA�
+/*app.UseHttpsRedirection();*/  // POTEM ODKOMENTOWAC
 
 app.UseCors("_myAllowSpecificOrigins");
 
@@ -122,14 +126,8 @@ var webSocketOptions = new WebSocketOptions
 
 app.UseWebSockets(webSocketOptions);
 
+app.UseMiddleware<WebSocketMiddleware>();
+
 app.MapControllers();
 
-app.Run(/*async (context) =>
-{
-    using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-    var socketFinishetTcs = new TaskCompletionSource<object>();
-
-    BackgroundSocketProcessor.AddSocket(webSocket, socketFinishetTcs);
-
-    await socketFinishedTcs.Task;
-}*/);
+app.Run();
