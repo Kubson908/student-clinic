@@ -9,11 +9,7 @@ using Przychodnia.Webapi.Models;
 using Przychodnia.Shared;
 using System.Text.Json.Serialization;
 using Przychodnia.Webapi.CustomTokenProviders;
-using System.Net.WebSockets;
-using System.Net;
-using Org.BouncyCastle.Tls;
 using Przychodnia.Webapi.Websocket;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

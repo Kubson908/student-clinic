@@ -1,6 +1,8 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.WebSockets;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace Przychodnia.Webapi.Websocket
 {
@@ -10,6 +12,12 @@ namespace Przychodnia.Webapi.Websocket
         private readonly ILogger<WebSocketsController> _logger;
         List<WsConnectionObject> connections;
         JwtSecurityTokenHandler handler;
+        List<string> endpoints = new List<string>()
+        {
+            "/api/appointment/create",
+            "/api/appointment/assign-appointment/",
+            "/api/appointment/cancel-appointment/"
+        };
 
 
         public WebSocketMiddleware(RequestDelegate next, ILogger<WebSocketsController> logger)
@@ -22,6 +30,34 @@ namespace Przychodnia.Webapi.Websocket
 
         public async Task InvokeAsync(HttpContext context)
         {
+            CancellationToken ct = context.RequestAborted;
+            if (endpoints.Any(e => context.Request.Path.ToString().Contains(e))  
+                && context.Response.Body != null)
+            {
+                var originalBody = context.Response.Body;
+                try
+                {
+                    var memoryBodyStream = new MemoryStream();
+
+                    context.Response.Body = memoryBodyStream;
+                    await _next.Invoke(context);
+                    memoryBodyStream.Seek(0, SeekOrigin.Begin);
+                    string body = await new StreamReader(memoryBodyStream).ReadToEndAsync();
+                    memoryBodyStream.Seek(0, SeekOrigin.Begin);
+
+                    await memoryBodyStream.CopyToAsync(originalBody);
+                    Console.WriteLine(body);
+                    // TODO: Manage events and clients
+                    if (context.Response.StatusCode == 201)
+                        await SendEventAsync("Staff", body, "newAppointment", ct);
+                    return;
+
+                }
+                finally
+                {
+                    context.Response.Body = originalBody;
+                }
+            }
             if (!context.WebSockets.IsWebSocketRequest)
             {
                 await _next.Invoke(context);
@@ -30,7 +66,6 @@ namespace Przychodnia.Webapi.Websocket
             string wsId = context.Connection.Id;
             
             
-            CancellationToken ct = context.RequestAborted;
             WebSocket ws = await context.WebSockets.AcceptWebSocketAsync();
             connections.Add(new WsConnectionObject()
             {
@@ -68,11 +103,11 @@ namespace Przychodnia.Webapi.Websocket
                 {
                     var token = handler.ReadJwtToken(data);
                     con.IsAuthenticated = true;
-                    con.Role = token.Claims.First(c => c.Type == ClaimTypes.Role).Value;
+                    con.Role = token.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
                     continue;
                 }
                 Console.WriteLine(wsId + ": " + data);
-                foreach (var item in connections.Where(c => c.Role == "Patient"))
+                foreach (var item in connections.Where(c => c.Role != null && c.Role.Contains("Staff")))
                 {
                     if (item.Connection != null && item.Connection.State != WebSocketState.Open)
                     {
@@ -132,26 +167,38 @@ namespace Przychodnia.Webapi.Websocket
             return ws.SendAsync(segment, WebSocketMessageType.Text, true, ct);
         }
 
-        Task SendEventAsync(WebSocket ws, string data, CancellationToken ct = default)
+        public async Task SendEventAsync(string role, string data, string eventName, CancellationToken ct = default)
         {
+/*            string eventString = JsonSerializer.Serialize(new { eventName = eventName, data = data });*/
             var buffer = System.Text.Encoding.UTF8.GetBytes(data);
             var segment = new ArraySegment<byte>(buffer);
-            return ws.
-        }
-
-      /*  async Task SendEvent(string name, string data, CancellationToken ct = default)
-        {
-            var buffer = System.Text.Encoding.UTF8.GetBytes(data);
-            var segment = new ArraySegment<byte>(buffer);
-            foreach (var item in connections)
+            
+            foreach (var item in connections.Where(c => c.Role != null && c.Role.Any(r => r.ToString() == role)))
             {
-                if (item.Value.State != WebSocketState.Open)
+                Console.WriteLine(item.Role);
+                if (item.Connection != null && item.Connection.State != WebSocketState.Open ||
+                    item.Connection == null)
                 {
                     continue;
                 }
 
-                await item.Value.SendAsync(segment, WebSocketMessageType.Binary);
+                await item.Connection.SendAsync(segment, WebSocketMessageType.Text, true, ct);
             }
-        }*/
+        }
+
+        /*  async Task SendEvent(string name, string data, CancellationToken ct = default)
+          {
+              var buffer = System.Text.Encoding.UTF8.GetBytes(data);
+              var segment = new ArraySegment<byte>(buffer);
+              foreach (var item in connections)
+              {
+                  if (item.Value.State != WebSocketState.Open)
+                  {
+                      continue;
+                  }
+
+                  await item.Value.SendAsync(segment, WebSocketMessageType.Binary);
+              }
+          }*/
     }
 }

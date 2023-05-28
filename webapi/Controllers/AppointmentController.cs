@@ -144,7 +144,7 @@ namespace Przychodnia.Webapi.Controllers
 
             await _db.Appointments.AddAsync(appointment);
             await _db.SaveChangesAsync();
-            return StatusCode(201, "Created");
+            return StatusCode(201, new { message =  "Created", appointment = appointment });
         }
 
         [HttpDelete("cancel-appointment/{id}")]
