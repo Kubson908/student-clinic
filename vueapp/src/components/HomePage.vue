@@ -34,11 +34,7 @@ import HomePageCard from "./HomePageCard.vue";
             </v-carousel-item>
 
             <v-carousel-item>
-              <v-parallax
-                height="100%"
-                src="https://w.wallhaven.cc/full/k7/wallhaven-k7e52q.jpgr"
-              >
-              </v-parallax>
+              <v-parallax height="100%" src="slider1.png"> </v-parallax>
             </v-carousel-item>
           </v-carousel>
         </v-col>

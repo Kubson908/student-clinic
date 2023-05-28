@@ -2,6 +2,7 @@
 import { onBeforeMount, watch } from "vue";
 import NavBar from "./components/NavBar.vue";
 import { user, snackbar } from "./main";
+import { connect } from "./socket";
 // import FooterBar from "./components/FooterBar.vue";
 // let timeout: any = null;
 
@@ -12,15 +13,19 @@ onBeforeMount(() => {
     user.name = "Niezalogowany";
     user.isLoggedIn = false;
   }
+  if (user.isLoggedIn) connect();
 });
-watch(() => snackbar.showing, (curr, prev) => {
-  if (!curr && prev) {
-    // timeout = setTimeout(() => {
-    //   snackbar.text = "";
-    //   snackbar.error = false;
-    // }, 2000)
+watch(
+  () => snackbar.showing,
+  (curr, prev) => {
+    if (!curr && prev) {
+      // timeout = setTimeout(() => {
+      //   snackbar.text = "";
+      //   snackbar.error = false;
+      // }, 2000)
+    }
   }
-});
+);
 </script>
 
 <template>

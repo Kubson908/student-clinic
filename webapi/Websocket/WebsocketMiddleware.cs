@@ -1,4 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NuGet.Protocol;
+using Przychodnia.Shared;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.WebSockets;
 using System.Security.Claims;
@@ -46,10 +49,24 @@ namespace Przychodnia.Webapi.Websocket
                     memoryBodyStream.Seek(0, SeekOrigin.Begin);
 
                     await memoryBodyStream.CopyToAsync(originalBody);
-                    Console.WriteLine(body);
-                    // TODO: Manage events and clients
-                    if (context.Response.StatusCode == 201)
-                        await SendEventAsync("Staff", body, "newAppointment", ct);
+                    if (context.Response.StatusCode >= 300) return;
+                    JObject json = JObject.Parse(body);
+
+                    switch (json["message"]?.ToString())
+                    {
+                        case "Appointment created":
+                            await SendEventAsync(new List<string>{"Staff"}, json["data"]?.ToString() ?? "", "newAppointment", ct);
+                            break;
+
+                        case "Appointment cancelled": // ???
+                            await SendEventAsync(new List<string> {"Staff"}, json["data"]?.ToString() ?? "", "deletedAppointment", ct);
+                            break;
+                        
+                        case "Appointment assigned": // ???
+                            await SendAssignedAppointment(json["data"]?.ToString() ?? "", "assignedAppointment", ct);
+                            break;
+                    }
+                        
                     return;
 
                 }
@@ -104,6 +121,7 @@ namespace Przychodnia.Webapi.Websocket
                     var token = handler.ReadJwtToken(data);
                     con.IsAuthenticated = true;
                     con.Role = token.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+                    con.UserId = token.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                     continue;
                 }
                 Console.WriteLine(wsId + ": " + data);
@@ -119,7 +137,11 @@ namespace Przychodnia.Webapi.Websocket
             }
             connections.Remove(connections.First(c => c.Id == wsId));
             if (ws.State != WebSocketState.Aborted )
-                await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "UserDisconnected", ct);
+                try
+                {
+                    await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "UserDisconnected", ct);
+                }  
+                catch (TaskCanceledException) { } catch (OperationCanceledException) { }
             _logger.Log(LogLevel.Information, wsId + ": WebSocket connection closed"
                             + "\nTotal connections: " + connections.Count());
             ws.Dispose();
@@ -146,7 +168,7 @@ namespace Przychodnia.Webapi.Websocket
                 } while (!receiveResult.EndOfMessage);
 
 
-                ms.Seek(0, SeekOrigin.Begin); // Changing stream position to cover whole message
+                ms.Seek(0, SeekOrigin.Begin);
 
 
                 if (receiveResult.MessageType != WebSocketMessageType.Text)
@@ -154,7 +176,7 @@ namespace Przychodnia.Webapi.Websocket
 
                 using (StreamReader reader = new StreamReader(ms, System.Text.Encoding.UTF8))
                 {
-                    return await reader.ReadToEndAsync(); // decoding message
+                    return await reader.ReadToEndAsync();
                 }
 
             }
@@ -167,15 +189,18 @@ namespace Przychodnia.Webapi.Websocket
             return ws.SendAsync(segment, WebSocketMessageType.Text, true, ct);
         }
 
-        public async Task SendEventAsync(string role, string data, string eventName, CancellationToken ct = default)
+        public async Task SendEventAsync(List<string> role, string data, string eventName, CancellationToken ct = default)
         {
-/*            string eventString = JsonSerializer.Serialize(new { eventName = eventName, data = data });*/
-            var buffer = System.Text.Encoding.UTF8.GetBytes(data);
+            var obj = new WebSocketEventDto()
+            {
+                EventName = eventName,
+                Data = JObject.Parse(data)
+            };
+            var buffer = System.Text.Encoding.UTF8.GetBytes(obj.ToJson() ?? "");
             var segment = new ArraySegment<byte>(buffer);
             
-            foreach (var item in connections.Where(c => c.Role != null && c.Role.Any(r => r.ToString() == role)))
+            foreach (var item in connections.Where(c => c.Role != null && c.Role.Any(r => role.Contains(r.ToString()))))
             {
-                Console.WriteLine(item.Role);
                 if (item.Connection != null && item.Connection.State != WebSocketState.Open ||
                     item.Connection == null)
                 {
@@ -186,19 +211,29 @@ namespace Przychodnia.Webapi.Websocket
             }
         }
 
-        /*  async Task SendEvent(string name, string data, CancellationToken ct = default)
-          {
-              var buffer = System.Text.Encoding.UTF8.GetBytes(data);
-              var segment = new ArraySegment<byte>(buffer);
-              foreach (var item in connections)
-              {
-                  if (item.Value.State != WebSocketState.Open)
-                  {
-                      continue;
-                  }
+        public async Task SendAssignedAppointment(string data, string eventName, CancellationToken ct = default)
+        {
+            var obj = new WebSocketEventDto()
+            {
+                EventName = eventName,
+                Data = JObject.Parse(data)
+            };
+            var buffer = System.Text.Encoding.UTF8.GetBytes(obj.ToJson() ?? "");
+            var segment = new ArraySegment<byte>(buffer);
+            dynamic temp = JsonConvert.DeserializeObject(data) ?? "";
+            string patientId = (string)temp.patientId;
+            string doctorId = (string)temp.doctorId;
+            Console.WriteLine(patientId + " | " + doctorId);
+            foreach (var item in connections.Where(c => c.UserId == patientId || c.UserId == doctorId))
+            {
+                if (item.Connection != null && item.Connection.State != WebSocketState.Open ||
+                    item.Connection == null)
+                {
+                    continue;
+                }
 
-                  await item.Value.SendAsync(segment, WebSocketMessageType.Binary);
-              }
-          }*/
+                await item.Connection.SendAsync(segment, WebSocketMessageType.Text, true, ct);
+            }
+        }
     }
 }

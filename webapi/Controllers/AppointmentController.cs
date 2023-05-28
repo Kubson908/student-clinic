@@ -144,7 +144,7 @@ namespace Przychodnia.Webapi.Controllers
 
             await _db.Appointments.AddAsync(appointment);
             await _db.SaveChangesAsync();
-            return StatusCode(201, new { message =  "Created", appointment = appointment });
+            return StatusCode(201, new { message =  "Appointment created", data = appointment });
         }
 
         [HttpDelete("cancel-appointment/{id}")]
@@ -156,7 +156,7 @@ namespace Przychodnia.Webapi.Controllers
             {
                 await _db.Appointments.Where(a => a.Id == id && a.PatientId == userId).ExecuteDeleteAsync();
                 await _db.SaveChangesAsync();
-                return Ok("Appointment cancelled");
+                return Ok(new { message = "Appointment cancelled", data = new { id = id } });
             } else if (appointment != null && (appointment.Date - DateTime.Now).TotalHours < 24) 
                 return Conflict("The visit can be canceled at least 24 hours before the date");
             return NotFound("Appointment not found");
@@ -263,7 +263,7 @@ namespace Przychodnia.Webapi.Controllers
             appointment.DoctorId = doctorId;
             _db.Entry(appointment).Property(p => p.DoctorId).IsModified = true;
             await _db.SaveChangesAsync();
-            return Ok("Appointment assigned");
+            return Ok(new { message = "Appointment assigned", data = appointment });
         }
 
         [HttpPatch("finish/{id}")]
