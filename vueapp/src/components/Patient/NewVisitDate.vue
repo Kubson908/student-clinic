@@ -37,7 +37,7 @@ defineExpose({
 });
 
 const getUnavailableHours = async () => {
-  let token = await localStorage.getItem("token");
+  // let token = await localStorage.getItem("token");
   let res = await authorized.get(
     `/appointment/available-hours/${
       date.value.toISOString().split("T")[0]
@@ -47,7 +47,7 @@ const getUnavailableHours = async () => {
 };
 
 const getUnavailableDays = async (month: number) => {
-  let token = await localStorage.getItem("token");
+  // let token = await localStorage.getItem("token");
   let res = await authorized.get(
     `http://localhost:7042/api/appointment/specialization/0/year/${date.value.getFullYear()}/month/${
       month + 1
@@ -78,7 +78,7 @@ const available_hours = computed(() => {
 });
 
 onMounted(async () => {
-  let token = await localStorage.getItem("token");
+  // let token = await localStorage.getItem("token");
   let today = new Date();
   let res = await authorized.get(
     `http://localhost:7042/api/appointment/specialization/0/year/${today.getFullYear()}/month/${

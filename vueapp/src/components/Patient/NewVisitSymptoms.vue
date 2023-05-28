@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { specializations, authorized, router } from "@/main";
+import { specializations, router } from "@/main";
 import { notNull } from "../../validation";
 // eslint-disable-next-line
 const emit = defineEmits(["page"]);
@@ -51,8 +51,16 @@ defineExpose({
           :rules="notNull"
           v-model="specialization"
         ></v-select>
-        <v-textarea label="Objawy" variant="solo" v-model="symptoms"></v-textarea>
-        <v-textarea label="Stosowane leki" variant="solo" v-model="medicine"></v-textarea>
+        <v-textarea
+          label="Objawy"
+          variant="solo"
+          v-model="symptoms"
+        ></v-textarea>
+        <v-textarea
+          label="Stosowane leki"
+          variant="solo"
+          v-model="medicine"
+        ></v-textarea>
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
             <v-btn

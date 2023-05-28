@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { authorized, specializations, snackbar } from "../../main";
 import NewVisitSymptoms from "./NewVisitSymptoms.vue";
 import NewVisitDate from "./NewVisitDate.vue";

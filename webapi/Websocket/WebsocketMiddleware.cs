@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using System.Collections.Concurrent;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net.WebSockets;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Security.Claims;
 
 namespace Przychodnia.Webapi.Websocket
 {
@@ -11,14 +8,16 @@ namespace Przychodnia.Webapi.Websocket
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<WebSocketsController> _logger;
-        ConcurrentDictionary<string, WebSocket> connections { get; set; }
+        List<WsConnectionObject> connections;
+        JwtSecurityTokenHandler handler;
 
 
         public WebSocketMiddleware(RequestDelegate next, ILogger<WebSocketsController> logger)
         {
             _next = next;
-            connections = new ConcurrentDictionary<string, WebSocket>();
+            connections = new List<WsConnectionObject>();
             _logger = logger;
+            handler = new JwtSecurityTokenHandler();
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -28,14 +27,18 @@ namespace Przychodnia.Webapi.Websocket
                 await _next.Invoke(context);
                 return;
             }
-            _logger.Log(LogLevel.Information, "WebSocket connection established");
+            string wsId = context.Connection.Id;
+            
+            
             CancellationToken ct = context.RequestAborted;
             WebSocket ws = await context.WebSockets.AcceptWebSocketAsync();
-            string wsId = Guid.NewGuid().ToString();
-
-            connections.TryAdd(wsId, ws);
-
-
+            connections.Add(new WsConnectionObject()
+            {
+                Id = wsId,
+                Connection = ws,
+            });
+            _logger.Log(LogLevel.Information, wsId + ": WebSocket connection established" 
+                + "\nTotal connections: " + connections.Count());
 
             while (true)
             {
@@ -43,34 +46,48 @@ namespace Przychodnia.Webapi.Websocket
                 {
                     return;
                 }
-                string data = await ReadStringAsync(ws,ct);
-
+                string data = string.Empty;
+                try
+                {
+                    data = await ReadStringAsync(ws, ct);
+                } catch (OperationCanceledException)
+                {
+                    break;
+                }
+                var con = connections.First(c => c.Id == wsId);
                 if (string.IsNullOrEmpty(data))
                 {
                     if (ws.State != WebSocketState.Open)
                     {
-                        _logger.Log(LogLevel.Information, "WebSocket connection closed");
                         break;
                     }
 
                     continue;
                 }
-                foreach (var item in connections)
+                if (!con.IsAuthenticated && handler.CanReadToken(data))
                 {
-                    if (item.Value.State != WebSocketState.Open)
+                    var token = handler.ReadJwtToken(data);
+                    con.IsAuthenticated = true;
+                    con.Role = token.Claims.First(c => c.Type == ClaimTypes.Role).Value;
+                    continue;
+                }
+                Console.WriteLine(wsId + ": " + data);
+                foreach (var item in connections.Where(c => c.Role == "Patient"))
+                {
+                    if (item.Connection != null && item.Connection.State != WebSocketState.Open)
                     {
                         continue;
                     }
 
-                    await SendStringAsync(item.Value, data, ct);
+                    await SendStringAsync(item.Connection ?? ws, data, ct);
                 }
             }
-            WebSocket dummy;
-            connections.TryRemove(wsId, out dummy);
-            await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "UserDisconnected", ct);
-            
+            connections.Remove(connections.First(c => c.Id == wsId));
+            if (ws.State != WebSocketState.Aborted )
+                await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "UserDisconnected", ct);
+            _logger.Log(LogLevel.Information, wsId + ": WebSocket connection closed"
+                            + "\nTotal connections: " + connections.Count());
             ws.Dispose();
-
 
             /*await _next(context);*/
         }
@@ -89,7 +106,7 @@ namespace Przychodnia.Webapi.Websocket
 
                     receiveResult = await ws.ReceiveAsync(buffer, ct);
 
-                    ms.Write(buffer.Array, buffer.Offset, receiveResult.Count);
+                    if (buffer.Array != null) ms.Write(buffer.Array, buffer.Offset, receiveResult.Count);
 
                 } while (!receiveResult.EndOfMessage);
 
@@ -98,7 +115,7 @@ namespace Przychodnia.Webapi.Websocket
 
 
                 if (receiveResult.MessageType != WebSocketMessageType.Text)
-                    return null;
+                    return string.Empty;
 
                 using (StreamReader reader = new StreamReader(ms, System.Text.Encoding.UTF8))
                 {
@@ -113,6 +130,13 @@ namespace Przychodnia.Webapi.Websocket
             var buffer = System.Text.Encoding.UTF8.GetBytes(data);
             var segment = new ArraySegment<byte>(buffer);
             return ws.SendAsync(segment, WebSocketMessageType.Text, true, ct);
+        }
+
+        Task SendEventAsync(WebSocket ws, string data, CancellationToken ct = default)
+        {
+            var buffer = System.Text.Encoding.UTF8.GetBytes(data);
+            var segment = new ArraySegment<byte>(buffer);
+            return ws.
         }
 
       /*  async Task SendEvent(string name, string data, CancellationToken ct = default)

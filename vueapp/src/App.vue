@@ -3,7 +3,7 @@ import { onBeforeMount, watch } from "vue";
 import NavBar from "./components/NavBar.vue";
 import { user, snackbar } from "./main";
 // import FooterBar from "./components/FooterBar.vue";
-let timeout: any = null;
+// let timeout: any = null;
 
 onBeforeMount(() => {
   const date = Date.parse(localStorage.getItem("expireDate") as string);
@@ -15,10 +15,10 @@ onBeforeMount(() => {
 });
 watch(() => snackbar.showing, (curr, prev) => {
   if (!curr && prev) {
-    timeout = setTimeout(() => {
-      snackbar.text = "";
-      snackbar.error = false;
-    }, 2000)
+    // timeout = setTimeout(() => {
+    //   snackbar.text = "";
+    //   snackbar.error = false;
+    // }, 2000)
   }
 });
 </script>

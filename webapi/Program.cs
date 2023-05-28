@@ -13,6 +13,7 @@ using System.Net.WebSockets;
 using System.Net;
 using Org.BouncyCastle.Tls;
 using Przychodnia.Webapi.Websocket;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,9 +124,9 @@ var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(5)
 };
+webSocketOptions.AllowedOrigins.Add("http://localhost:8080");
 
 app.UseWebSockets(webSocketOptions);
-
 app.UseMiddleware<WebSocketMiddleware>();
 
 app.MapControllers();

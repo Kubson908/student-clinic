@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
 import { router, user } from "../../main";
 import { snackbar } from "../../main";
+import { connect } from "@/socket";
 
 const visible = ref(false);
 const loading = ref<boolean>(false);
@@ -44,7 +45,7 @@ const submit = async (data: SubmitEvent) => {
       user.name = res.data.user;
       user.isLoggedIn = true;
       user.roles = res.data.roles;
-
+      connect();
       router.push("/");
     } catch (error: any) {
       snackbar.text =
