@@ -8,13 +8,18 @@ const logout = () => {
   user.roles = [];
   router.push("/");
   socket.value?.close();
+  // console.log(user.roles);
 };
-const checkRole = (roles: string[], role: string) => {
-  roles.forEach(function (value) {
-    if (value == role) {
-      return true;
-    }
-  });
+const checkRole = (roles: string[], role: string[]) => {
+  // roles.forEach(function (value) {
+  if (JSON.stringify(roles) == JSON.stringify(role)) {
+    // console.log(JSON.stringify(roles[0]));
+    // console.log(JSON.stringify(role));
+    // console.log(role)
+    return true;
+  }
+  // }
+  // );
   return false;
 };
 // console.log(router.currentRoute.value)
@@ -32,7 +37,7 @@ const checkRole = (roles: string[], role: string) => {
         </v-app-bar-nav-icon
       ></router-link>
 
-      <div v-if="checkRole(user.roles!,'Patient')">
+      <div v-if="checkRole(user.roles!,['Patient'])">
         <v-tabs
           :mandatory="false"
           :model-value="router.currentRoute.value.path"
@@ -49,19 +54,50 @@ const checkRole = (roles: string[], role: string) => {
           </router-link>
         </v-tabs>
       </div>
-      <div v-else-if="checkRole(user.roles!,'Employee')">
+      <div v-else-if="checkRole(user.roles!,['Employee'])">
         <v-tabs
           :mandatory="false"
           :model-value="router.currentRoute.value.path"
         >
-          <router-link to="/patient/appointments" custom v-slot="{ navigate }">
-            <v-tab value="/patient/appointments" @click="navigate"
+          <router-link to="/doctor/visit_harmonogram" custom v-slot="{ navigate }">
+            <v-tab value="/doctor/visit_harmonogram" @click="navigate"
+              >Wizyty</v-tab
+            >
+          </router-link>
+          <router-link to="/staff/patientlist" custom v-slot="{ navigate }">
+            <v-tab value="/staff/patientlist" @click="navigate"
+              >Pacjenci</v-tab
+            >
+          </router-link>
+        </v-tabs>
+      </div>
+      <div v-else-if="checkRole(user.roles!,['Staff'])">
+        <v-tabs
+          :mandatory="false"
+          :model-value="router.currentRoute.value.path"
+        >
+          <router-link to="/doctor/visit_harmonogram" custom v-slot="{ navigate }">
+            <v-tab value="/doctor/visit_harmonogram" @click="navigate"
               >Wizyty</v-tab
             >
           </router-link>
           <router-link to="/patient/patientcard" custom v-slot="{ navigate }">
             <v-tab value="/patient/patientcard" @click="navigate"
               >Pacjenci</v-tab
+            >
+          </router-link>
+          <router-link to="/doctor/doctorpage" custom v-slot="{ navigate }">
+            <v-tab value="/doctor/doctorpage" @click="navigate"
+              >Lekarze</v-tab
+            >
+          </router-link>
+          <router-link
+            to="/staff/appointmentstatistics"
+            custom
+            v-slot="{ navigate }"
+          >
+            <v-tab value="/staff/appointmentstatistics" @click="navigate"
+              >Statystyka</v-tab
             >
           </router-link>
         </v-tabs>

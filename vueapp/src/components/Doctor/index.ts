@@ -1,0 +1,10 @@
+export { default as DoctorData } from "./DoctorData.vue";
+export { default as DoctorDataEdit } from "./DoctorDataEdit.vue";
+export { default as DoctorPage } from "./DoctorPage.vue";
+export { default as DoctorPasswordReset } from "./DoctorPasswordReset.vue";
+export { default as DoctorVisitDetails } from "./DoctorVisitDetails.vue";
+export { default as PatientDataReceptionEdit } from "./PatientDataReceptionEdit.vue";
+export { default as VisitAssign } from "./VisitAssign.vue";
+export { default as VisitDetails } from "./VisitDetails.vue";
+export { default as VisitHarmonogram } from "./VisitHarmonogram.vue";
+export { default as VisitSummary } from "./VisitSummary.vue";

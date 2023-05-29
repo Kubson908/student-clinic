@@ -1,47 +1,85 @@
-import SignUp from "./components/Guest/SignUp.vue";
-import AppointmentList from "./components/Patient/AppointmentList.vue";
-import LoginForm from "./components/Guest/LoginForm.vue";
-import HomePage from "./components/HomePage.vue";
-import { Component } from "vue";
-import VisitHarmonogram from "./components/Doctor/VisitHarmonogram.vue";
-import VisitDetails from "./components/Doctor/VisitDetails.vue";
-import VisitSummary from "./components/Doctor/VisitSummary.vue";
-import PatientCard from "./components/Patient/PatientCard.vue";
-import DoctorData from "./components/Doctor/DoctorData.vue";
-import PatientData from "./components/Patient/PatientData.vue";
-import PatientCancelVisit from "./components/Patient/PatientCancelVisit.vue";
-import PatientChangePassword from "./components/Patient/ChangePassword.vue";
-import GuestPasswordReset2 from "./components/Guest/GuestPasswordReset2.vue";
-import GuestPasswordReset from "./components/Guest/GuestPasswordReset.vue";
-import DoctorPasswordReset from "./components/Doctor/DoctorPasswordReset.vue";
-import UnauthorizedView from "./components/UnauthorizedView.vue";
-import DoctorDataEdit from "./components/Doctor/DoctorDataEdit.vue";
-import DoctorPage from "./components/Doctor/DoctorPage.vue";
-import DoctorVisitDetails from "./components/Doctor/DoctorVisitDetails.vue";
-import VisitAssign from "./components/Doctor/VisitAssign.vue";
-import PatientDataReceptionEdit from "./components/Doctor/PatientDataReceptionEdit.vue";
-import AwaitingAppointments from "./components/Staff/AwaitingAppointments.vue";
-import AppointmentStatistics from "./components/Staff/AppointmentStatistics.vue";
-import PatientList from "./components/Staff/PatientList.vue";
-import NewVisit from "./components/Patient/NewVisit.vue";
-import PatientPasswordReset from "./components/Patient/PasswordReset.vue";
-import StaffPasswordReset from "./components/Staff/StaffPasswordReset.vue";
+import { Route } from "./typings";
 
-export const routes: Array<{
-  path: string;
-  component: Component;
-  meta: { roles: Array<string> | null };
-}> = [
+import {
+  AppointmentStatistics,
+  AwaitingAppointments,
+  StaffPasswordReset,
+  PatientList,
+} from "./components/Staff";
+import {
+  PatientPasswordReset,
+  NewVisit,
+  PatientChangePassword,
+  PatientCancelVisit,
+  PatientCard,
+  PatientData,
+  AppointmentList,
+  PatientView,
+} from "./components/Patient";
+import {
+  GuestPasswordReset,
+  GuestPasswordReset2,
+  LoginForm,
+  SignUp,
+} from "./components/Guest";
+import {
+  VisitHarmonogram,
+  VisitDetails,
+  VisitSummary,
+  DoctorData,
+  DoctorDataEdit,
+  DoctorPage,
+  PatientDataReceptionEdit,
+  DoctorPasswordReset,
+  DoctorVisitDetails,
+  VisitAssign,
+} from "./components/Doctor";
+import { HomePage, UnauthorizedView } from "./components";
+
+export const routes: Array<Route> = [
   { path: "/", component: HomePage, meta: { roles: null } },
   { path: "/unauthorized", component: UnauthorizedView, meta: { roles: null } },
   {
-    path: "/patient/appointments",
-    component: AppointmentList,
-    meta: { roles: null },
+    path: "/patient/",
+    component: PatientView,
+    meta: { roles: ["Patient", "Employee"] },
+    children: [
+      {
+        path: "appointments",
+        component: AppointmentList,
+        meta: { roles: null },
+      },
+      { path: "new_visit", component: NewVisit, meta: { roles: null } },
+      {
+        path: "patientcard",
+        component: PatientCard,
+        meta: { roles: null },
+      },
+      {
+        path: "patientdata",
+        component: PatientData,
+        meta: { roles: null },
+      },
+
+      {
+        path: "cancelvisit",
+        component: PatientCancelVisit,
+        meta: { roles: null },
+      },
+      {
+        path: "changepassword",
+        component: PatientChangePassword,
+        meta: { roles: null },
+      },
+      {
+        path: "passwordreset",
+        component: PatientPasswordReset,
+        meta: { roles: null },
+      },
+    ],
   },
   { path: "/login", component: LoginForm, meta: { roles: null } },
   { path: "/signup", component: SignUp, meta: { roles: null } },
-  { path: "/patient/new_visit", component: NewVisit, meta: { roles: null } },
   {
     path: "/doctor/visit_harmonogram",
     component: VisitHarmonogram,
@@ -51,11 +89,6 @@ export const routes: Array<{
   {
     path: "/doctor/visitsummary",
     component: VisitSummary,
-    meta: { roles: null },
-  },
-  {
-    path: "/patient/patientcard",
-    component: PatientCard,
     meta: { roles: null },
   },
   { path: "/doctor/doctordata", component: DoctorData, meta: { roles: null } },
@@ -68,22 +101,6 @@ export const routes: Array<{
   {
     path: "/doctor/doctordataedit",
     component: DoctorDataEdit,
-    meta: { roles: null },
-  },
-  {
-    path: "/patient/patientdata",
-    component: PatientData,
-    meta: { roles: null },
-  },
-
-  {
-    path: "/patient/cancelvisit",
-    component: PatientCancelVisit,
-    meta: { roles: null },
-  },
-  {
-    path: "/patient/changepassword",
-    component: PatientChangePassword,
     meta: { roles: null },
   },
   {
@@ -125,11 +142,6 @@ export const routes: Array<{
     path: "/staff/patientlist",
     component: PatientList,
     meta: { roles: ["Staf", "Employee"] },
-  },
-  {
-    path: "/patient/passwordreset",
-    component: PatientPasswordReset,
-    meta: { roles: null },
   },
   {
     path: "/staff/passwordreset",

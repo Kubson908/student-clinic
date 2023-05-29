@@ -1,11 +1,26 @@
 <script setup lang="ts">
-//import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+import { authorized, snackbar } from "@/main";
+import { onMounted } from "vue";
+// eslint-disable-next-line
+const props = defineProps({
+  appointment_id: Number,
+});
+
+onMounted(async () => {
+  try {
+    const res = await authorized.get(`/appointments/${props.appointment_id}`);
+
+  } catch (e: any) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text =
+      e.response && e.response.status === 406
+        ? "Nie można anulować wizyty - termin na anulowanie upłynął"
+        : "Wystąpił nieznany błąd";
+  } finally {
+    snackbar.showing = true;
+  }
+});
 </script>
 
 <template>
@@ -84,14 +99,21 @@
 
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
-            <v-btn
-              variant="outlined"
-              size="large"
-              class="mt-2 button"
-              color="blue-darken-2"
+            <router-link
+              to="/patient/appointments"
+              custom
+              v-slot="{ navigate }"
             >
-              Wstecz
-            </v-btn>
+              <v-btn
+                variant="outlined"
+                size="large"
+                class="mt-2 button"
+                color="blue-darken-2"
+                @click="navigate"
+              >
+                Wstecz
+              </v-btn>
+            </router-link>
           </v-col>
           <v-col justify="center" class="text-right">
             <v-btn
