@@ -1,51 +1,14 @@
 <script setup lang="ts">
-
-//Wojtek
-// const appointments = [
-//   {
-//     id: 1,
-//     patient: "Tomasz Problem",
-//     date: "05/18/2023",
-//     symptom: "Ból głowy",
-//     medicines: "Rutinoskorbin"
-//   },
-//   {
-//     id: 2,
-//     patient: "Andrew Tate",
-//     date: "05/20/2023",
-//     symptom: "Ból głowy, kaszel",
-//     medicines: "Gripeks"
-//   },
-//   {
-//     id: 3,
-//     patient: "Greta Thunberg",
-//     date: "05/21/2023",
-//     symptom: "Ból głowy, katar",
-//     medicines: "Rutinoskorbin"
-//   }
-// ];
-// const doctor = [
-//   {
-//     id: 1,
-//     patient: "Adam Jaki",
-//   },
-//   {
-//     id: 2,
-//     patient: "Wiktor Chuj",
-//   }
-// ];
-
-//import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+import VueDatePicker from "@vuepic/vue-datepicker";
+import { router } from "@/main";
+const emit = defineEmits(["page"]);
+const change_page = (arg: number) => {
+  emit("page", arg);
+};
 </script>
 
 <template>
-  <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+  <v-card>
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -57,8 +20,8 @@
           <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
         </v-card>
       </v-container>
-      <v-card-title font-size="56">Przydziel wizytę</v-card-title>
-      <v-card-subtitle>Wybierz lekarza</v-card-subtitle>
+      <v-card-title font-size="56">Wizyta</v-card-title>
+      <v-card-subtitle>Wypełnij dane o wizycie</v-card-subtitle>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
@@ -73,7 +36,7 @@
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
-              Data wizyty
+              Informacje o wizycie
             </v-col>
             <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
           </v-row>
@@ -85,15 +48,6 @@
               Pacjent
             </v-col>
             <v-col class="text-left"> Jan ambroziak </v-col>
-          </v-row>
-          <v-row>
-            <v-col
-              cols="4"
-              class="font-weight-bold text-blue-darken-1 text-left"
-            >
-              Specjalizacja
-            </v-col>
-            <v-col class="text-left"> Punmonolog </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -114,19 +68,44 @@
             <v-col class="text-left"> Riposton </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
-          <!--<v-spacer></v-spacer>-->
+          <v-spacer></v-spacer>
+        </v-container>
+        <v-container>
           <v-row>
-            <p class="font-weight-bold">Lekarz</p>
+            <v-col cols="12" sm="6">
+              <v-textarea
+                variant="filled"
+                auto-grow
+                label="Diagnoza"
+                rows="5"
+                row-height="20"
+              ></v-textarea>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-textarea
+                variant="filled"
+                auto-grow
+                label="Leki"
+                rows="5"
+                row-height="20"
+              ></v-textarea>
+            </v-col>
+          </v-row>
+          <v-textarea label="Zalecenia"></v-textarea>
+
+          <v-row>
+            <p class="font-weight-bold">Termin wizyty kontrolnej</p>
+            <v-divider></v-divider>
           </v-row>
           <v-row>
             <v-col>
-              <v-select label="Wybierz lekarza"
-                :items="['Jan Chomar', 'Grzegorz Brzęczyszczykiewicz']">
-              </v-select>
+              <VueDatePicker auto-apply> </VueDatePicker>
+            </v-col>
+            <v-col>
+              <v-checkbox label=""></v-checkbox>
             </v-col>
           </v-row>
         </v-container>
-        
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
             <v-btn
@@ -134,6 +113,7 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>
@@ -147,8 +127,21 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="change_page(1)"
             >
-              Przydziel
+              Zakończ wizytę
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row justify="center">
+          <v-col justify="center" class="text-right">
+            <v-btn
+              variant="text"
+              align-self="center"
+              size="small"
+              class="mt-2 button"
+            >
+              Zapisz i wyjdź
             </v-btn>
           </v-col>
         </v-row>

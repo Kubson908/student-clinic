@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// Wojtek 
     import { ref } from "vue";
     const name = ref<string>("");
     const lastName = ref<string>("");
@@ -7,8 +6,13 @@
     const pesel = ref<string>("");
     const phone = ref<string>("");
     const birthDate = ref<string>("");
-    const medicinec = ref<string>("");
-    const allergiest = ref<string>("");
+    const medicine = ref<string>("");
+    const allergies = ref<string>("");
+    const terms = ref<boolean>(false);
+
+    const submit = () => {
+
+    }
 </script>
 
 <template>
@@ -16,7 +20,7 @@
     <v-card-item>
       <!-- <v-card-title font-size="32">Twoje dane</v-card-title> -->
       <p class="font-weight-bold text-h4">Dane pacjenta</p>
-      <v-card-subtitle>Edytuj dane pacjęta</v-card-subtitle>
+      <v-card-subtitle>Edytuj dane pacjenta</v-card-subtitle>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
@@ -88,7 +92,7 @@
                         <v-col>
                           <v-text-field type="input"
                                         label="Przyjmowane leki"
-                                        v-model="medicinec"
+                                        v-model="medicine"
                                         variant="solo"
                                         color="blue-darken-2"
                                         required>
@@ -99,7 +103,7 @@
                         <v-col>
                           <v-text-field type="input"
                                         label="Alergie"
-                                        v-model="allergiest"
+                                        v-model="allergies"
                                         variant="solo"
                                         color="blue-darken-2"
                                         required>

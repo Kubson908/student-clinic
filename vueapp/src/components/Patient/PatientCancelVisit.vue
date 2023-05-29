@@ -16,7 +16,6 @@ const getAppointmentData = async () => {
   try {
     const res = await authorized.get(`/appointment/${appointment_id}`);
     appointment_data.value = res.data
-    console.log(res.data)
   } catch (e: any) {
     console.log(e);
     snackbar.error = true;
@@ -86,7 +85,7 @@ const deleteAppointment = async () => {
             >
               Data wizyty
             </v-col>
-            <v-col class="text-left"> {{ appointment_data ? new Date(appointment_data.date).toLocaleDateString() : "Wczytywanie..." }} </v-col>
+            <v-col class="text-left"> {{ appointment_data ? `${new Date(appointment_data.date).toLocaleDateString()}, ${new Date(appointment_data.date).getHours()}:${("0" + new Date(appointment_data.date).getMinutes()).slice(-2)}` : "Wczytywanie..." }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -113,7 +112,7 @@ const deleteAppointment = async () => {
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> {{ appointment_data ? (appointment_data.medicines !== "string" ? appointment_data.medicines : "Nie podano") : "Wczytywanie..." }} </v-col>
+            <v-col class="text-left"> {{ appointment_data ? (appointment_data.medicines !== "" ? appointment_data.medicines : "Nie podano") : "Wczytywanie..." }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -122,28 +121,23 @@ const deleteAppointment = async () => {
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> {{ appointment_data ? (appointment_data.symptoms !== "string" ? appointment_data.symptoms : "Nie podano") : "Wczytywanie..." }} </v-col>
+            <v-col class="text-left"> {{ appointment_data ? (appointment_data.symptoms !== "" ? appointment_data.symptoms : "Nie podano") : "Wczytywanie..." }} </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
 
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
-            <router-link
-              to="/patient/appointments"
-              custom
-              v-slot="{ navigate }"
-            >
+  
               <v-btn
                 variant="outlined"
                 size="large"
                 class="mt-2 button"
                 color="blue-darken-2"
-                @click="navigate"
+                @click="router.back()"
               >
                 Wstecz
               </v-btn>
-            </router-link>
           </v-col>
           <v-col justify="center" class="text-right">
             <v-btn

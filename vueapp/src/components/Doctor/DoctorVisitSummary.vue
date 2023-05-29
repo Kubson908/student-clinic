@@ -1,15 +1,13 @@
 <script setup lang="ts">
-//import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+import { router } from "@/main";
+const emit = defineEmits(["page"]);
+const change_page = (arg: number) => {
+  emit("page", arg);
+};
 </script>
 
 <template>
-  <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+  <v-card >
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -123,6 +121,7 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="change_page(-1)"
             >
               Wstecz
             </v-btn>

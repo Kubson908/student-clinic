@@ -231,6 +231,43 @@ namespace Przychodnia.Webapi.Controllers
             }
         }
 
+        [Authorize(Roles = "Staff")]
+        [HttpGet("everySchedule")]
+        public async Task<IActionResult> GetAllDoctorsSchedule([FromBody] string? date)
+        {
+            if (date != null)
+            {
+                DateTime newDate = DateTime.Parse(date);
+                var appointments = await _db.Appointments.Where(a=> a.Date.CompareTo(newDate) == 0).Select(a => new
+                    {
+                        Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
+                        a.Date,
+                        a.Id,
+                        a.Finished,
+                        a.Medicines,
+                        a.Recommendations,
+                        a.Symptoms,
+                        a.ControlAppointment
+                    }).ToListAsync(); 
+                return Ok(appointments);
+            }
+            else
+            {
+                var appointments = await _db.Appointments.Select(a => new
+                   {
+                       Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
+                       a.Date,
+                       a.Id,
+                       a.Finished,
+                       a.Medicines,
+                       a.Recommendations,
+                       a.Symptoms,
+                       a.ControlAppointment
+                   }).ToListAsync(); 
+                return Ok(appointments);
+            }
+        }
+
         [HttpPatch("update/{id}")]
 
         public async Task<IActionResult> UpdateAppointment([FromRoute] int id, [FromBody] UpdateAppointmentDto dto)

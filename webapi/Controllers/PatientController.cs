@@ -38,10 +38,11 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         [Authorize(Roles = "Staff, Employee, Patient")]
+        [HttpGet("patient-card/{id}")]
         [HttpGet("patient-card")]
         [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPatientCard([FromBody] string? id )
+        public async Task<IActionResult> GetPatientCard([FromRoute] string? id )
         {
             string? role = HttpContext.User.FindFirstValue(ClaimTypes.Role);
             string patientId = string.Empty;

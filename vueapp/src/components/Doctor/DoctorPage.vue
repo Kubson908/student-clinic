@@ -2,15 +2,14 @@
 import DoctorCard from "./DoctorCard.vue";
 import { ref } from "vue";
 import { onBeforeMount } from "vue";
-import { authorized, specializations } from "@/main";
+import { authorized } from "@/main";
 
 const doctors = ref<any[]>([]);
 
 onBeforeMount(async () => {
   const card = await authorized.get("/employee/");
-  doctors.value = card.data.filter((emp: any)=> emp.specialization !== null);
+  doctors.value = card.data.filter((emp: any) => emp.specialization !== null);
 });
-
 </script>
 <template>
   <v-row no-gutters justify="center">

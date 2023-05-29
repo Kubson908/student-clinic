@@ -22,7 +22,7 @@ watch(
       timeout = setTimeout(() => {
         snackbar.text = "";
         snackbar.error = false;
-      }, 2000)
+      }, 2000);
     }
     if (curr && !prev) {
       clearTimeout(timeout);
@@ -91,7 +91,7 @@ watch(
   opacity: 0;
 }
 
-.list-move, 
+.list-move,
 .list-enter-active,
 .list-leave-active {
   transition: all 0.5s ease;

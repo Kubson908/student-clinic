@@ -3,10 +3,17 @@ import Datepicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
 import { computed } from "vue";
 import { onBeforeMount } from "vue";
-import { authorized } from "@/main";
+import { authorized, user, router } from "@/main";
+import { prefix } from "@/config";
 
+const checkRole = (role: string) => {
+  const roles = user.roles!;
+  return roles.includes(role);
+};
+
+// const date = ref(new Date());
+// date.value.setHours(0, 0, 0, 0);
 const date = ref(new Date());
-date.value.setHours(0, 0, 0, 0);
 
 interface IApppointment {
   id: number;
@@ -18,10 +25,14 @@ interface IApppointment {
 var appointments: IApppointment[] = [];
 
 onBeforeMount(async () => {
-  const res = await authorized.get(
-    "http://localhost:7042/api/Appointment/schedule"
-  );
-  appointments = res.data;
+  if (checkRole("Staff")) {
+    const res = await authorized.get(`${prefix}/api/Appointment/everySchedule`);
+    appointments = res.data;
+  } else if (checkRole("Employee")) {
+    const res = await authorized.get(`${prefix}/api/Appointment/schedule`);
+    appointments = res.data;
+  }
+
   //console.log(appointments);
 });
 
@@ -34,10 +45,10 @@ const format = (date: Date) => {
 };
 
 const filteredAppointments = computed(() => {
-  const d = date.value //Don't question it
-  //console.log(date.value.toDateString());//bez tego nie działa
+  const d = date.value; //Don't question it
+  //console.log(date.value.toDateString());
   return appointments.filter(
-    (it) => new Date(it.date).toDateString() == d.toDateString()
+    (it) => new Date(it.date).toDateString() == d.toDateString() // TODO: filter appointments at startup
   );
 });
 </script>
@@ -80,19 +91,33 @@ const filteredAppointments = computed(() => {
                 </v-col>
                 <v-col xs="10" md="8">
                   <v-container class="right">
-                    <v-btn
-                      color="blue-darken-2"
-                      class="mt-2 mx-2 button"
-                      :disabled="appointment.finished"
-                      >Rozpocznij</v-btn
+                    <router-link
+                      to="/doctor/visit"
+                      custom
+                      v-slot="{ navigate }"
                     >
-                    <v-btn
-                      color="blue-darken-2"
-                      class="mt-2 mx-2 button"
-                      variant="text"
+                      <v-btn
+                        color="blue-darken-2"
+                        class="mt-2 mx-2 button"
+                        :disabled="appointment.finished"
+                        @click="navigate"
+                        >Rozpocznij</v-btn
+                      >
+                    </router-link>
+                    <router-link
+                      :to="'/doctor/appointments/' + appointment.id"
+                      custom
+                      v-slot="{ navigate }"
                     >
-                      <u>Szczegóły</u>
-                    </v-btn>
+                      <v-btn
+                        color="blue-darken-2"
+                        class="mt-2 mx-2 button"
+                        variant="text"
+                        @click="navigate"
+                      >
+                        <u>Szczegóły</u>
+                      </v-btn>
+                    </router-link>
                   </v-container>
                 </v-col>
               </v-row>
@@ -107,6 +132,7 @@ const filteredAppointments = computed(() => {
               variant="outlined"
               color="blue-darken-2"
               class="mt-2 button"
+              @click="router.back()"
               >Wstecz</v-btn
             >
           </div>
