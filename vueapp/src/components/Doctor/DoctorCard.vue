@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { specializations } from '@/main';
 // eslint-disable-next-line
-defineProps<{
+const props = defineProps<{
   img: string;
-  doctor: { name: string; profession: string };
+  doctor: any;
   disabled: boolean;
 }>();
+
+
 </script>
 
 <template>
@@ -16,10 +19,10 @@ defineProps<{
       <v-col cols="6" class="d-flex flex-column">
         <v-card-item class="text-left pa-2">
           <v-card-title class="text-subtitle-2 py-0 my-0">
-            {{ doctor.profession }}
+            {{ specializations.find(specialization => specialization.value === props.doctor.specialization)?.title}}
           </v-card-title>
           <v-card-subtitle class="text-caption py-0 my-0">
-            {{ doctor.name }}
+            {{ props.doctor.firstName }} {{ props.doctor.lastName }}
           </v-card-subtitle>
         </v-card-item>
         <v-card-actions

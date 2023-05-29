@@ -1,5 +1,4 @@
 <script setup lang="ts">
-//Jakub Giecko
 import Datepicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
 import { computed } from "vue";

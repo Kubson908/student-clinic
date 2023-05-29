@@ -10,19 +10,10 @@ const logout = () => {
   socket.value?.close();
   // console.log(user.roles);
 };
-const checkRole = (roles: string[], role: string[]) => {
-  // roles.forEach(function (value) {
-  if (JSON.stringify(roles) == JSON.stringify(role)) {
-    // console.log(JSON.stringify(roles[0]));
-    // console.log(JSON.stringify(role));
-    // console.log(role)
-    return true;
-  }
-  // }
-  // );
-  return false;
+const checkRole = (role: string) => {
+  const roles = user.roles!
+  return roles.includes(role);
 };
-// console.log(router.currentRoute.value)
 </script>
 <template>
   <v-app-bar color="#597EDD" density="compact" theme="dark">
@@ -37,7 +28,7 @@ const checkRole = (roles: string[], role: string[]) => {
         </v-app-bar-nav-icon
       ></router-link>
 
-      <div v-if="checkRole(user.roles!,['Patient'])">
+      <div v-if="checkRole('Patient')">
         <v-tabs
           :mandatory="false"
           :model-value="router.currentRoute.value.path"
@@ -54,7 +45,7 @@ const checkRole = (roles: string[], role: string[]) => {
           </router-link>
         </v-tabs>
       </div>
-      <div v-else-if="checkRole(user.roles!,['Employee'])">
+      <div v-else-if="checkRole('Staff')">
         <v-tabs
           :mandatory="false"
           :model-value="router.currentRoute.value.path"
@@ -66,23 +57,6 @@ const checkRole = (roles: string[], role: string[]) => {
           </router-link>
           <router-link to="/staff/patientlist" custom v-slot="{ navigate }">
             <v-tab value="/staff/patientlist" @click="navigate"
-              >Pacjenci</v-tab
-            >
-          </router-link>
-        </v-tabs>
-      </div>
-      <div v-else-if="checkRole(user.roles!,['Staff'])">
-        <v-tabs
-          :mandatory="false"
-          :model-value="router.currentRoute.value.path"
-        >
-          <router-link to="/doctor/visit_harmonogram" custom v-slot="{ navigate }">
-            <v-tab value="/doctor/visit_harmonogram" @click="navigate"
-              >Wizyty</v-tab
-            >
-          </router-link>
-          <router-link to="/patient/patientcard" custom v-slot="{ navigate }">
-            <v-tab value="/patient/patientcard" @click="navigate"
               >Pacjenci</v-tab
             >
           </router-link>
@@ -102,18 +76,60 @@ const checkRole = (roles: string[], role: string[]) => {
           </router-link>
         </v-tabs>
       </div>
+      <div v-else-if="checkRole('Employee')">
+        <v-tabs
+          :mandatory="false"
+          :model-value="router.currentRoute.value.path"
+        >
+          <router-link to="/doctor/visit_harmonogram" custom v-slot="{ navigate }">
+            <v-tab value="/doctor/visit_harmonogram" @click="navigate"
+              >Wizyty</v-tab
+            >
+          </router-link>
+          <router-link to="/staff/patientlist" custom v-slot="{ navigate }">
+            <v-tab value="/staff/patientlist" @click="navigate"
+              >Pacjenci</v-tab
+            >
+          </router-link>
+        </v-tabs>
+      </div>
+      
     </template>
-    <span class="d-inline-block link">
+    
+    <span class="d-inline-block link" >
       {{ user.name }}
-      <v-app-bar-nav-icon
-        size="30"
+      <router-link to="/patient/patientcard" custom v-slot="{ navigate }" >
+      <v-app-bar-nav-icon v-if="checkRole('Patient')"
+        size="50"
         icon="mdi-account-circle-outline"
         class="icon"
         link
+        @click="navigate"
       >
       </v-app-bar-nav-icon>
+      <v-app-bar-nav-icon v-else-if="checkRole('Staff')"
+        size="50"
+        icon="mdi-hospital-building"
+        class="icon"
+        link
+        
+      >
+      </v-app-bar-nav-icon>
+      <v-app-bar-nav-icon v-else-if="checkRole('Employee')"
+        size="50"
+        icon="mdi-doctor"
+        class="icon"
+        link
+        @click="navigate"
+      >
+      </v-app-bar-nav-icon>
+      
+      </router-link>
+      
+    
     </span>
 
+    
     <v-menu>
       <template v-slot:activator="{ props }">
         <v-app-bar-nav-icon v-bind="props" class="icon"> </v-app-bar-nav-icon>
@@ -149,7 +165,8 @@ const checkRole = (roles: string[], role: string[]) => {
   color: var(--font-primary-color) !important;
 }
 .link {
-  width: 150px;
+  width: 300px;
   color: white;
+  text-align: right;
 }
 </style>

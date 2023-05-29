@@ -1,30 +1,60 @@
 <script setup lang="ts">
-import { authorized, snackbar } from "@/main";
-import { onMounted } from "vue";
-// eslint-disable-next-line
-const props = defineProps({
-  appointment_id: Number,
-});
+import { authorized, snackbar, router, specializations } from "@/main";
+import { onBeforeMount, ref } from "vue";
 
-onMounted(async () => {
+let appointment_id: string = "";
+const appointment_data = ref<any>(null);
+
+const waiting = ref<boolean>(true);
+
+onBeforeMount(async () => {
+  appointment_id = router.currentRoute.value.params['id'] as string;
+  await getAppointmentData();
+})
+
+const getAppointmentData = async () => {
   try {
-    const res = await authorized.get(`/appointments/${props.appointment_id}`);
-
+    const res = await authorized.get(`/appointment/${appointment_id}`);
+    appointment_data.value = res.data
+    console.log(res.data)
   } catch (e: any) {
     console.log(e);
     snackbar.error = true;
-    snackbar.text =
-      e.response && e.response.status === 406
-        ? "Nie można anulować wizyty - termin na anulowanie upłynął"
-        : "Wystąpił nieznany błąd";
+    snackbar.text = "Wystąpił błąd przy pobieraniu danych z serwera";
+  } finally {
+    waiting.value = false;
+  }
+}
+
+const deleteAppointment = async () => {
+  try {
+    waiting.value = true;
+    const res = await authorized.delete(`/appointment/cancel-appointment/${appointment_id}`)
+    if (res.status === 200) {
+      snackbar.error = false;
+      snackbar.text = "Pomyślnie anulowano wizytę";
+    }
+  } catch (e: any) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = e.status === 409 ? "Nie możesz już anulować tej wizyty" : "Wystąpił błąd przy anulowaniu wizyty";
   } finally {
     snackbar.showing = true;
+    waiting.value = false;
   }
-});
+}
 </script>
 
 <template>
   <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+    <template #loader>
+      <v-progress-linear
+        :active="waiting"
+        color="deep-purple"
+        height="4"
+        indeterminate
+      ></v-progress-linear>
+    </template>
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -56,7 +86,7 @@ onMounted(async () => {
             >
               Data wizyty
             </v-col>
-            <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
+            <v-col class="text-left"> {{ appointment_data ? new Date(appointment_data.date).toLocaleDateString() : "Wczytywanie..." }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -65,7 +95,7 @@ onMounted(async () => {
             >
               Lekarz
             </v-col>
-            <v-col class="text-left"> Maciej Kowalczyk </v-col>
+            <v-col class="text-left"> {{ appointment_data ? appointment_data.doctor ? appointment_data.doctor.firstName + " " + appointment_data.doctor.lastName : specializations.find(specialization => specialization.value === appointment_data.specialization)!.title : "Wczytywanie..." }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -74,7 +104,7 @@ onMounted(async () => {
             >
               Pacjent
             </v-col>
-            <v-col class="text-left"> Jan Kowalski </v-col>
+            <v-col class="text-left"> {{ appointment_data ? appointment_data.patient.firstName + " " + appointment_data.patient.lastName : "Wczytywanie..." }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -83,7 +113,7 @@ onMounted(async () => {
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> Kaszel, katar, gorączka </v-col>
+            <v-col class="text-left"> {{ appointment_data ? (appointment_data.medicines !== "string" ? appointment_data.medicines : "Nie podano") : "Wczytywanie..." }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -92,7 +122,7 @@ onMounted(async () => {
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> Riposton </v-col>
+            <v-col class="text-left"> {{ appointment_data ? (appointment_data.symptoms !== "string" ? appointment_data.symptoms : "Nie podano") : "Wczytywanie..." }} </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
@@ -124,6 +154,7 @@ onMounted(async () => {
               size="large"
               class="mt-2 button"
               color="red-darken-2"
+              @click="deleteAppointment"
             >
               Potwierdź
             </v-btn>

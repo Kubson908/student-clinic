@@ -95,6 +95,7 @@ namespace Przychodnia.Webapi.Controllers
                 a.Id,
                 a.Date,
                 a.Finished,
+                a.Specialization,
                 Doctor = a.Doctor != null ? new
                 {
                     a.Doctor.FirstName,
@@ -173,6 +174,7 @@ namespace Przychodnia.Webapi.Controllers
                     a.Date,
                     a.Id,
                     a.Finished,
+                    a.Specialization,
                     Doctor = a.Doctor != null ? new
                     {
                         a.Doctor.FirstName,

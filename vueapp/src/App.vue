@@ -4,7 +4,7 @@ import NavBar from "./components/NavBar.vue";
 import { user, snackbar } from "./main";
 import { connect } from "./socket";
 // import FooterBar from "./components/FooterBar.vue";
-// let timeout: any = null;
+let timeout: any = null;
 
 onBeforeMount(() => {
   const date = Date.parse(localStorage.getItem("expireDate") as string);
@@ -19,10 +19,13 @@ watch(
   () => snackbar.showing,
   (curr, prev) => {
     if (!curr && prev) {
-      // timeout = setTimeout(() => {
-      //   snackbar.text = "";
-      //   snackbar.error = false;
-      // }, 2000)
+      timeout = setTimeout(() => {
+        snackbar.text = "";
+        snackbar.error = false;
+      }, 2000)
+    }
+    if (curr && !prev) {
+      clearTimeout(timeout);
     }
   }
 );
@@ -86,5 +89,21 @@ watch(
 .details-enter-from,
 .details-leave-to {
   opacity: 0;
+}
+
+.list-move, 
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-leave-active {
+  position: absolute;
 }
 </style>

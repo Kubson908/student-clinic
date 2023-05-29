@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { authorized } from "@/main";
-import { onBeforeMount, reactive } from "vue";
+import { authorized, specializations } from "@/main";
+import { onBeforeMount, reactive, computed } from "vue";
 import { Appointments } from "../../typings";
 
 let test = reactive<Appointments>({
@@ -8,9 +8,7 @@ let test = reactive<Appointments>({
 });
 onBeforeMount(async () => {
   const res = await authorized.get("/Appointment/patient");
-  // console.log(res.data.appointments);
   test.appointments = res.data.appointments[0];
-  console.log(test);
 });
 let getDateFromString = (string: any) => {
   let date = new Date(string);
@@ -26,6 +24,12 @@ const disable = (dateString: string) => {
   if (today > date) return true;
   return false;
 };
+setInterval(() => {
+
+}, 100)
+const sortedByDate = computed(() => {
+  return Array.from(test.appointments).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+})
 </script>
 
 <template>
@@ -42,14 +46,14 @@ const disable = (dateString: string) => {
             <v-list-item
               elevation="3"
               class="rounded-lg my-2"
-              v-for="appointment in test.appointments"
-              :key="appointment.id"
+              v-for="(appointment, idx) in sortedByDate"
+              :key="idx"
               width="90%"
             >
               <v-row>
                 <v-col xs="2" md="4">
                   <v-container class="d-flex flex-1-0 flex-column left">
-                    <strong>{{ appointment.id }}</strong>
+                    <strong>{{ specializations.find(specialization => appointment.specialization === specialization )}}</strong>
                     {{ getDateFromString(appointment.date) }}
                   </v-container>
                 </v-col>
@@ -62,7 +66,7 @@ const disable = (dateString: string) => {
                     </router-link>
                     <router-link
                       v-if="!disable(appointment.date)"
-                      to="/patient/cancelvisit"
+                      :to="'/patient/appointment/' + appointment.id + '/cancel'"
                     >
                       <v-btn
                         variant="outlined"

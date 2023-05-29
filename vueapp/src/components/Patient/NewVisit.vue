@@ -20,7 +20,7 @@ const getSpecialization = () => {
 const getData = () => {
   return {
     symptoms: symptoms.value.symptoms,
-    date: `${("0" + new Date(date.value.date).toLocaleDateString()).slice(-11)}`,
+    date: `${("0" + new Date(date.value.date).toLocaleDateString()).slice(-10)}`,
     hour: date.value.select,
     specialization: getSpecialization(),
     medicine: symptoms.value.medicine,

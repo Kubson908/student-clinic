@@ -1,6 +1,6 @@
 <script setup lang="ts">
 //import VueDatePicker from "@vuepic/vue-datepicker";
-import { authorized, specializations } from "@/main";
+import { authorized, specializations, router } from "@/main";
 import { onBeforeMount } from "vue";
 import { ref } from "vue";
 // let test = {};
@@ -133,7 +133,7 @@ onBeforeMount(async () => {
         </v-container>
         <v-row justify="center" class="mt-4">
           <v-col class="text-left">
-            <v-btn variant="outlined" class="mt-2 button" color="blue-darken-2">
+            <v-btn variant="outlined" class="mt-2 button" color="blue-darken-2"  @click="router.back()">
               Wstecz
             </v-btn>
           </v-col>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { router } from "@/main";
 //import VueDatePicker from "@vuepic/vue-datepicker";
 // let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
 //   .toISOString()
@@ -83,6 +84,7 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>
