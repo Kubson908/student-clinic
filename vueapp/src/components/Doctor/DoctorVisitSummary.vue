@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { router } from "@/main";
+// import { router } from "@/main";
+//eslint-disable-next-line
 const emit = defineEmits(["page"]);
 const change_page = (arg: number) => {
   emit("page", arg);

@@ -50,8 +50,8 @@ const checkRole = (role: string) => {
           :mandatory="false"
           :model-value="router.currentRoute.value.path"
         >
-          <router-link to="/doctor/visit_harmonogram" custom v-slot="{ navigate }">
-            <v-tab value="/doctor/visit_harmonogram" @click="navigate"
+          <router-link to="/staff/awaitingappointments" custom v-slot="{ navigate }">
+            <v-tab value="/staff/awaitingappointments" @click="navigate"
               >Wizyty</v-tab
             >
           </router-link>

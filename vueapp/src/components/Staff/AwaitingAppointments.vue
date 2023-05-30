@@ -2,6 +2,7 @@
 import DatePicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
 
+
 const date = ref<any>();
 const awaiting = [
   {
@@ -122,18 +123,31 @@ const awaiting = [
                   {{ visit.doctor }}
                 </td>
                 <td>
-                  <v-btn class="mt-2 mx-2 button hp-dark" size="small">
-                    Wybór lekarza
-                  </v-btn>
+                  <router-link to="/staff/visit_assign" custom v-slot="{ navigate }">
+                    <v-btn 
+                    class="mt-2 mx-2 button hp-dark"  
+                    size="small" 
+                    value="/staff/visit_assign"
+                    @click="navigate" 
+                    >
+                      Wybór lekarza
+                    </v-btn>
+                  </router-link>
+                  
                 </td>
                 <td>
-                  <v-btn
+                  <router-link to="/staff/visit_assign" custom v-slot="{ navigate }">
+                    <v-btn
                     variant="text"
                     class="mt-2 mx-2 button hp-bright"
                     size="small"
+                    value="/staff/visit_assign"
+                    @click="navigate" 
                   >
                     Szczegóły
                   </v-btn>
+                  </router-link>
+                  
                 </td>
               </tr>
             </tbody>

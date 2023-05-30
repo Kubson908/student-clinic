@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+import {router} from "@/main";
 </script>
 
 <template>
@@ -94,12 +94,14 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>
           </v-col>
           <v-col justify="center" class="text-right">
-            <v-btn
+            <router-link to="/staff/awaitingappointments" custom v-slot="{ navigate }">
+              <v-btn
               xs="12"
               sm="6"
               md="3"
@@ -107,9 +109,13 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              value="/staff/awaitingappointments"
+              @click="navigate"
             >
               Przydziel
             </v-btn>
+            </router-link>
+            
           </v-col>
         </v-row>
       </v-form>
