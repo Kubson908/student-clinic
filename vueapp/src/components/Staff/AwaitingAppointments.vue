@@ -2,7 +2,6 @@
 import DatePicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
 
-
 const date = ref<any>();
 const awaiting = [
   {
@@ -123,31 +122,37 @@ const awaiting = [
                   {{ visit.doctor }}
                 </td>
                 <td>
-                  <router-link to="/staff/visit_assign" custom v-slot="{ navigate }">
-                    <v-btn 
-                    class="mt-2 mx-2 button hp-dark"  
-                    size="small" 
-                    value="/staff/visit_assign"
-                    @click="navigate" 
+                  <router-link
+                    :to="'/staff/appointment/' + visit.id + '/assign'"
+                    custom
+                    v-slot="{ navigate }"
+                  >
+                    <v-btn
+                      class="mt-2 mx-2 button hp-dark"
+                      size="small"
+                      :value="'/staff/appointment/' + visit.id + '/assign'"
+                      @click="navigate"
                     >
                       Wybór lekarza
                     </v-btn>
                   </router-link>
-                  
                 </td>
                 <td>
-                  <router-link to="/staff/visit_assign" custom v-slot="{ navigate }">
-                    <v-btn
-                    variant="text"
-                    class="mt-2 mx-2 button hp-bright"
-                    size="small"
-                    value="/staff/visit_assign"
-                    @click="navigate" 
+                  <router-link
+                    :to="'/staff/appointment/' + visit.id"
+                    custom
+                    v-slot="{ navigate }"
                   >
-                    Szczegóły
-                  </v-btn>
+                    <v-btn
+                      variant="text"
+                      class="mt-2 mx-2 button hp-bright"
+                      size="small"
+                      :value="'/staff/appointment/' + visit.id"
+                      @click="navigate"
+                    >
+                      Szczegóły
+                    </v-btn>
                   </router-link>
-                  
                 </td>
               </tr>
             </tbody>
@@ -156,7 +161,7 @@ const awaiting = [
         <v-card-actions>
           <v-container class="d-flex justify-center bottom pa-0 white">
             <div width="90%" class="space-between pa-4">
-              <router-link to="/doctor/doctorpage" custom v-slot="{ navigate }">
+              <router-link to="/staff/doctors" custom v-slot="{ navigate }">
                 <v-btn
                   width="20%"
                   variant="outlined"

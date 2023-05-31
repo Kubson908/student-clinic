@@ -11,18 +11,14 @@ onBeforeMount(async () => {
   });
 });
 const checkRole = (role: string) => {
-  const roles = user.roles!
+  const roles = user.roles!;
   return roles.includes(role);
 };
 const filteredPatients = computed(() => {
-      if (!patients.value) return [];
-      return patients.value.filter((patient: any) => {
-        return (
-          patient
-            .toLowerCase()
-            .indexOf(search.value.toLowerCase()) != -1
-        );
-      });
+  if (!patients.value) return [];
+  return patients.value.filter((patient: any) => {
+    return patient.toLowerCase().indexOf(search.value.toLowerCase()) != -1;
+  });
 });
 </script>
 <template>
@@ -61,30 +57,44 @@ const filteredPatients = computed(() => {
               </template>
               <template #append>
                 <v-row no-gutters v-if="checkRole('Staff')">
-                  <v-btn class="ma-2 button " color="blue-darken-2">Dane pacjenta</v-btn>
-                  <router-link to="/patient/patientcard" custom v-slot="{ navigate }" >
-                  <v-btn variant="outlined" class="ma-2 button hp-bright" @click="navigate"
-                    >Karta pacjenta</v-btn
+                  <v-btn class="ma-2 button" color="blue-darken-2"
+                    >Dane pacjenta</v-btn
                   >
+                  <router-link
+                    :to="'/staff/patient/' + idx + '/card'"
+                    custom
+                    v-slot="{ navigate }"
+                  >
+                    <v-btn
+                      variant="outlined"
+                      class="ma-2 button hp-bright"
+                      @click="navigate"
+                      >Karta pacjenta</v-btn
+                    >
                   </router-link>
                 </v-row>
                 <v-row no-gutters v-else-if="checkRole('Employee')">
-                  <router-link to="/patient/patientcard" custom v-slot="{ navigate }" >
-                    <v-btn class="ma-2 button hp-dark" @click="navigate">Karta pacjenta</v-btn>
+                  <router-link
+                    :to="'/doctor/patient/' + idx + '/card'"
+                    custom
+                    v-slot="{ navigate }"
+                  >
+                    <v-btn class="ma-2 button hp-dark" @click="navigate"
+                      >Karta pacjenta</v-btn
+                    >
                   </router-link>
                 </v-row>
-                
-                
-                
-                
               </template>
             </v-list-item>
           </v-list>
           <v-divider></v-divider>
         </v-card-text>
         <v-card-actions>
-          
-          <v-btn variant="outlined" color="blue-darken-2" class="mx-8 my-2" @click="router.back()"
+          <v-btn
+            variant="outlined"
+            color="blue-darken-2"
+            class="mx-8 my-2"
+            @click="router.back()"
             >Wstecz</v-btn
           >
         </v-card-actions>
