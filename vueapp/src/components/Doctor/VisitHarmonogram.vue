@@ -40,8 +40,16 @@ const format = (date: Date) => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
+  
 
   return `${day}/${month}/${year}`;
+};
+const formatTime = (date: Date) => {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  
+
+  return `${hours}:${minutes}`;
 };
 
 const filteredAppointments = computed(() => {
@@ -84,8 +92,10 @@ const filteredAppointments = computed(() => {
             >
               <v-row>
                 <v-col xs="2" md="4">
-                  <v-container class="d-flex flex-1-0 flex-column left">
-                    <strong>{{ appointment.patient }}</strong>
+                  <v-container class="d-flex  flex-column left">
+                    
+                    {{ formatTime(new Date(appointment.date)) }}
+                    {{ appointment.patient }}
                     {{ format(new Date(appointment.date)) }}
                   </v-container>
                 </v-col>

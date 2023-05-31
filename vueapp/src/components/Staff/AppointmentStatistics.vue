@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DatePicker from "@vuepic/vue-datepicker";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
+import { specializations } from "@/main";
 import {
   Chart as ChartJS,
   Title,
@@ -10,7 +11,10 @@ import {
   CategoryScale,
   LinearScale,
 } from "chart.js";
+
 import { Bar } from "vue-chartjs";
+import { watch } from "vue";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -19,10 +23,26 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-const data: any = {
-  labels: ["January", "February", "March"],
+
+const statistics_options: Array<{ id: number; title: string }> = [
+  {
+    id: 0,
+    title: "Wizyty wg specjalności",
+  },
+  {
+    id: 1,
+    title: "Wizyty wg lekarza",
+  },
+];
+
+const specialization_labels: Array<string> = specializations.map(
+  (specialization) => specialization.title
+);
+
+const data = reactive({
+  labels: specialization_labels,
   datasets: [{ data: [40, 20, 12] }],
-};
+});
 const options: any = {
   responsive: true,
 };
@@ -31,7 +51,10 @@ const date = ref<any>({
   year: new Date().getFullYear(),
 });
 const picker = ref<any>(null);
-const selected = ref<string>("Wizyty wg specjalności");
+const selected = ref<number>(0);
+watch(selected, (n, o) => {
+  console.log(n, o);
+});
 //console.log(date);
 </script>
 <template>
@@ -49,7 +72,9 @@ const selected = ref<string>("Wizyty wg specjalności");
                 v-model="selected"
                 class="px-8"
                 variant="solo"
-                :items="['Wizyty wg specjalności', 'Wizyty wg lekarza']"
+                :items="statistics_options"
+                item-title="title"
+                item-value="id"
               >
               </v-select>
             </v-col>
@@ -95,7 +120,7 @@ const selected = ref<string>("Wizyty wg specjalności");
         <v-card-actions>
           <v-container class="d-flex justify-center bottom pa-0 white">
             <div width="90%" class="space-between pa-4">
-              <router-link to="/doctor/doctorpage" custom v-slot="{ navigate }">
+              <router-link to="/staff/doctors" custom v-slot="{ navigate }">
                 <v-btn
                   width="20%"
                   variant="outlined"

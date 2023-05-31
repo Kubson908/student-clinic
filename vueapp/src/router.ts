@@ -59,25 +59,25 @@ export const routes: Array<Route> = [
         component: AppointmentList,
         meta: { roles: null },
       },
-      { path: "new_visit", component: NewVisit, meta: { roles: null } }, // pacjent - Nowa wizyta 2 / pacjent - Nowa wizyta 1 / pacjent - Podsumowanie wizyty
+      { path: "appointments/new", component: NewVisit, meta: { roles: null } }, // pacjent - Nowa wizyta 2 / pacjent - Nowa wizyta 1 / pacjent - Podsumowanie wizyty
       {
-        path: "patientcard", // doctor - Karta pacjenta / pacjent - Karta pacjenta - pacjent
+        path: "card", // doctor - Karta pacjenta / pacjent - Karta pacjenta - pacjent
         component: PatientCard,
         meta: { roles: null },
       },
       {
-        path: "patientdata", // pacjent - Dane pacjenta / Dane pacjenta - recepcjonista ???? jakies niedorobione
+        path: "profile", // pacjent - Dane pacjenta / Dane pacjenta - recepcjonista ???? jakies niedorobione
         component: PatientData,
         meta: { roles: null },
       },
 
       {
-        path: "appointments/:id/cancel", // pacjent - Anuluj wizytę
+        path: "appointment/:id/cancel", // pacjent - Anuluj wizytę
         component: PatientCancelVisit,
         meta: { roles: null },
       },
       {
-        path: "/patient/appointments/:id", // pacjent - Szczegóły wizyty - pacjent / pacjent - Szczegóły wizyty - pacjent 2
+        path: "appointment/:id", // pacjent - Szczegóły wizyty - pacjent / pacjent - Szczegóły wizyty - pacjent 2
         component: VisitDetails,
         meta: { roles: null },
       },
@@ -99,18 +99,18 @@ export const routes: Array<Route> = [
     meta: { roles: ["Employee"] },
     children: [
       {
-        path: "visit_harmonogram", // doctor - Harmonogram wizyt
+        path: "harmonogram", // doctor - Harmonogram wizyt
         component: VisitHarmonogram,
         meta: { roles: null },
       },
-      { path: "visit", component: DoctorVisit, meta: { roles: null } }, // doctor - Wizyta
+      { path: "appointment", component: DoctorVisit, meta: { roles: null } }, // doctor - Wizyta
       {
-        path: "visitsummary", // doctor - Podsumowanie wizyty - lekarz
+        path: "appointment/summary", // doctor - Podsumowanie wizyty - lekarz
         component: DoctorVisitSummary,
         meta: { roles: null },
       },
       {
-        path: "doctordata",
+        path: "profile",
         component: DoctorData,
         meta: { roles: null },
       }, // doctor - Dane lekarza - lekarz
@@ -120,24 +120,29 @@ export const routes: Array<Route> = [
         meta: { roles: null },
       },
       {
-        path: "doctorpage",
+        path: "doctors",
         component: DoctorPage,
         meta: { roles: null },
       }, // recepcja - Panel admina - recepcja
       {
-        path: "doctordataedit", // recepcja - Dane lekarza - recepcjonista
+        path: "profile/edit", // recepcja - Dane lekarza - recepcjonista
         component: DoctorDataEdit,
-        meta: { roles: null },
-      },
-      {
-        path: "patient_reception_edit", // JAKIES MOCNO NIEDOROBIONE recepcja - Dane pacjenta - recepcjonista / pacjent - Dane pacjenta
-        component: PatientDataReceptionEdit,
         meta: { roles: null },
       },
       {
         path: "appointments/:id", // doctor - Szczegóły wizyty - z harmonogramu / doctor - Szczegóły wizyty (recipe)
         component: VisitDetails,
         meta: { roles: null },
+      },
+      {
+        path: "patient/:id/card",
+        component: PatientCard,
+        meta: { roles: null },
+      },
+      {
+        path: "patients", // recepcja - Pacjenci - recepcjonista
+        component: PatientList,
+        meta: { roles: ["Staf", "Employee"] },
       },
     ],
   },
@@ -147,30 +152,50 @@ export const routes: Array<Route> = [
     meta: { roles: ["Staff"] },
     children: [
       {
-        path: "visit_assign", // recepcja - Przydziel wizytę(visitassign)
+        path: "appointment/:id/assign", // recepcja - Przydziel wizytę(visitassign)
         component: VisitAssign,
         meta: { roles: null },
       },
       {
-        path: "awaitingappointments", // recepcja - Oczekujące wizyty
+        path: "appointments/awaiting", // recepcja - Oczekujące wizyty
         component: AwaitingAppointments,
         meta: { roles: null },
       },
       {
-        path: "appointmentstatistics", // recepcja - Statystyka
+        path: "statistics", // recepcja - Statystyka
         component: AppointmentStatistics,
         meta: { roles: null },
       },
       {
-        path: "patientlist", // recepcja - Pacjenci - recepcjonista
+        path: "patients", // recepcja - Pacjenci - recepcjonista
         component: PatientList,
         meta: { roles: ["Staf", "Employee"] },
+      },
+      {
+        path: "patient/:id/edit", // JAKIES MOCNO NIEDOROBIONE recepcja - Dane pacjenta - recepcjonista / pacjent - Dane pacjenta
+        component: PatientDataReceptionEdit,
+        meta: { roles: null },
       },
       {
         path: "passwordreset", // recepcja - Zmień hasło - recepcjonista
         component: StaffPasswordReset,
         meta: { roles: null },
       },
+      {
+        path: "patient/:id/card",
+        component: PatientCard,
+        meta: { roles: null },
+      },
+      {
+        path: "doctors",
+        component: DoctorPage,
+        meta: { roles: null },
+      },
+      {
+        path: "profile",
+        component: DoctorData,
+        meta: { roles: null },
+      }, // doctor - Dane lekarza - lekarz
     ],
   },
   {

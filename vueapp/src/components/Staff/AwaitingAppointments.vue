@@ -60,18 +60,37 @@ onBeforeMount(async () => {
                   {{ spec[visit.specialization] }}
                 </td>
                 <td>
-                  <v-btn class="mt-2 mx-2 button hp-dark" size="small">
-                    Wybór lekarza
-                  </v-btn>
+                  <router-link
+                    :to="'/staff/appointment/' + visit.id + '/assign'"
+                    custom
+                    v-slot="{ navigate }"
+                  >
+                    <v-btn
+                      class="mt-2 mx-2 button hp-dark"
+                      size="small"
+                      :value="'/staff/appointment/' + visit.id + '/assign'"
+                      @click="navigate"
+                    >
+                      Wybór lekarza
+                    </v-btn>
+                  </router-link>
                 </td>
                 <td>
-                  <v-btn
-                    variant="text"
-                    class="mt-2 mx-2 button hp-bright"
-                    size="small"
+                  <router-link
+                    :to="'/staff/appointment/' + visit.id"
+                    custom
+                    v-slot="{ navigate }"
                   >
-                    Szczegóły
-                  </v-btn>
+                    <v-btn
+                      variant="text"
+                      class="mt-2 mx-2 button hp-bright"
+                      size="small"
+                      :value="'/staff/appointment/' + visit.id"
+                      @click="navigate"
+                    >
+                      Szczegóły
+                    </v-btn>
+                  </router-link>
                 </td>
               </tr>
             </tbody>
@@ -80,7 +99,7 @@ onBeforeMount(async () => {
         <v-card-actions>
           <v-container class="d-flex justify-center bottom pa-0 white">
             <div width="90%" class="space-between pa-4">
-              <router-link to="/doctor/doctorpage" custom v-slot="{ navigate }">
+              <router-link to="/staff/doctors" custom v-slot="{ navigate }">
                 <v-btn
                   width="20%"
                   variant="outlined"

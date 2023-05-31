@@ -49,55 +49,49 @@ const sortedByDate = computed(() => {
               :key="idx"
               width="90%"
             >
-              <v-fade-transition>
-                <v-row>
-                  <v-col xs="2" md="4">
-                    <v-container class="d-flex flex-1-0 flex-column left">
-                      <strong>{{
-                        specializations.find(
-                          (specialization) =>
-                            appointment.specialization === specialization.value
-                        )?.title
-                      }}</strong>
-                      {{ getDateFromString(appointment.date) }}
-                    </v-container>
-                  </v-col>
-                  <v-col xs="10" md="8">
-                    <v-container class="right">
-                      <router-link
-                        :to="'/patient/appointments/' + appointment.id"
+              <v-row>
+                <v-col xs="2" md="4">
+                  <v-container class="d-flex flex-1-0 flex-column left">
+                    <strong>{{
+                      specializations.find(
+                        (specialization) =>
+                          appointment.specialization === specialization.value
+                      )?.title
+                    }}</strong>
+                    {{ getDateFromString(appointment.date) }}
+                  </v-container>
+                </v-col>
+                <v-col xs="10" md="8">
+                  <v-container class="right">
+                    <router-link :to="'/patient/appointment/' + appointment.id">
+                      <v-btn color="blue-darken-2" class="mt-2 mx-2 button"
+                        >Szczegóły</v-btn
                       >
-                        <v-btn color="blue-darken-2" class="mt-2 mx-2 button"
-                          >Szczegóły</v-btn
-                        >
-                      </router-link>
-                      <router-link
-                        v-if="!disable(appointment.date)"
-                        :to="
-                          '/patient/appointments/' + appointment.id + '/cancel'
-                        "
-                      >
-                        <v-btn
-                          variant="outlined"
-                          color="red-darken-2"
-                          class="mt-2 mx-2 button"
-                        >
-                          Anuluj wizytę
-                        </v-btn>
-                      </router-link>
+                    </router-link>
+                    <router-link
+                      v-if="!disable(appointment.date)"
+                      :to="'/patient/appointment/' + appointment.id + '/cancel'"
+                    >
                       <v-btn
-                        v-else
-                        disabled
                         variant="outlined"
                         color="red-darken-2"
                         class="mt-2 mx-2 button"
                       >
                         Anuluj wizytę
                       </v-btn>
-                    </v-container>
-                  </v-col>
-                </v-row>
-              </v-fade-transition>
+                    </router-link>
+                    <v-btn
+                      v-else
+                      disabled
+                      variant="outlined"
+                      color="red-darken-2"
+                      class="mt-2 mx-2 button"
+                    >
+                      Anuluj wizytę
+                    </v-btn>
+                  </v-container>
+                </v-col>
+              </v-row>
             </v-list-item>
           </v-list>
         </div>
@@ -112,7 +106,7 @@ const sortedByDate = computed(() => {
               @click="router.push('/')"
               >Wstecz</v-btn
             >
-            <router-link to="/patient/new_visit">
+            <router-link to="/patient/appointments/new">
               <v-btn color="blue-darken-2" class="mt-2 button"
                 >Nowa wizyta</v-btn
               >

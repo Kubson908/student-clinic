@@ -1,12 +1,5 @@
 <script setup lang="ts">
 import { router } from "@/main";
-//import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
 </script>
 
 <template>
@@ -21,8 +14,11 @@ import { router } from "@/main";
         <v-container>
           <v-row>
             <v-col align="center">
-              <v-img height="200" src="https://st2.depositphotos.com/1010683/5848/i/950/depositphotos_58482379-stock-photo-male-asian-doctor.jpg">
-            </v-img>
+              <v-img
+                height="200"
+                src="https://st2.depositphotos.com/1010683/5848/i/950/depositphotos_58482379-stock-photo-male-asian-doctor.jpg"
+              >
+              </v-img>
             </v-col>
           </v-row>
           <v-row>

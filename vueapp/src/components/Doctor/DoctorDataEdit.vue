@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// Wojtek
 import { ref } from "vue";
 import { authorized, snackbar, specializations } from "@/main";
 import { onBeforeMount } from "vue";
