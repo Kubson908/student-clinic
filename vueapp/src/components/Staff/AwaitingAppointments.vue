@@ -1,82 +1,18 @@
 <script setup lang="ts">
+import { prefix } from "@/config";
+import { authorized, spec } from "@/main";
 import DatePicker from "@vuepic/vue-datepicker";
-import { ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 
 const date = ref<any>();
-const awaiting = [
-  {
-    id: 1,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 2,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 3,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 4,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 5,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 6,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 7,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 8,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 9,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 10,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 11,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-  {
-    id: 12,
-    doctor: "Internista",
-    date: "17.03.2023",
-    hour: "8:00",
-  },
-];
+const awaiting = ref<Array<any>>([]);
+
+onBeforeMount(async () => {
+  const res = await authorized.get(
+    `${prefix}/api/appointment/awaiting-appointments`
+  );
+  awaiting.value = res.data;
+});
 </script>
 <template>
   <v-row justify="center" no-gutters>
@@ -113,13 +49,15 @@ const awaiting = [
             <tbody>
               <tr v-for="visit in awaiting" :key="visit.id">
                 <td>
-                  {{ visit.date }}
+                  {{ new Date(visit.date).toLocaleDateString() }}
                 </td>
                 <td>
-                  {{ visit.hour }}
+                  {{
+                    new Date(visit.date).toLocaleTimeString().substring(0, 5)
+                  }}
                 </td>
                 <td>
-                  {{ visit.doctor }}
+                  {{ spec[visit.specialization] }}
                 </td>
                 <td>
                   <v-btn class="mt-2 mx-2 button hp-dark" size="small">

@@ -28,6 +28,13 @@ export const specializations: Array<{ value: number; title: string }> = [
   { value: 3, title: "Gastrolog" },
 ];
 
+export const spec: Array<string> = [
+  "Internista",
+  "Pulmonolog",
+  "Okulista",
+  "Gastrolog",
+];
+
 export const authorized = axios.create({
   headers: {
     Authorization: `Bearer ${localStorage.getItem("token")}`,

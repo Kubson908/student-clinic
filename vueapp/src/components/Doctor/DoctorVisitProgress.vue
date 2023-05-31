@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { router } from "@/main";
+// eslint-disable-next-line
 const emit = defineEmits(["page"]);
 const change_page = (arg: number) => {
   emit("page", arg);

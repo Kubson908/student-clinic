@@ -291,6 +291,14 @@ namespace Przychodnia.Webapi.Controllers
             return Ok("Updated");
         }
 
+        [Authorize(Roles = "Staff")]
+        [HttpGet("awaiting-appointments")]
+        public async Task<IActionResult> GetAwaitingAppointments()
+        {
+            var appointments = await _db.Appointments.Where(a => a.DoctorId == null).OrderBy(a => a.Date).ToListAsync();
+            return Ok(appointments);
+        }
+
         [HttpPatch("assign-appointment/{appointmentId}")]
         public async Task<IActionResult> AssignAppointment([FromRoute] string appointmentId, [FromBody] string doctorId)
         {

@@ -64,7 +64,9 @@ const sortedByDate = computed(() => {
                   </v-col>
                   <v-col xs="10" md="8">
                     <v-container class="right">
-                      <router-link :to="'/patient/appointments/' + appointment.id">
+                      <router-link
+                        :to="'/patient/appointments/' + appointment.id"
+                      >
                         <v-btn color="blue-darken-2" class="mt-2 mx-2 button"
                           >Szczegóły</v-btn
                         >
