@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { VForm } from "vuetify/lib/components/index";
-import { router, authorized, specializations } from "@/main";
+import { authorized } from "@/main";
 import { onBeforeMount, ref } from "vue";
 import {
   dateRules,

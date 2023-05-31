@@ -21,6 +21,7 @@
 //     recomendations.value = DoctorVisitProgress.recomendations
 //   })
 
+// eslint-disable-next-line
 const emit = defineEmits(["page", "submit"]);
 const change_page = (arg: number) => {
   emit("page", arg);
@@ -28,11 +29,13 @@ const change_page = (arg: number) => {
 
 const submit = () => {
   emit("submit");
-}
+};
+// eslint-disable-next-line
 const props = defineProps({
   data: Object,
 });
 console.log(props.data);
+console.log(props.data?.select);
 </script>
 
 <template>
@@ -67,7 +70,12 @@ console.log(props.data);
               Informacje o wizycie
             </v-col>
             <v-col class="text-left">
-              {{ new Date(props.data?.appointmentDate).toLocaleDateString() }}, {{ new Date(props.data?.appointmentDate).toLocaleTimeString().substring(0, 5) }}
+              {{ new Date(props.data?.appointmentDate).toLocaleDateString() }},
+              {{
+                new Date(props.data?.appointmentDate)
+                  .toLocaleTimeString()
+                  .substring(0, 5)
+              }}
             </v-col>
           </v-row>
           <v-row>
@@ -142,7 +150,9 @@ console.log(props.data);
               Wizyta kontrolna
             </v-col>
             <!-- 31.01.2023, 17:30 -->
-            <v-col class="text-left"> {{ new Date(props.data?.date).toLocaleDateString() }}, {{ new Date(props.data?.select).toLocaleTimeString().substring(0, 5) }}
+            <v-col class="text-left">
+              {{ new Date(props.data?.date).toLocaleDateString() }},
+              {{ props.data?.select }}
             </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>

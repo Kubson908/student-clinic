@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import VueDatePicker from "@vuepic/vue-datepicker";
-import { router, authorized, snackbar, specializations } from "@/main";
+import { router, authorized, snackbar } from "@/main";
 import { ref, onBeforeMount, onMounted, computed, watch } from "vue";
 import { notNull } from "@/validation";
 // eslint-disable-next-line
@@ -39,7 +39,7 @@ onBeforeMount(async () => {
 // }
 const select = ref<any>();
 const picker = ref<any>();
-const date = ref<any>(new Date());
+const date = ref<any>(new Date);
 const unavailable_hours = ref<Array<string>>([]);
 const unavailable_dates = ref<any>();
 const current_month = ref<number>(date.value.getMonth());
@@ -75,20 +75,14 @@ const hours = [
   "16:00",
   "16:30",
 ];
-// const getSpecialization = () => {
-//   const specialization = specializations.find(
-//     (elem: any) => elem.value === doctorSpecialization.value
-//   );
-//   if (specialization) return specialization.title;
-//   else return "Błąd";
-// };
+
 const getUnavailableHours = async () => {
   try {
     hours_ready.value = false;
     let res = await authorized.get(
       `/appointment/available-hours/${
         date.value.toISOString().split("T")[0]
-      }/specialization/${doctorSpecialization.value}` //specjalizacja tutaj
+      }/specialization/${doctorSpecialization.value}` 
     );
     unavailable_hours.value = res.data;
   } catch (e) {
@@ -119,7 +113,7 @@ const getUnavailableDays = async (month: number) => {
     days_ready.value = false;
     let res = await authorized.get(
       `http://localhost:7042/api/appointment/specialization/${
-        doctorSpecialization.value //specjalizacja tutal
+        doctorSpecialization.value 
       }/year/${date.value.getFullYear()}/month/${month + 1}`
     );
     unavailable_dates.value = res.data;

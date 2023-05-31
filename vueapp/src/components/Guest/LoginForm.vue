@@ -51,9 +51,12 @@ const submit = async (data: SubmitEvent) => {
       snackbar.text =
         error.response && error.response.status == 401
           ? "Błędny e-mail lub hasło"
+          : error.response && error.response.status == 403
+          ? "Zweryfikuj adres email"
           : "Wystąpił nieznany błąd";
       snackbar.error = true;
       snackbar.showing = true;
+      // TODO: Ekran podawania kodu z maila dla niezatwierdzonych
     } finally {
       loading.value = false;
     }

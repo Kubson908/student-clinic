@@ -6,6 +6,7 @@ import { router } from "@/main";
 
 const progress = ref<any>();
 let appointment_id = router.currentRoute.value.params["id"] as string;
+appointment_id;
 const getData = () => {
   return {
     medicines: progress.value.medicines,
@@ -17,11 +18,9 @@ const getData = () => {
     meds: progress.value.meds,
     date: progress.value.date,
     select: progress.value.select,
-  }
-}
-const onSubmit = () => {
-
-}
+  };
+};
+const onSubmit = () => {};
 const page = ref<number>(1);
 </script>
 <template>
@@ -33,10 +32,14 @@ const page = ref<number>(1);
   >
     <v-window v-model="page" direction="vertical" reverse :touch="false">
       <v-window-item :value="1">
-        <DoctorVisitProgress @page="(arg) => (page += arg)" ref="progress"/>
+        <DoctorVisitProgress @page="(arg) => (page += arg)" ref="progress" />
       </v-window-item>
       <v-window-item :value="2">
-        <DoctorVisitSummary @page="(arg) => (page += arg)" :data="getData()" @submit="onSubmit()"/>
+        <DoctorVisitSummary
+          @page="(arg) => (page += arg)"
+          :data="getData()"
+          @submit="onSubmit()"
+        />
       </v-window-item>
     </v-window>
   </v-card>

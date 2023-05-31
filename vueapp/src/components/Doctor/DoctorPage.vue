@@ -12,7 +12,9 @@ onBeforeMount(async () => {
     doctors.value = card.data.filter((emp: any) => emp.specialization !== null);
     loading.value = false;
   } catch (e) {
+    console.log(e);
   } finally {
+    ("");
   }
 });
 </script>
@@ -26,7 +28,7 @@ onBeforeMount(async () => {
           </v-container>
         </v-card-item>
         <v-card-text>
-          <v-row class="pa-8">
+          <v-row class="pa-8" v-if="!loading">
             <v-col
               v-for="doctor in doctors"
               :key="doctor.id"
@@ -42,9 +44,11 @@ onBeforeMount(async () => {
               >
               </DoctorCard>
             </v-col>
+          </v-row>
+          <v-row v-else>
             <v-col
-              v-if="loading"
               v-for="elem in Array(6)"
+              :key="elem"
               cols="12"
               sm="6"
               md="4"

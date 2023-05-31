@@ -29,14 +29,6 @@ namespace Przychodnia.Webapi.Controllers
             _employeeManager = employeeManager;
         }
 
-       /* [HttpPost("send-register-code")]
-        public async Task<IActionResult> SendCode([FromBody] MailAddress email)
-        {
-            if (email == null) return BadRequest("Email is null");
-            var code = _patientManager.Generate
-            
-        }*/
-
         // /api/auth/register
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody]RegisterDto model)
@@ -95,7 +87,7 @@ namespace Przychodnia.Webapi.Controllers
                 if (result.IsSuccess)
                     return Ok(result);
                 if (!result.Errors.IsNullOrEmpty())
-                    return Unauthorized("Email not confirmed");
+                    return Forbid("Email not confirmed");
 
                 return Unauthorized("Login error");
             }
