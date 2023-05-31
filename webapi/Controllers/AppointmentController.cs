@@ -300,14 +300,14 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         [HttpPatch("assign-appointment/{appointmentId}")]
-        public async Task<IActionResult> AssignAppointment([FromRoute] string appointmentId, [FromBody] string doctorId)
+        public async Task<IActionResult> AssignAppointment([FromRoute] string appointmentId, [FromBody] DoctorIdDto doctorId)
         {
             if (doctorId == null) return BadRequest("Doctor id is null");
 
             string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == Int32.Parse(appointmentId));
             if (appointment == null) return NotFound("Appointment not found");
-            appointment.DoctorId = doctorId;
+            appointment.DoctorId = doctorId.DoctorId;
             _db.Entry(appointment).Property(p => p.DoctorId).IsModified = true;
             await _db.SaveChangesAsync();
             return Ok(new { message = "Appointment assigned", data = appointment });

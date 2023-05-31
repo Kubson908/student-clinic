@@ -7,7 +7,7 @@ const patients = ref<any>(null);
 onBeforeMount(async () => {
   const card = await authorized.get("/patient/");
   patients.value = card.data.map((patient: any) => {
-    return patient.firstName + " " + patient.lastName;
+    return { id: patient.id, name: patient.firstName + " " + patient.lastName };
   });
 });
 const checkRole = (role: string) => {
@@ -17,9 +17,10 @@ const checkRole = (role: string) => {
 const filteredPatients = computed(() => {
   if (!patients.value) return [];
   return patients.value.filter((patient: any) => {
-    return patient.toLowerCase().indexOf(search.value.toLowerCase()) != -1;
+    return patient.name.toLowerCase().indexOf(search.value.toLowerCase()) != -1;
   });
 });
+console.log(filteredPatients);
 </script>
 <template>
   <v-row justify="center" no-gutters>
@@ -52,7 +53,7 @@ const filteredPatients = computed(() => {
             >
               <template #prepend>
                 <v-list-item-title class="mx-4">{{
-                  patient
+                  patient.name
                 }}</v-list-item-title>
               </template>
               <template #append>
@@ -61,7 +62,7 @@ const filteredPatients = computed(() => {
                     >Dane pacjenta</v-btn
                   >
                   <router-link
-                    :to="'/staff/patient/' + idx + '/card'"
+                    :to="'/staff/patient/' + patient.id + '/card'"
                     custom
                     v-slot="{ navigate }"
                   >
@@ -75,7 +76,7 @@ const filteredPatients = computed(() => {
                 </v-row>
                 <v-row no-gutters v-else-if="checkRole('Employee')">
                   <router-link
-                    :to="'/doctor/patient/' + idx + '/card'"
+                    :to="'/doctor/patient/' + patient.id + '/card'"
                     custom
                     v-slot="{ navigate }"
                   >

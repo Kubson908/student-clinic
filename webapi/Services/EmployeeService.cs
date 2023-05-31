@@ -119,5 +119,33 @@ namespace Przychodnia.Webapi.Services
             };
         }
 
+        public async Task<UserManagerResponse> DeleteUserAsync(string userId)
+        {
+            if (userId == null)
+                return new UserManagerResponse
+                {
+                    Message = "User id us null",
+                    IsSuccess = false
+                };
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return new UserManagerResponse
+                {
+                    Message = "User not found",
+                    IsSuccess = false
+                };
+            await _userManager.DeleteAsync(user);
+
+            return new UserManagerResponse
+            {
+                Message = "User has been deleted",
+                IsSuccess = true
+            };
+        }
+
+        public Task SendEmailConfirmationCode(Patient user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

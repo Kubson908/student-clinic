@@ -1,5 +1,26 @@
 <script setup lang="ts">
-import { router } from "@/main";
+import { router, authorized,specializations } from "@/main";
+import { onBeforeMount, ref } from "vue";
+const name = ref<string>("");
+const lastName = ref<string>("");
+const email = ref<string>("");
+const pesel = ref<string>("");
+const phone = ref<string>("");
+const birthDate = ref<string>("");
+const specialization = ref<number>(0);
+onBeforeMount(async () => {
+  const res = await authorized.get(
+    `http://localhost:7042/api/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`
+  );
+  const data = res.data;
+  name.value = data.firstName;
+  lastName.value = data.lastName;
+  pesel.value = data.pesel;
+  email.value = data.email;
+  phone.value = data.phoneNumber;
+  birthDate.value = data.dateOfBirth;
+  specialization.value = data.specialization;
+});
 </script>
 
 <template>
@@ -32,7 +53,7 @@ import { router } from "@/main";
             >
               Imię i nazwisko
             </v-col>
-            <v-col class="text-left"> Maciej Kowalczyk </v-col>
+            <v-col class="text-left"> {{name}} {{lastName}} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -41,7 +62,7 @@ import { router } from "@/main";
             >
               PESEL
             </v-col>
-            <v-col class="text-left"> 48322349428 </v-col>
+            <v-col class="text-left"> {{pesel}} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -50,7 +71,16 @@ import { router } from "@/main";
             >
               Data urodzenia
             </v-col>
-            <v-col class="text-left"> 12.05.1979r. </v-col>
+            <v-col class="text-left"> {{birthDate}} </v-col>
+          </v-row>
+          <v-row>
+            <v-col
+              class="font-weight-bold text-blue-darken-1 text-left"
+              cols="4"
+            >
+              Nr telefonu
+            </v-col>
+            <v-col class="text-left"> {{phone}} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -59,7 +89,7 @@ import { router } from "@/main";
             >
               Email
             </v-col>
-            <v-col class="text-left"> m.kowalczyk@poczta.pl </v-col>
+            <v-col class="text-left"> {{email}} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -68,7 +98,9 @@ import { router } from "@/main";
             >
               Specjalizacja
             </v-col>
-            <v-col class="text-left"> Pulmunolog </v-col>
+            <v-col class="text-left"> {{specializations.find(
+                      (s) => s.value === specialization
+                    )?.title}} </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
@@ -84,14 +116,18 @@ import { router } from "@/main";
             >
               Wstecz
             </v-btn>
+            <router-link to="/doctor/passwordreset" custom v-slot="{ navigate }">
             <v-btn
               variant="text"
               align-self="center"
               size="small"
               class="mt-2 button"
+              value="/doctor/passwordreset"
+              @click="navigate"
             >
               Zmień hasło
             </v-btn>
+          </router-link>
           </v-col>
         </v-row>
       </v-form>

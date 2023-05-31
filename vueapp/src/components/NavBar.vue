@@ -39,7 +39,7 @@ const checkRole = (role: string) => {
             >
           </router-link>
           <router-link to="/patient/card" custom v-slot="{ navigate }">
-            <v-tab value="/patient/card" @click="navigate">Pacjenci</v-tab>
+            <v-tab value="/patient/card" @click="navigate">Karta Pacjenta</v-tab>
           </router-link>
         </v-tabs>
       </div>

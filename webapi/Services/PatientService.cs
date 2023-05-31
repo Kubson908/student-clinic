@@ -21,12 +21,9 @@ namespace Przychodnia.Webapi.Services
             _configuration = configuration;
         }
 
-        private async Task SendEmailConfirmationLink(Patient user)
+        public async Task SendEmailConfirmationCode(Patient user)
         {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-            UriBuilder baseUri = new UriBuilder("localhost:8080/auth/email-confirm");
-            baseUri.Query = "query=" + token + "&id=" + user.Id;
+            var token = await _userManager.GenerateUserTokenAsync(user, "EmailConfirmationTokenProvider", UserManager<object>.ConfirmEmailTokenPurpose);
 
             string mailFrom = "kartinghappywheels@gmail.com";
             var message = new MimeMessage();
@@ -34,7 +31,7 @@ namespace Przychodnia.Webapi.Services
             message.To.Add(new MailboxAddress(user.Email, user.Email));
             message.Subject = "Weryfikacja adresu email do konta w przychodni";
             var body = new BodyBuilder();
-            body.HtmlBody = "<h3>Link do weryfikacji</h3>" + "<a href =http://" + baseUri + ">" + baseUri + "</a>";
+            body.HtmlBody = "<h3>Kod do weryfikacji</h3>" + "<h1>" + token + "</h1>";
             message.Body = body.ToMessageBody();
             using (var client = new MailKit.Net.Smtp.SmtpClient())
             {
@@ -74,7 +71,7 @@ namespace Przychodnia.Webapi.Services
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(patient, "Patient");
-                await SendEmailConfirmationLink(patient);
+                await SendEmailConfirmationCode(patient);
 
                 return new UserManagerResponse
                 {
@@ -148,6 +145,30 @@ namespace Przychodnia.Webapi.Services
                 ExpireDate = token.ValidTo,
                 User = user.FirstName + " " + user.LastName,
                 Roles = await _userManager.GetRolesAsync(user)
+            };
+        }
+
+        public async Task<UserManagerResponse> DeleteUserAsync(string userId)
+        {
+            if (userId == null)
+                return new UserManagerResponse
+                {
+                    Message = "User id us null",
+                    IsSuccess = false
+                };
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return new UserManagerResponse
+                {
+                    Message = "User not found",
+                    IsSuccess = false
+                };
+            await _userManager.DeleteAsync(user);
+
+            return new UserManagerResponse
+            {
+                Message = "User has been deleted",
+                IsSuccess = true
             };
         }
     }

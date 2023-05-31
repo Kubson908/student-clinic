@@ -1,11 +1,6 @@
-﻿using System;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.Logging;
 
 namespace Przychodnia.Webapi.Websocket
 {
@@ -57,6 +52,6 @@ namespace Przychodnia.Webapi.Websocket
             _logger.Log(LogLevel.Information, "WebSocket connection closed");
         }
 
-       /* private async Task SendEvent(WebSocket)*/
+        /* private async Task SendEvent(WebSocket)*/
     }
 }

@@ -141,7 +141,7 @@ namespace Przychodnia.Webapi.Websocket
                 {
                     await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "UserDisconnected", ct);
                 }  
-                catch (TaskCanceledException) { } catch (OperationCanceledException) { }
+                catch (TaskCanceledException) { } catch (OperationCanceledException) { } catch (WebSocketException) { }
             _logger.Log(LogLevel.Information, wsId + ": WebSocket connection closed"
                             + "\nTotal connections: " + connections.Count());
             ws.Dispose();

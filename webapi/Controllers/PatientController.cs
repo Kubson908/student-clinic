@@ -58,6 +58,8 @@ namespace Przychodnia.Webapi.Controllers
                     p.Email,
                     p.Pesel,
                     p.DateOfBirth,
+                    p.Allergies,
+                    p.Medicines,
                     TreatmentHistory = p.Appointments.Where(a => a.Finished).Select(a => new
                     {
                         a.Id,

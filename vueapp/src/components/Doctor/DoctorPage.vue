@@ -4,11 +4,16 @@ import { ref } from "vue";
 import { onBeforeMount } from "vue";
 import { authorized } from "@/main";
 
-const doctors = ref<any[]>([]);
-
+const doctors = ref<any[]>();
+const loading = ref<boolean>(true);
 onBeforeMount(async () => {
-  const card = await authorized.get("/employee/");
-  doctors.value = card.data.filter((emp: any) => emp.specialization !== null);
+  try {
+    const card = await authorized.get("/employee/");
+    doctors.value = card.data.filter((emp: any) => emp.specialization !== null);
+    loading.value = false;
+  } catch (e) {
+  } finally {
+  }
 });
 </script>
 <template>
@@ -36,6 +41,17 @@ onBeforeMount(async () => {
                 :disabled="false"
               >
               </DoctorCard>
+            </v-col>
+            <v-col
+              v-if="loading"
+              v-for="elem in Array(6)"
+              cols="12"
+              sm="6"
+              md="4"
+              class="d-flex justify-center"
+            >
+              <v-skeleton-loader type="card-avatar" width="288">
+              </v-skeleton-loader>
             </v-col>
           </v-row>
         </v-card-text>

@@ -1,10 +1,38 @@
 <script setup lang="ts">
 // import { router } from "@/main";
 // eslint-disable-next-line
-const emit = defineEmits(["page"]);
+
+// import DoctorVisitProgress from "./DoctorVisitProgress.vue";
+// import { ref, onBeforeMount } from "vue";
+// const meds = ref(null);
+// const appointmentDate = ref(null);
+// const patientName = ref(null);
+// const symptoms = ref(null);
+// const medicines = ref(null);
+// const diagnose = ref(null);
+// const recomendations = ref(null);
+// onBeforeMount(() => {
+//     appointmentDate.value = DoctorVisitProgress.appointmentDate
+//     patientName.value = DoctorVisitProgress.patientName
+//     symptoms.value = DoctorVisitProgress.symptoms
+//     medicines.value = DoctorVisitProgress.medicines
+//     // meds.value = DoctorVisitProgress.value.meds
+//     diagnose.value = DoctorVisitProgress.diagnose
+//     recomendations.value = DoctorVisitProgress.recomendations
+//   })
+
+const emit = defineEmits(["page", "submit"]);
 const change_page = (arg: number) => {
   emit("page", arg);
 };
+
+const submit = () => {
+  emit("submit");
+}
+const props = defineProps({
+  data: Object,
+});
+console.log(props.data);
 </script>
 
 <template>
@@ -38,7 +66,9 @@ const change_page = (arg: number) => {
             >
               Informacje o wizycie
             </v-col>
-            <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
+            <v-col class="text-left">
+              {{ new Date(props.data?.appointmentDate).toLocaleDateString() }}, {{ new Date(props.data?.appointmentDate).toLocaleTimeString().substring(0, 5) }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -47,7 +77,7 @@ const change_page = (arg: number) => {
             >
               Pacjent
             </v-col>
-            <v-col class="text-left"> Jan ambroziak </v-col>
+            <v-col class="text-left"> {{ props.data?.patientName }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -56,7 +86,7 @@ const change_page = (arg: number) => {
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> Kaszel, katar, gorączka </v-col>
+            <v-col class="text-left"> {{ props.data?.symptoms }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -65,7 +95,7 @@ const change_page = (arg: number) => {
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> Riposton </v-col>
+            <v-col class="text-left"> {{ props.data?.medicines }} </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
           <v-row>
@@ -80,7 +110,8 @@ const change_page = (arg: number) => {
               Diagnoza
             </v-col>
             <v-col class="text-left">
-              Pacjent choruje na bakteryjne zapalenie zatok.
+              <!-- Pacjent choruje na bakteryjne zapalenie zatok. -->
+              {{ props.data?.diagnose }}
             </v-col>
           </v-row>
           <v-row>
@@ -90,7 +121,7 @@ const change_page = (arg: number) => {
             >
               Leki
             </v-col>
-            <v-col class="text-left"> Augmentin 1000mg </v-col>
+            <v-col class="text-left"> {{ props.data?.meds }}</v-col>
           </v-row>
           <v-row>
             <v-col
@@ -100,7 +131,7 @@ const change_page = (arg: number) => {
               Zalecenia
             </v-col>
             <v-col class="text-left">
-              Augmentin, dawkowanie - 2 tabletki/doba.
+              {{ props.data?.recomendations }}
             </v-col>
           </v-row>
           <v-row>
@@ -110,7 +141,9 @@ const change_page = (arg: number) => {
             >
               Wizyta kontrolna
             </v-col>
-            <v-col class="text-left"> 31.01.2023, 17:30 </v-col>
+            <!-- 31.01.2023, 17:30 -->
+            <v-col class="text-left"> {{ new Date(props.data?.date).toLocaleDateString() }}, {{ new Date(props.data?.select).toLocaleTimeString().substring(0, 5) }}
+            </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
@@ -133,6 +166,7 @@ const change_page = (arg: number) => {
               sm="6"
               md="3"
               align-self="center"
+              @click="submit()"
               size="large"
               class="mt-2 button"
               color="blue-darken-2"

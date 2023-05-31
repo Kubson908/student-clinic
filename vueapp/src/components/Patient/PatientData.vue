@@ -1,29 +1,49 @@
 <script lang="ts" setup>
-import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
-import { dateRules, peselRules, phoneRules, surnameRules, nameRules, emailRules } from "@/validation";
+import { router, authorized, specializations } from "@/main";
+import { onBeforeMount, ref } from "vue";
+import {
+  dateRules,
+  peselRules,
+  phoneRules,
+  surnameRules,
+  nameRules,
+  emailRules,
+} from "@/validation";
 // const visible = ref(false);
 // const visible2 = ref(false);
 
-const form = ref<typeof VForm | null>(null);
 const name = ref<string>("");
-const surname = ref<string>("");
-const birth_date = ref<string>("");
-const pesel = ref<string>("");
+const lastName = ref<string>("");
 const email = ref<string>("");
+const pesel = ref<string>("");
 const phone = ref<string>("");
-const pass = ref<string>("");
-const rpass = ref<string>("");
+const meds = ref<string>("");
+const allergies = ref<string>("");
+const birthDate = ref<string>("");
+// const specialization = ref<number>(0);
+onBeforeMount(async () => {
+  const res = await authorized.get(`/Patient/patient-card`);
+  const data = res.data;
+  name.value = data.firstName;
+  lastName.value = data.lastName;
+  pesel.value = data.pesel;
+  email.value = data.email;
+  phone.value = data.phoneNumber;
+  birthDate.value = data.dateOfBirth;
+  allergies.value = data.allergies;
+  meds.value = data.medicines;
+  // specialization.value = data.specialization;
+});
 
-const submit = async (data: SubmitEvent) => {
-  const valid = ((await data) as any).valid;
-  if (!valid) return;
-  alert(
-    `Imię: ${name.value}\nNazwisko: ${surname.value}\nData urodzenia: ${birth_date.value}\nPesel: ${pesel.value}\nHasło: ${pass.value}\nPowtórzone hasło: ${rpass.value}\n`
-  );
-  form.value?.reset();
-};
-
+// const submit = async (data: SubmitEvent) => {
+//   const valid = ((await data) as any).valid;
+//   if (!valid) return;
+//   alert(
+//     `Imię: ${name.value}\nNazwisko: ${surname.value}\nData urodzenia: ${birth_date.value}\nPesel: ${pesel.value}\nHasło: ${pass.value}\nPowtórzone hasło: ${rpass.value}\n`
+//   );
+//   form.value?.reset();
+// };
 </script>
 
 <template>
@@ -44,8 +64,8 @@ const submit = async (data: SubmitEvent) => {
           <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
         </v-card>
       </v-container>
-      <v-card-title>Zarejestruj się</v-card-title>
-      <v-card-subtitle>Podaj dane rejestracji</v-card-subtitle>
+      <v-card-title>Dane Pacjenta</v-card-title>
+      <v-card-subtitle>Edytuj dane pacjenta</v-card-subtitle>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
@@ -67,7 +87,7 @@ const submit = async (data: SubmitEvent) => {
             <v-col class="py-1">
               <v-text-field
                 type="input"
-                v-model="surname"
+                v-model="lastName"
                 label="Nazwisko"
                 variant="solo"
                 :rules="surnameRules"
@@ -82,7 +102,7 @@ const submit = async (data: SubmitEvent) => {
               <v-text-field
                 type="Date"
                 label="Data urodzenia"
-                v-model="birth_date"
+                v-model="birthDate"
                 variant="solo"
                 :rules="dateRules"
                 color="blue-darken-2"
@@ -131,33 +151,62 @@ const submit = async (data: SubmitEvent) => {
           </v-row>
           <v-row>
             <v-textarea
-                variant="filled"
-                auto-grow
-                label="Przyjmowane Leki"
-                rows="2"
-                row-height="20"
-                
-              ></v-textarea>
+              variant="filled"
+              auto-grow
+              label="Przyjmowane Leki"
+              v-model="meds"
+              rows="2"
+              row-height="20"
+            ></v-textarea>
           </v-row>
           <v-row>
             <v-textarea
-                variant="filled"
-                auto-grow
-                label="alergia"
-                rows="2"
-                row-height="20"
-              ></v-textarea>
+              variant="filled"
+              auto-grow
+              label="alergia"
+              v-model="allergies"
+              rows="2"
+              row-height="20"
+            ></v-textarea>
           </v-row>
         </div>
-        <v-row justify="center">
-          <v-btn type="submit" color="blue-darken-2" class="mt-2 button"
-            >Zarejestruj się</v-btn
-          >
+        <v-row justify="start">
+          <v-col align-self="center" class="text-left">
+            <v-btn
+              variant="outlined"
+              size="large"
+              class="mt-2 button"
+              color="blue-darken-2"
+            >
+              Wstecz
+            </v-btn>
+          </v-col>
+          <v-col>
+            <v-btn size="large" class="mt-2 button" color="blue-darken-2">
+              zapisz
+            </v-btn>
+          </v-col>
         </v-row>
-        <v-row justify="center">
-          <v-btn variant="text" size="small" class="mt-2 button"
-            >Mam już konto</v-btn
-          >
+        <v-row>
+          <v-col> </v-col>
+          <v-col>
+            <router-link
+              to="/doctor/passwordreset"
+              custom
+              v-slot="{ navigate }"
+            >
+              <v-btn
+                variant="text"
+                align-self="center"
+                size="small"
+                class="mt-2 button"
+                value="/doctor/passwordreset"
+                @click="navigate"
+              >
+                Zmień hasło
+              </v-btn>
+            </router-link>
+          </v-col>
         </v-row>
       </v-form>
     </v-card-text>

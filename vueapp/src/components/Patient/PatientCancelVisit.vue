@@ -8,14 +8,14 @@ const appointment_data = ref<any>(null);
 const waiting = ref<boolean>(true);
 
 onBeforeMount(async () => {
-  appointment_id = router.currentRoute.value.params['id'] as string;
+  appointment_id = router.currentRoute.value.params["id"] as string;
   await getAppointmentData();
-})
+});
 
 const getAppointmentData = async () => {
   try {
     const res = await authorized.get(`/appointment/${appointment_id}`);
-    appointment_data.value = res.data
+    appointment_data.value = res.data;
   } catch (e: any) {
     console.log(e);
     snackbar.error = true;
@@ -23,25 +23,31 @@ const getAppointmentData = async () => {
   } finally {
     waiting.value = false;
   }
-}
+};
 
 const deleteAppointment = async () => {
   try {
     waiting.value = true;
-    const res = await authorized.delete(`/appointment/cancel-appointment/${appointment_id}`)
+    const res = await authorized.delete(
+      `/appointment/cancel-appointment/${appointment_id}`
+    );
     if (res.status === 200) {
       snackbar.error = false;
       snackbar.text = "Pomyślnie anulowano wizytę";
+      router.push("/patient/appointments");
     }
   } catch (e: any) {
     console.log(e);
     snackbar.error = true;
-    snackbar.text = e.status === 409 ? "Nie możesz już anulować tej wizyty" : "Wystąpił błąd przy anulowaniu wizyty";
+    snackbar.text =
+      e.status === 409
+        ? "Nie możesz już anulować tej wizyty"
+        : "Wystąpił błąd przy anulowaniu wizyty";
   } finally {
     snackbar.showing = true;
     waiting.value = false;
   }
-}
+};
 </script>
 
 <template>
@@ -72,7 +78,6 @@ const deleteAppointment = async () => {
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
-      <v-form @submit.prevent>
         <v-container>
           <v-row>
             <p class="font-weight-bold">Informacje o wizycie</p>
@@ -85,7 +90,19 @@ const deleteAppointment = async () => {
             >
               Data wizyty
             </v-col>
-            <v-col class="text-left"> {{ appointment_data ? `${new Date(appointment_data.date).toLocaleDateString()}, ${new Date(appointment_data.date).getHours()}:${("0" + new Date(appointment_data.date).getMinutes()).slice(-2)}` : "Wczytywanie..." }} </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? `${new Date(
+                      appointment_data.date
+                    ).toLocaleDateString()}, ${new Date(
+                      appointment_data.date
+                    ).getHours()}:${(
+                      "0" + new Date(appointment_data.date).getMinutes()
+                    ).slice(-2)}`
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -94,7 +111,21 @@ const deleteAppointment = async () => {
             >
               Lekarz
             </v-col>
-            <v-col class="text-left"> {{ appointment_data ? appointment_data.doctor ? appointment_data.doctor.firstName + " " + appointment_data.doctor.lastName : specializations.find(specialization => specialization.value === appointment_data.specialization)!.title : "Wczytywanie..." }} </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? appointment_data.doctor
+                    ? appointment_data.doctor.firstName +
+                      " " +
+                      appointment_data.doctor.lastName
+                    : specializations.find(
+                        (specialization) =>
+                          specialization.value ===
+                          appointment_data.specialization
+                      )!.title
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -103,7 +134,15 @@ const deleteAppointment = async () => {
             >
               Pacjent
             </v-col>
-            <v-col class="text-left"> {{ appointment_data ? appointment_data.patient.firstName + " " + appointment_data.patient.lastName : "Wczytywanie..." }} </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? appointment_data.patient.firstName +
+                    " " +
+                    appointment_data.patient.lastName
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -112,7 +151,15 @@ const deleteAppointment = async () => {
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> {{ appointment_data ? (appointment_data.medicines !== "" ? appointment_data.medicines : "Nie podano") : "Wczytywanie..." }} </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? appointment_data.symptoms !== ""
+                    ? appointment_data.symptoms
+                    : "Nie podano"
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -121,23 +168,30 @@ const deleteAppointment = async () => {
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> {{ appointment_data ? (appointment_data.symptoms !== "" ? appointment_data.symptoms : "Nie podano") : "Wczytywanie..." }} </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? appointment_data.medicines !== ""
+                    ? appointment_data.medicines
+                    : "Nie podano"
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
 
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
-  
-              <v-btn
-                variant="outlined"
-                size="large"
-                class="mt-2 button"
-                color="blue-darken-2"
-                @click="router.back()"
-              >
-                Wstecz
-              </v-btn>
+            <v-btn
+              variant="outlined"
+              size="large"
+              class="mt-2 button"
+              color="blue-darken-2"
+              @click="router.back()"
+            >
+              Wstecz
+            </v-btn>
           </v-col>
           <v-col justify="center" class="text-right">
             <v-btn
@@ -154,7 +208,6 @@ const deleteAppointment = async () => {
             </v-btn>
           </v-col>
         </v-row>
-      </v-form>
     </v-card-text>
   </v-card>
 </template>

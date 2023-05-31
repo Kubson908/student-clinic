@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { prefix } from "@/config";
-import { authorized, spec } from "@/main";
-import DatePicker from "@vuepic/vue-datepicker";
+import { authorized, snackbar, specializations } from "@/main";
 import { ref, onBeforeMount } from "vue";
 
-const date = ref<any>();
 const awaiting = ref<Array<any>>([]);
-
 onBeforeMount(async () => {
-  const res = await authorized.get(
-    `${prefix}/api/appointment/awaiting-appointments`
-  );
-  awaiting.value = res.data;
+  try {
+    const res = await authorized.get("/appointment/awaiting-appointments");
+    awaiting.value = res.data;
+  } catch (e) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = "Błąd pobierania danych";
+    snackbar.showing = true;
+  } finally {
+    //snackbar.showing = true;
+  }
 });
 </script>
 <template>
@@ -22,18 +25,6 @@ onBeforeMount(async () => {
           <v-container class="d-flex justify-center align-center">
             <h1>Oczekujące wizyty</h1>
           </v-container>
-          <v-row no-gutters class="justify-center text-center"
-            ><DatePicker
-              auto-apply
-              no-today
-              v-model="date"
-              range
-              :teleport="true"
-              :enable-time-picker="false"
-              locale="pl"
-              class="w-50 m-auto"
-            ></DatePicker
-          ></v-row>
         </v-card-item>
         <v-card-text>
           <v-table height="50vh" class="px-8" fixed-header>
@@ -57,18 +48,22 @@ onBeforeMount(async () => {
                   }}
                 </td>
                 <td>
-                  {{ spec[visit.specialization] }}
+                  {{
+                    specializations.find(
+                      (s) => s.value === visit.specialization
+                    )?.title
+                  }}
                 </td>
                 <td>
                   <router-link
-                    :to="'/staff/appointment/' + visit.id + '/assign'"
+                    :to="'/staff/appointments/' + visit.id + '/assign'"
                     custom
                     v-slot="{ navigate }"
                   >
                     <v-btn
                       class="mt-2 mx-2 button hp-dark"
                       size="small"
-                      :value="'/staff/appointment/' + visit.id + '/assign'"
+                      :value="'/staff/appointments/' + visit.id + '/assign'"
                       @click="navigate"
                     >
                       Wybór lekarza
@@ -77,7 +72,7 @@ onBeforeMount(async () => {
                 </td>
                 <td>
                   <router-link
-                    :to="'/staff/appointment/' + visit.id"
+                    :to="'/staff/appointments/' + visit.id"
                     custom
                     v-slot="{ navigate }"
                   >

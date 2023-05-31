@@ -32,7 +32,7 @@ const submit = async (data: SubmitEvent) => {
         password: pass.value,
       });
 
-      localStorage.setItem("token", res.data.accessToken);
+      await localStorage.setItem("token", res.data.accessToken);
       if (remember_me.value)
         localStorage.setItem("expireDate", res.data.expireDate);
       else {

@@ -85,12 +85,12 @@ namespace Przychodnia.Webapi.Controllers
         // TODO: sprawdzanie dostępności lekarza o konkretnej godzinie (przypisywanie wizyt)
         [Authorize(Roles = "Staff")]
         [HttpGet("available-doctors")]
-        public async Task<IActionResult> GetAvailableDoctors([FromBody] GetAvailableDoctorsDto dto)
+        public async Task<IActionResult> GetAvailableDoctors([FromQuery] DateTime date, [FromQuery] Specialization specialization)
         {
-            if (dto.Date < DateTime.Now || dto == null) return BadRequest("Model error");
+            if (date < DateTime.Now || date.Equals(null)) return BadRequest("Model error");
 
-            var doctors = await _db.Employees.Where(e => e.Specialization == dto.Specialization 
-                && !e.Appointments.Select(a => a.Date).Contains(dto.Date))
+            var doctors = await _db.Employees.Where(e => e.Specialization == specialization 
+                && !e.Appointments.Select(a => a.Date).Contains(date))
                 .Select(d => new
                 {
                     d.Id,

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { authorized, specializations, snackbar } from "../../main";
+import { authorized, specializations, snackbar, router } from "../../main";
 import NewVisitSymptoms from "./NewVisitSymptoms.vue";
 import NewVisitDate from "./NewVisitDate.vue";
 import NewVisitSummary from "./NewVisitSummary.vue";
@@ -20,7 +20,9 @@ const getSpecialization = () => {
 const getData = () => {
   return {
     symptoms: symptoms.value.symptoms,
-    date: `${("0" + new Date(date.value.date).toLocaleDateString()).slice(-10)}`,
+    date: `${("0" + new Date(date.value.date).toLocaleDateString()).slice(
+      -10
+    )}`,
     hour: date.value.select,
     specialization: getSpecialization(),
     medicine: symptoms.value.medicine,
@@ -43,6 +45,7 @@ const submit = async () => {
     if (response.status === 201) {
       snackbar.error = false;
       snackbar.text = "Pomyślnie zarezerowano wizytę";
+      router.push("/patient/appointments");
     }
   } catch (e: any) {
     console.log(e);
@@ -81,7 +84,11 @@ const submit = async () => {
       </v-window-item>
 
       <v-window-item :value="2">
-        <NewVisitDate @page="(arg) => (page += arg)" ref="date" />
+        <NewVisitDate
+          @page="(arg) => (page += arg)"
+          ref="date"
+          :specialization="symptoms.specialization"
+        />
       </v-window-item>
       <v-window-item :value="3">
         <NewVisitSummary

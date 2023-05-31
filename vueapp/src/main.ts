@@ -11,6 +11,7 @@ import { routes } from "./router";
 import { User, Snackbar } from "./typings";
 import axios from "axios";
 import { prefix } from "./config";
+import * as labsComponents from "vuetify/labs/components";
 
 export const user = reactive<User>({
   id: 0,
@@ -77,7 +78,12 @@ router.beforeEach((to) => {
 });
 
 const vuetify = createVuetify({
-  components,
-  directives,
+  components: {
+    ...components,
+    ...labsComponents,
+  },
+  directives: {
+    ...directives,
+  },
 });
 createApp(App).use(router).use(vuetify).mount("#app");

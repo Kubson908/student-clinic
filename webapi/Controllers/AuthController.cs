@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Przychodnia.Shared;
 using Przychodnia.Webapi.Services;
 using System.Net.Mail;
@@ -7,11 +6,7 @@ using MimeKit;
 using Microsoft.AspNetCore.Identity;
 using Przychodnia.Webapi.Models;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -61,13 +56,27 @@ namespace Przychodnia.Webapi.Controllers
         [HttpPost("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
         {
-            if (dto.Token == null) return BadRequest("Token is null");
+            if (dto.Token == null) return BadRequest("Code is null");
 
-            var user = await _patientManager.FindByIdAsync(dto.Id);
+            var user = await _patientManager.FindByEmailAsync(dto.Email);
             if (user == null) return NotFound("User not found");
-            var result = await _patientManager.ConfirmEmailAsync(user, dto.Token);
-            if (result.Succeeded) return Ok("Email confirmed");
-            return BadRequest("Invalid token");
+            var result = await _patientManager.VerifyUserTokenAsync(user, "EmailConfirmationTokenProvider", UserManager<object>.ConfirmEmailTokenPurpose, dto.Token);
+            if (result)
+            {
+                string token = await _patientManager.GenerateEmailConfirmationTokenAsync(user);
+                await _patientManager.ConfirmEmailAsync(user, token);
+                return Ok("Email confirmed");
+            }
+            return BadRequest("Invalid code");
+        }
+
+        [HttpPost("resend-email")]
+        public async Task<IActionResult> ResendEmail([FromBody] ConfirmEmailDto dto)
+        {
+            var user = await _patientManager.FindByEmailAsync(dto.Email);
+            if (user == null) return NotFound("User not found");
+            await _patientService.SendEmailConfirmationCode(user);
+            return Ok("Mail sent");
         }
 
         // /api/auth/login
@@ -183,6 +192,16 @@ namespace Przychodnia.Webapi.Controllers
             var result = await _employeeManager.ResetPasswordAsync(user, token, dto.Password);
             if (result.Succeeded) return Ok("Success");
             return BadRequest("Token is invalid");
+        }
+
+        [HttpPatch("delete-patient")]
+        public async Task<IActionResult> DeletePatient([FromBody] string patientId)
+        {
+            var result = await _patientService.DeleteUserAsync(patientId);
+
+            if (result.IsSuccess) return Ok("Succes"); // Status code: 200
+
+            return BadRequest(result);
         }
     }
 }

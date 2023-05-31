@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+import {router} from "@/main"
 //Wojtek
 const form = ref<HTMLFormElement | null>(null);
 const email = ref<string>("");
@@ -69,6 +70,7 @@ const submit = async (data: SubmitEvent) => {
               text="blue-darken"
               color="blue-darken-2"  
               class="mt-2 button"
+              @click="router.back()"
                 >Wstecz</v-btn
               >
             </v-sheet>
@@ -79,7 +81,7 @@ const submit = async (data: SubmitEvent) => {
                 type="submit"
                 color="blue-darken-2"
                 class="mt-2 button"
-                >Dalej</v-btn
+                >Zapisz</v-btn
               >
             </v-sheet>
           </v-col>

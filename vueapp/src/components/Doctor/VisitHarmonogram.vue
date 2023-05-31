@@ -32,7 +32,7 @@ onBeforeMount(async () => {
     const res = await authorized.get(`${prefix}/api/Appointment/schedule`);
     appointments = res.data;
   }
-
+  date.value.setHours(0, 0, 0, 0);
   //console.log(appointments);
 });
 
@@ -102,7 +102,7 @@ const filteredAppointments = computed(() => {
                 <v-col xs="10" md="8">
                   <v-container class="right">
                     <router-link
-                      to="/doctor/visit"
+                    :to="'/doctor/appointment/' + appointment.id + '/finish'"
                       custom
                       v-slot="{ navigate }"
                     >
@@ -115,7 +115,7 @@ const filteredAppointments = computed(() => {
                       >
                     </router-link>
                     <router-link
-                      :to="'/doctor/appointments/' + appointment.id"
+                      :to="'/doctor/appointment/' + appointment.id"
                       custom
                       v-slot="{ navigate }"
                     >

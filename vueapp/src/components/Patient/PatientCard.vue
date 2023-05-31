@@ -17,8 +17,12 @@ const treatmentHistory = ref<
 // const lastName = ref<string>("");
 onBeforeMount(async () => {
   // const res = await authorized.get("/appointment");
-  const card = await authorized.get("/patient/patient-card");
-  console.log(card.data);
+  const patientId = router.currentRoute.value.params["id"] as string;
+  console.log(patientId);
+  let card = null;
+  if (patientId == undefined)
+    card = await authorized.get("/patient/patient-card");
+  else card = await authorized.get("/patient/patient-card/" + patientId);
   const data = card.data;
   name.value = data.firstName;
   lastName.value = data.lastName;
@@ -133,7 +137,12 @@ onBeforeMount(async () => {
         </v-container>
         <v-row justify="center" class="mt-4">
           <v-col class="text-left">
-            <v-btn variant="outlined" class="mt-2 button" color="blue-darken-2"  @click="router.back()">
+            <v-btn
+              variant="outlined"
+              class="mt-2 button"
+              color="blue-darken-2"
+              @click="router.back()"
+            >
               Wstecz
             </v-btn>
           </v-col>
