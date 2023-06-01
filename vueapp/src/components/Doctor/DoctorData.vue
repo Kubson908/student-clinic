@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { router, authorized, specializations, user } from "@/main";
 import { onBeforeMount, ref } from "vue";
-import { nameRules, surnameRules, dateRules, peselRules, emailRules, phoneRules } from "@/validation";
+import {
+  nameRules,
+  surnameRules,
+  dateRules,
+  peselRules,
+  emailRules,
+  phoneRules,
+} from "@/validation";
 const checkRole = (role: string) => {
   const roles = user.roles!;
   return roles.includes(role);
@@ -12,7 +19,7 @@ const email = ref<string>("");
 const pesel = ref<string>("");
 const phone = ref<string>("");
 const birthDate = ref<string>("");
-const specialization = ref<number>(0);
+const specialization = ref<string | undefined>("");
 onBeforeMount(async () => {
   const res = await authorized.get(
     `http://localhost:7042/api/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`
@@ -24,9 +31,10 @@ onBeforeMount(async () => {
   email.value = data.email;
   phone.value = data.phoneNumber;
   birthDate.value = data.dateOfBirth;
-  specialization.value = data.specialization;
+  specialization.value = specializations.find(
+    (s) => s.value === data.specialization
+  )?.title;
 });
-
 </script>
 
 <template>
@@ -137,8 +145,7 @@ onBeforeMount(async () => {
             </v-col>
           </v-row>
           <v-row>
-            <v-select v-model="specialization">
-              
+            <v-select v-model="specialization" label="Specjalizacja">
             </v-select>
 
             <!-- <v-col
@@ -165,6 +172,18 @@ onBeforeMount(async () => {
             >
               Wstecz
             </v-btn>
+          </v-col>
+          <v-col>
+            <v-btn size="large"  class="mt-2 button" color="blue-darken-2">
+              zapisz
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+          </v-col>
+
+            <v-col>
             <router-link
               to="/doctor/passwordreset"
               custom

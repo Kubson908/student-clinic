@@ -69,36 +69,46 @@ const resend = async () => {
       </v-card-title>
     </v-card-item>
     <v-card-text>
-      <v-row>
-        <v-form ref="form">
-          <v-text-field
-            label="Powtórz hasło"
-            v-model="code"
-            variant="solo"
-            :rules="codeRules"
-            class="px-3 py-1"
-            height="10px"
-            color="blue-darken-2"
-            required
-          >
-          </v-text-field>
-          <v-row justify="center">
-            <v-btn color="blue-darken-2" class="mt-2 button" @click="verify"
-              >Zweryfikuj</v-btn
+      <v-form>
+        <v-row>
+          <v-col>
+            <v-text-field
+              label="Kod weryfikacyjny"
+              v-model="code"
+              variant="solo"
+              :rules="codeRules"
+              class="px-3 py-1"
+              height="10px"
+              color="blue-darken-2"
+              required
             >
-          </v-row>
-          <v-row justify="center">
-            <v-btn
-              variant="text"
-              size="small"
-              class="mt-2 button"
-              @click="resend"
-            >
-              Wyślij kod ponownie
-            </v-btn>
-          </v-row>
-        </v-form>
-      </v-row>
+            </v-text-field>
+            <v-row>
+              <v-col>
+                <v-btn
+                  color="blue-darken-2"
+                  class="mt-2 button"
+                  @click="verify"
+                >
+                  Zweryfikuj
+                </v-btn>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  class="mt-2 button"
+                  @click="resend"
+                >
+                  Wyślij kod ponownie
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-form>
     </v-card-text>
   </v-card>
 </template>
