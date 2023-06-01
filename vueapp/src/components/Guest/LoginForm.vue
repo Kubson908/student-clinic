@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SignedUp from "./SignedUp.vue";
 import { unauthorized } from "../../main";
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
@@ -15,15 +16,16 @@ const email = ref<string>("");
 const pass = ref<string>("");
 const email_reset = ref<string>("");
 const remember_me = ref<boolean>(false);
-
+const email_to_confirm = ref<string>("");
 const page = ref<number>(1);
 
-const send_mail = () => {};
+const send_mail = () => {}; // TODO: do dokończenia
 
 const submit = async (data: SubmitEvent) => {
   await data;
   const login = await form_login.value?.validate();
   const reset = await form_reset.value?.validate();
+  email_to_confirm.value = email.value;
   if (login && login.valid) {
     try {
       loading.value = true;
@@ -56,7 +58,6 @@ const submit = async (data: SubmitEvent) => {
           : "Wystąpił nieznany błąd";
       snackbar.error = true;
       snackbar.showing = true;
-      // TODO: Ekran podawania kodu z maila dla niezatwierdzonych
       if (error.response.status == 403) page.value = 4;
     } finally {
       loading.value = false;
@@ -278,6 +279,9 @@ const passwordRules = [
                 </v-row>
               </v-form>
             </v-card-text>
+          </v-window-item>
+          <v-window-item :value="4">
+            <SignedUp :email_to_confirm="email_to_confirm" />
           </v-window-item>
         </v-window>
       </v-card>

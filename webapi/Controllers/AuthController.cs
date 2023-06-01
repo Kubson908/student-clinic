@@ -87,7 +87,7 @@ namespace Przychodnia.Webapi.Controllers
                 if (result.IsSuccess)
                     return Ok(result);
                 if (!result.Errors.IsNullOrEmpty())
-                    return Forbid("Email not confirmed");
+                    return StatusCode(403, "Email not confirmed");
 
                 return Unauthorized("Login error");
             }

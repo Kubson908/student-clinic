@@ -24,7 +24,7 @@ const email = ref<string>("");
 const phone = ref<string>("");
 const pass = ref<string>("");
 const rpass = ref<string>("");
-const page = ref<number>(1);
+const page = ref<number>(0);
 
 const email_to_confirm = ref<string>("");
 const submit = async (data: SubmitEvent) => {

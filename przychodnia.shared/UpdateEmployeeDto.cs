@@ -19,8 +19,7 @@ namespace Przychodnia.Shared
         [Required]
         [StringLength(11)]
         public string Pesel { get; set; } = string.Empty;
-        [Required]
-        public Specialization Specialization { get; set; }
+        public Specialization? Specialization { get; set; }
         [Required]
         [Phone]
         public string PhoneNumber { get; set; } = string.Empty;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+import { router } from "@/main";
 </script>
 
 <template>
@@ -30,6 +30,7 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>

@@ -92,7 +92,7 @@ const repeatPasswordRules = [
             </div>
             <v-row no-gutters class="mt-2">
               <v-col cols="12" class="d-flex justify-space-between">
-                <v-btn variant="outlined" color="blue-darken-2" class="button"
+                <v-btn variant="outlined" color="blue-darken-2" class="button" @click="router.back()"
                   >Wstecz</v-btn
                 >
                 <v-btn color="blue-darken-2" class="button">Zapisz</v-btn>

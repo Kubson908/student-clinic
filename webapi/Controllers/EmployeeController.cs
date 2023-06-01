@@ -5,6 +5,7 @@ using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
 using Przychodnia.Shared;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -39,8 +40,12 @@ namespace Przychodnia.Webapi.Controllers
         [ProducesResponseType(typeof(Employee), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute] string id)
+        [HttpGet("account")]
+        public async Task<IActionResult> GetById([FromRoute] string? id)
         {
+            string? userId = "";
+            if (id == null) userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            else userId = id;
             var Worker = await _db.Employees.Select(e => new
             {
                 e.Id,
@@ -51,7 +56,7 @@ namespace Przychodnia.Webapi.Controllers
                 e.PhoneNumber,
                 e.DateOfBirth,
                 e.Pesel
-            }).FirstOrDefaultAsync(e => e.Id == id);
+            }).FirstOrDefaultAsync(e => e.Id == userId);
             return Worker == null ? NotFound("Employee not found") : Ok(Worker);
         }
 
@@ -63,7 +68,7 @@ namespace Przychodnia.Webapi.Controllers
             {
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null) return BadRequest("User not found");
-                user.Email = dto.Email;
+/*                user.Email = dto.Email;
                 user.NormalizedEmail = dto.Email.Normalize();
                 user.UserName = dto.Email;
                 user.NormalizedEmail = dto.Email.Normalize();
@@ -75,9 +80,20 @@ namespace Przychodnia.Webapi.Controllers
                 user.Pesel = dto.Pesel;
 
                 var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded) return Ok("Updated");
+                if (result.Succeeded) return Ok("Updated");*/
+                foreach (var prop in typeof(Employee).GetProperties())
+                {
+                    var fromProp = typeof(UpdateEmployeeDto).GetProperty(prop.Name);
+                    var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;
+                    if (toValue != null)
+                    {
+                        prop.SetValue(user, toValue, null);
+                        _db.Entry(user).Property(prop.Name).IsModified = true;
+                    }
+                }
+                await _db.SaveChangesAsync();
 
-                return BadRequest("Error");
+                return Ok("Updated");
             }
             return BadRequest("Model is not valid");
         }

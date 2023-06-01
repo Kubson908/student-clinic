@@ -1,4 +1,4 @@
-import { createApp, reactive } from "vue";
+import { createApp, reactive, ref, watch, computed } from "vue";
 import App from "./App.vue";
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
@@ -36,16 +36,17 @@ export const spec: Array<string> = [
   "Gastrolog",
 ];
 export const getToken = () => {
-  return localStorage.getItem("token")
-  ? localStorage.getItem("token")
-  : null;}
+  return localStorage.getItem("token") ? localStorage.getItem("token") : null;
+};
 
 export const authorized = axios.create({
-  headers: {
-    Authorization: `Bearer ${getToken()}`,
-  },
   baseURL: `${prefix}/api`,
   timeout: 5000,
+});
+
+authorized.interceptors.request.use((config) => {
+  config.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
+  return config;
 });
 
 export const unauthorized = axios.create({

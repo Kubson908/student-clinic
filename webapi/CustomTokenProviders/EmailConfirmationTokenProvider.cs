@@ -22,7 +22,7 @@ namespace Przychodnia.Webapi.CustomTokenProviders
         {
             if (manager == null)
                 throw new ArgumentNullException(nameof(manager));
-            byte[] token = await manager.CreateSecurityTokenAsync(user);
+            byte[]? token = await manager.CreateSecurityTokenAsync(user);
             string async = CustomRfc6238AuthenticationService.GenerateCode
                 (
                     token,
@@ -30,7 +30,7 @@ namespace Przychodnia.Webapi.CustomTokenProviders
                     _timeStep
                 )
                 .ToString("D6", (IFormatProvider)CultureInfo.InvariantCulture);
-            token = (byte[])null;
+            token = null;
             return async;
         }
 

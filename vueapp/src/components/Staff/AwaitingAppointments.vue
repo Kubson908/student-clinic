@@ -12,9 +12,10 @@ onBeforeMount(async () => {
     snackbar.error = true;
     snackbar.text = "Błąd pobierania danych";
     snackbar.showing = true;
-  } finally {
-    //snackbar.showing = true;
   }
+  // finally {
+  //   //snackbar.showing = true;
+  // }
 });
 </script>
 <template>

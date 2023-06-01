@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import {router} from "@/main"
+import { router } from "@/main";
 //Wojtek
 const form = ref<HTMLFormElement | null>(null);
 const email = ref<string>("");
@@ -29,7 +29,8 @@ const submit = async (data: SubmitEvent) => {
       </v-container>
       <v-card-title>Zmień hasło</v-card-title>
       <v-card-subtitle
-        >Zmień hasło lekarza: imie i nazwisko lekarza</v-card-subtitle>
+        >Zmień hasło lekarza: imie i nazwisko lekarza</v-card-subtitle
+      >
     </v-card-item>
     <v-card-text>
       <v-form @submit.prevent="submit" ref="form">
@@ -64,23 +65,20 @@ const submit = async (data: SubmitEvent) => {
         <v-row>
           <v-col cols="auto" class="me-auto">
             <v-sheet class="pa-2 ma-2">
-              <v-btn 
-              type="submit"
-              variant="outlined"
-              text="blue-darken"
-              color="blue-darken-2"  
-              class="mt-2 button"
-              @click="router.back()"
+              <v-btn
+                type="submit"
+                variant="outlined"
+                text="blue-darken"
+                color="blue-darken-2"
+                class="mt-2 button"
+                @click="router.back()"
                 >Wstecz</v-btn
               >
             </v-sheet>
           </v-col>
           <v-col cols="auto">
             <v-sheet class="pa-2 ma-2">
-              <v-btn
-                type="submit"
-                color="blue-darken-2"
-                class="mt-2 button"
+              <v-btn type="submit" color="blue-darken-2" class="mt-2 button"
                 >Zapisz</v-btn
               >
             </v-sheet>

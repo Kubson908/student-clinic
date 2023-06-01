@@ -103,7 +103,11 @@ export const routes: Array<Route> = [
         component: VisitHarmonogram,
         meta: { roles: null },
       },
-      { path: "appointment/:id/finish", component: DoctorVisit, meta: { roles: null } }, // doctor - Wizyta
+      {
+        path: "appointment/:id/finish",
+        component: DoctorVisit,
+        meta: { roles: null },
+      }, // doctor - Wizyta
       {
         path: "profile",
         component: DoctorData,
@@ -191,6 +195,11 @@ export const routes: Array<Route> = [
         component: DoctorPage,
         meta: { roles: null },
       },
+      {
+        path: "doctors/profile/:id",
+        component: DoctorDataEdit,
+        meta: { roles: null },
+      }, // doctor - Dane lekarza - lekarz
       {
         path: "profile",
         component: DoctorData,

@@ -17,6 +17,7 @@ namespace Przychodnia.Webapi.Controllers
             _db = db;
         }
 
+        [Authorize(Roles = "Employee, Staff")]
         [HttpGet]
         [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

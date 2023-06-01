@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { authorized, snackbar, specializations } from "@/main";
+import { authorized, snackbar, specializations, router } from "@/main";
 import { onBeforeMount } from "vue";
 import {
   nameRules,
@@ -18,6 +18,7 @@ const pesel = ref<string>("");
 const phone = ref<string>("");
 const birthDate = ref<string>("");
 const specialization = ref<number>(0);
+const employeeId = ref<string>("");
 const waiting = ref(false);
 
 const form = ref<any>();
@@ -27,9 +28,10 @@ const props = defineProps({
 });
 //const specialization = ref<string>("");
 onBeforeMount(async () => {
-  const res = await authorized.get(
-    `http://localhost:7042/api/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`
-  );
+  const id = router.currentRoute.value.params["id"] ?? null;
+  const res = id
+    ? await authorized.get("/employee/" + id)
+    : await authorized.get(`/employee/account`);
   const data = res.data;
   name.value = data.firstName;
   lastName.value = data.lastName;
@@ -38,6 +40,7 @@ onBeforeMount(async () => {
   phone.value = data.phoneNumber;
   birthDate.value = data.dateOfBirth;
   specialization.value = data.specialization;
+  employeeId.value = data.id;
 });
 
 const submitData = async () => {
@@ -46,7 +49,7 @@ const submitData = async () => {
   try {
     waiting.value = true;
     const res = await authorized.patch(
-      `http://localhost:7042/api/Employee/update/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`,
+      `http://localhost:7042/api/employee/update/${employeeId.value}`,
       {
         firstName: name.value,
         lastName: lastName.value,
@@ -55,7 +58,7 @@ const submitData = async () => {
         specialization: specialization.value,
         phoneNumber: phone.value,
         dateOfBirth: birthDate.value,
-      },
+      }
     );
     if (res.status === 200) snackbar.error = false;
     snackbar.text = "Pomyślnie zaktualizowano dane";
@@ -205,18 +208,16 @@ const submitData = async () => {
 
         <v-row no-gutters justify="start">
           <v-col cols="auto" class="me-auto">
-            <router-link to="/doctor/doctorpage" custom v-slot="{ navigate }">
-              <v-btn
-                type="submit"
-                variant="outlined"
-                text="blue-darken"
-                color="blue-darken-2"
-                class="mt-2 button"
-                @click="navigate"
-              >
-                Wstecz
-              </v-btn>
-            </router-link>
+            <v-btn
+              type="submit"
+              variant="outlined"
+              text="blue-darken"
+              color="blue-darken-2"
+              class="mt-2 button"
+              @click="router.back()"
+            >
+              Wstecz
+            </v-btn>
           </v-col>
           <v-col cols="auto">
             <v-row no-gutters>

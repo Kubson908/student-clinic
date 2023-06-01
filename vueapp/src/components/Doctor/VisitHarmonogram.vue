@@ -32,7 +32,7 @@ onBeforeMount(async () => {
     const res = await authorized.get(`${prefix}/api/Appointment/schedule`);
     appointments = res.data;
   }
-  date.value.setHours(0, 0, 0, 0);
+  date.value = new Date();//Sprawia, że computed się odpala przez zmianę wartości
   //console.log(appointments);
 });
 
@@ -47,8 +47,9 @@ const format = (date: Date) => {
 const formatTime = (date: Date) => {
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  
-
+  if(minutes == 0){
+    return `${hours}:00`;
+  }
   return `${hours}:${minutes}`;
 };
 
@@ -56,7 +57,7 @@ const filteredAppointments = computed(() => {
   const d = date.value; //Don't question it
   //console.log(date.value.toDateString());
   return appointments.filter(
-    (it) => new Date(it.date).toDateString() == d.toDateString() // TODO: filter appointments at startup
+    (it) => new Date(it.date).toDateString() == d.toDateString()
   );
 });
 </script>

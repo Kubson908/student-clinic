@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { passwordRules } from '@/validation';
+import { router } from "@/main";
 const pass = ref<string>("");
 const visible = ref<boolean>(false);
 const visible_repeat = ref<boolean>(false);
@@ -75,6 +76,7 @@ const repeatPasswordRules = [
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>

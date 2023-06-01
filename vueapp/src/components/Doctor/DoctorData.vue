@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router, authorized, specializations, user } from "@/main";
+import { router, authorized, specializations, user, snackbar } from "@/main";
 import { onBeforeMount, ref } from "vue";
 import {
   nameRules,
@@ -19,11 +19,13 @@ const email = ref<string>("");
 const pesel = ref<string>("");
 const phone = ref<string>("");
 const birthDate = ref<string>("");
-const specialization = ref<string | undefined>("");
+const specialization = ref<string>("");
+const employeeId = ref<string>("");
+const form = ref<any>();
+const waiting = ref(false);
+const specializationNumber = ref<number | null>(null);
 onBeforeMount(async () => {
-  const res = await authorized.get(
-    `http://localhost:7042/api/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`
-  );
+  const res = await authorized.get(`/employee/account`);
   const data = res.data;
   name.value = data.firstName;
   lastName.value = data.lastName;
@@ -31,10 +33,39 @@ onBeforeMount(async () => {
   email.value = data.email;
   phone.value = data.phoneNumber;
   birthDate.value = data.dateOfBirth;
-  specialization.value = specializations.find(
-    (s) => s.value === data.specialization
-  )?.title;
+  specialization.value =
+    specializations.find((s) => s.value === data.specialization)?.title ?? "";
+  employeeId.value = data.id;
+  specializationNumber.value = data.specialization;
 });
+const submitData = async () => {
+  const valid = await form.value.validate();
+  if (!valid) return;
+  try {
+    waiting.value = true;
+    const res = await authorized.patch(
+      `http://localhost:7042/api/Employee/update/${employeeId.value}`,
+      {
+        firstName: name.value,
+        lastName: lastName.value,
+        email: email.value,
+        pesel: pesel.value,
+        specialization: specializationNumber.value,
+        phoneNumber: phone.value,
+        dateOfBirth: birthDate.value,
+      }
+    );
+    if (res.status === 200) snackbar.error = false;
+    snackbar.text = "Pomyślnie zaktualizowano dane";
+  } catch (e) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = "Wystąpił błąd podczas edycji";
+  } finally {
+    waiting.value = false;
+    snackbar.showing = true;
+  }
+};
 </script>
 
 <template>
@@ -51,7 +82,7 @@ onBeforeMount(async () => {
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
-      <v-form @submit.prevent>
+      <v-form @submit.prevent ref="form">
         <v-container>
           <v-row>
             <v-col align="center">
@@ -144,7 +175,7 @@ onBeforeMount(async () => {
               </v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row v-if="specialization != ''">
             <v-select v-model="specialization" label="Specjalizacja">
             </v-select>
 
@@ -173,17 +204,19 @@ onBeforeMount(async () => {
               Wstecz
             </v-btn>
           </v-col>
-          <v-col>
-            <v-btn size="large"  class="mt-2 button" color="blue-darken-2">
-              zapisz
+          <v-col class="text-right">
+            <v-btn
+              size="large"
+              class="mt-2 button"
+              color="blue-darken-2"
+              @click="submitData"
+            >
+              Zapisz
             </v-btn>
           </v-col>
         </v-row>
         <v-row>
-          <v-col>
-          </v-col>
-
-            <v-col>
+          <v-col class="text-right">
             <router-link
               to="/doctor/passwordreset"
               custom
@@ -287,9 +320,7 @@ onBeforeMount(async () => {
               Specjalizacja
             </v-col>
             <v-col class="text-left">
-              {{
-                specializations.find((s) => s.value === specialization)?.title
-              }}
+              {{ specialization }}
             </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>

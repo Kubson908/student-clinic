@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { onBeforeMount } from "vue";
 import { authorized } from "@/main";
 import { passwordRules } from "@/validation";
-import { snackbar } from "@/main";
+import { snackbar, router } from "@/main";
 
 const name = ref<string>("");
 const lastName = ref<string>("");
@@ -43,22 +43,20 @@ const submitData = async () => {
     loading.value = true;
     const res = await authorized.patch(
       `http://localhost:7042/api/auth/employee-reset-password`,
-      
+
       {
         id: "52e97c43-3a30-49b3-ba28-9b761da64680",
         password: pass.value,
-      },
+      }
     );
     if (res.status === 200) {
       snackbar.error = false;
       snackbar.text = "Pomyślnie zmieniono hasło";
     }
-  } 
-  catch (e) {
+  } catch (e) {
     snackbar.error = true;
     snackbar.text = "Wystąpił błąd podczas zmiany hasła";
-  } 
-  finally {
+  } finally {
     loading.value = false;
     snackbar.showing = true;
   }
@@ -127,21 +125,15 @@ const submitData = async () => {
 
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
-            <router-link
-              to="/doctor/doctordataedit"
-              custom
-              v-slot="{ navigate }"
+            <v-btn
+              variant="outlined"
+              size="large"
+              class="mt-2 button"
+              color="blue-darken-2"
+              @click="router.back()"
             >
-              <v-btn
-                variant="outlined"
-                size="large"
-                class="mt-2 button"
-                color="blue-darken-2"
-                @click="navigate"
-              >
-                Wstecz
-              </v-btn>
-            </router-link>
+              Wstecz
+            </v-btn>
           </v-col>
           <v-col justify="center" class="text-right">
             <v-btn

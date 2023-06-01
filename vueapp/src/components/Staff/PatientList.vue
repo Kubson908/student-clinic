@@ -20,7 +20,6 @@ const filteredPatients = computed(() => {
     return patient.name.toLowerCase().indexOf(search.value.toLowerCase()) != -1;
   });
 });
-console.log(filteredPatients);
 </script>
 <template>
   <v-row justify="center" no-gutters>

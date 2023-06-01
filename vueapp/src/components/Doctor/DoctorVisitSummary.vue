@@ -1,27 +1,4 @@
 <script setup lang="ts">
-// import { router } from "@/main";
-// eslint-disable-next-line
-
-// import DoctorVisitProgress from "./DoctorVisitProgress.vue";
-// import { ref, onBeforeMount } from "vue";
-// const meds = ref(null);
-// const appointmentDate = ref(null);
-// const patientName = ref(null);
-// const symptoms = ref(null);
-// const medicines = ref(null);
-// const diagnose = ref(null);
-// const recomendations = ref(null);
-// onBeforeMount(() => {
-//     appointmentDate.value = DoctorVisitProgress.appointmentDate
-//     patientName.value = DoctorVisitProgress.patientName
-//     symptoms.value = DoctorVisitProgress.symptoms
-//     medicines.value = DoctorVisitProgress.medicines
-//     // meds.value = DoctorVisitProgress.value.meds
-//     diagnose.value = DoctorVisitProgress.diagnose
-//     recomendations.value = DoctorVisitProgress.recomendations
-//   })
-
-// eslint-disable-next-line
 const emit = defineEmits(["page", "submit"]);
 const change_page = (arg: number) => {
   emit("page", arg);
@@ -142,7 +119,7 @@ console.log(props.data?.select);
               {{ props.data?.recomendations }}
             </v-col>
           </v-row>
-          <v-row>
+          <v-row v-if="props.data?.controlVisit">
             <v-col
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
@@ -152,7 +129,7 @@ console.log(props.data?.select);
             <!-- 31.01.2023, 17:30 -->
             <v-col class="text-left">
               {{ new Date(props.data?.date).toLocaleDateString() }},
-              {{ props.data?.select }}
+              {{ `${props.data?.dateDay}, ${props.data?.dateHour}` }}
             </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
@@ -165,7 +142,7 @@ console.log(props.data?.select);
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
-              @click="change_page(-1)"
+              @click="change_page(props.data?.controlVisit ? -1 : -2)"
             >
               Wstecz
             </v-btn>

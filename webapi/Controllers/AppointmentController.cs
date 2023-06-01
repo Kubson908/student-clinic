@@ -10,7 +10,6 @@ namespace Przychodnia.Webapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    /*[Authorize(Roles = "Patient")]*/
     public class AppointmentController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -334,6 +333,14 @@ namespace Przychodnia.Webapi.Controllers
             }
             await _db.SaveChangesAsync();
             return Ok("Appointment finished");
+        }
+
+        [HttpGet("statistics/{year}/{month}")]
+        public async Task<IActionResult> GetStatistics([FromRoute] int year, [FromRoute] int month)
+        {
+            var appointments = await _db.Appointments.Where(a => a.Date.Year == year && a.Date.Month == month).ToListAsync();
+            if (appointments.Count() == 0) return NotFound("No appointments found");
+            return Ok(appointments);
         }
     }
 }

@@ -10,6 +10,7 @@ import {
   nameRules,
   emailRules,
 } from "@/validation";
+import { router } from "@/main";
 // const visible = ref(false);
 // const visible2 = ref(false);
 
@@ -177,6 +178,7 @@ onBeforeMount(async () => {
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>
