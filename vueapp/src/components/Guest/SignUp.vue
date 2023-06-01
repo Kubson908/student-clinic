@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import SignedUp from "./SignedUp.vue";
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
 import {
@@ -10,7 +11,7 @@ import {
   passwordRules,
   emailRules,
 } from "@/validation";
-import { router, snackbar, unauthorized } from "@/main";
+import { snackbar, unauthorized } from "@/main";
 const visible = ref(false);
 const visible2 = ref(false);
 
@@ -25,7 +26,6 @@ const pass = ref<string>("");
 const rpass = ref<string>("");
 const page = ref<number>(0);
 
-const code = ref<string>("");
 const email_to_confirm = ref<string>("");
 const submit = async (data: SubmitEvent) => {
   const valid = ((await data) as any).valid;
@@ -66,50 +66,6 @@ const repeatPasswordRules = [
     else return "Hasła muszą się zgadzać";
   },
 ];
-
-const codeRules = [
-  (value: string) => {
-    if (value.length == 6) return true;
-    else return "Podaj kod";
-  },
-];
-
-const verify = async () => {
-  if (code.value.length != 6) return;
-  try {
-    console.log(email_to_confirm.value);
-    await unauthorized.post("/auth/confirm-email", {
-      email: email_to_confirm.value,
-      token: code.value,
-    });
-    snackbar.text = "Zweryfikowano adres email";
-    snackbar.error = false;
-    router.push("/login");
-  } catch (e) {
-    console.log(e);
-    snackbar.error = true;
-    snackbar.text = "Błąd weryfikacji";
-  } finally {
-    snackbar.showing = true;
-  }
-};
-
-const resend = async () => {
-  try {
-    await unauthorized.post("/auth/resend-email", {
-      email: email.value,
-      token: code.value,
-    });
-    snackbar.text = "Kod został wysłany";
-    snackbar.error = false;
-  } catch (e) {
-    console.log(e);
-    snackbar.error = true;
-    snackbar.text = "Wystąpił błąd";
-  } finally {
-    snackbar.showing = true;
-  }
-};
 </script>
 
 <template>
@@ -277,7 +233,7 @@ const resend = async () => {
             </v-card-text>
           </v-window-item>
           <v-window-item :value="1">
-            
+            <SignedUp :email_to_confirm="email_to_confirm" />
           </v-window-item>
         </v-window>
       </v-card>

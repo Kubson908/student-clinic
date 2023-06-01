@@ -30,7 +30,7 @@ namespace Przychodnia.Webapi.CustomTokenProviders
                     _timeStep
                 )
                 .ToString("D6", (IFormatProvider)CultureInfo.InvariantCulture);
-            token = (byte[])null ?? new byte[123];
+            token = (byte[])null;
             return async;
         }
 

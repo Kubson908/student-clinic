@@ -57,6 +57,7 @@ const submit = async (data: SubmitEvent) => {
       snackbar.error = true;
       snackbar.showing = true;
       // TODO: Ekran podawania kodu z maila dla niezatwierdzonych
+      if (error.response.status == 403) page.value = 4;
     } finally {
       loading.value = false;
     }

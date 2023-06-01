@@ -29,13 +29,17 @@ const props = defineProps<{
           class="d-flex flex-column align-end mt-auto"
           align-self="bottom"
         >
+        <router-link to="/doctor/profile" custom v-slot="{ navigate }">
           <v-btn
             size="small"
             color="blue-darken-2"
             variant="outlined"
             class="text-body-2"
+            value="/doctor/profile"
+            @click="navigate"
             >Profil</v-btn
           >
+          </router-link >
           <v-btn
             size="small"
             color="blue-darken-2"

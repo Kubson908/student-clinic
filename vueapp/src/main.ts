@@ -35,10 +35,14 @@ export const spec: Array<string> = [
   "Okulista",
   "Gastrolog",
 ];
+export const getToken = () => {
+  return localStorage.getItem("token")
+  ? localStorage.getItem("token")
+  : null;}
 
 export const authorized = axios.create({
   headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
+    Authorization: `Bearer ${getToken()}`,
   },
   baseURL: `${prefix}/api`,
   timeout: 5000,

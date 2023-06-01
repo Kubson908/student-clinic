@@ -1,11 +1,20 @@
 <script setup lang="ts">
-//import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+import { ref } from 'vue';
+import { passwordRules } from '@/validation';
+const pass = ref<string>("");
+const visible = ref<boolean>(false);
+const visible_repeat = ref<boolean>(false);
+
+const repeatPasswordRules = [
+  (value: string) => {
+    if (value) return true;
+    else return "Pole jest wymagane";
+  },
+  (value: string) => {
+    if (value === pass.value) return true;
+    else return "Hasła muszą się zgadzać";
+  },
+];
 </script>
 
 <template>
@@ -47,10 +56,10 @@
             v-model="pass"
             label="Powtórz hasło"
             variant="solo"
-            :type="visible ? 'text' : 'password'"
-            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append-inner="() => (visible = !visible)"
-            :rules="passwordRules"
+            :type="visible_repeat ? 'text' : 'password'"
+            :append-inner-icon="visible_repeat ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append-inner="() => (visible_repeat = !visible_repeat)"
+            :rules="repeatPasswordRules"
             class="py-1"
             color="blue-darken-2"
             required
