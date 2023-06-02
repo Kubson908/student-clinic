@@ -315,7 +315,6 @@ namespace Przychodnia.Webapi.Controllers
         [HttpPatch("finish/{id}")]
         public async Task<IActionResult> FinishAppointment([FromRoute] int id, [FromBody] FinishAppointmentDto dto)
         {
-            Console.Write(dto.Diagnosis);
             if (dto == null) return BadRequest("Object is null");
             string? doctorId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var appointment = await _db.Appointments.FindAsync(id);
@@ -330,6 +329,36 @@ namespace Przychodnia.Webapi.Controllers
                     prop.SetValue(appointment, toValue, null);
                     _db.Entry(appointment).Property(prop.Name).IsModified = true;
                 }
+            }
+            if (dto.Date is not null)
+            {
+                var newDate = DateTime.Parse(dto.Date.ToString() ?? "");
+                if (newDate.Minute % 30 != 0 ||
+                (newDate.Hour >= 17 || newDate.Hour < 9
+                || newDate.DayOfWeek.Equals(0) || (newDate.Hour >= 14
+                || newDate.Hour < 9)
+                && newDate.DayOfWeek.Equals(6))) return StatusCode(406, "Wrong time");
+                if (newDate.CompareTo(DateTime.Now.AddHours(2)) < 0) return StatusCode(406, "Past date");
+                DateTime date = new DateTime(newDate.Year, newDate.Month, newDate.Day, newDate.Hour, newDate.Minute, 0, newDate.Kind);
+                int employees_count = _db.Employees.Count(emp => emp.Specialization == appointment.Specialization);
+                int appointments_count = _db.Appointments.Count(a => a.Date == date && a.Specialization == appointment.Specialization);
+                bool available = appointments_count < employees_count;
+                if (!available) return StatusCode(406, "Date not available");
+                if (_db.Appointments.Any(a => a.Date.CompareTo(date) == 0 && a.PatientId == appointment.PatientId))
+                    return Conflict("This patient has already scheduled an appointment for this time.");
+
+                var controlAppointment = new Appointment()
+                {
+                    PatientId = appointment.PatientId,
+                    DoctorId = appointment.DoctorId,
+                    Date = date,
+                    AppointmentId = appointment.Id,
+                    Specialization = appointment.Specialization,
+                    Medicines = appointment.Medicines,
+                    Symptoms = appointment.Symptoms,
+                };
+
+                await _db.Appointments.AddAsync(controlAppointment);
             }
             await _db.SaveChangesAsync();
             return Ok("Appointment finished");

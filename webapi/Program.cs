@@ -44,10 +44,10 @@ builder.Services.AddIdentityCore<Patient>(config =>
 {
     config.Tokens.PasswordResetTokenProvider = nameof(PasswordResetTokenProvider<Patient>);
     config.Tokens.EmailConfirmationTokenProvider = nameof(EmailConfirmationTokenProvider<Patient>);
-    config.SignIn.RequireConfirmedAccount = true;
-}).AddTokenProvider<PasswordResetTokenProvider<Patient>>(nameof(PasswordResetTokenProvider<Patient>))
+}).AddDefaultTokenProviders()
+    .AddTokenProvider<PasswordResetTokenProvider<Patient>>(nameof(PasswordResetTokenProvider<Patient>))
     .AddTokenProvider<EmailConfirmationTokenProvider<Patient>>(nameof(EmailConfirmationTokenProvider<Patient>))
-    .AddDefaultTokenProviders().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddIdentityCore<Employee>()
     .AddTokenProvider<PasswordResetTokenProvider<Employee>>(nameof(PasswordResetTokenProvider<Employee>))
     .AddDefaultTokenProviders().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
@@ -98,6 +98,7 @@ builder.Services.AddAuthentication(auth =>
 builder.Services.AddScoped<IUserService<RegisterDto, LoginDto>, PatientService>();
 builder.Services.AddScoped<IUserService<RegisterEmployeeDto, LoginDto>, EmployeeService>();
 builder.Services.AddScoped<PasswordResetTokenProvider<Patient>>();
+builder.Services.AddScoped<PasswordResetTokenProvider<Employee>>();
 
 var app = builder.Build();
 

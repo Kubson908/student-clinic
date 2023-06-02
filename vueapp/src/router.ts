@@ -70,7 +70,6 @@ export const routes: Array<Route> = [
         component: PatientData,
         meta: { roles: null },
       },
-
       {
         path: "appointment/:id/cancel", // pacjent - Anuluj wizytę
         component: PatientCancelVisit,
@@ -114,7 +113,7 @@ export const routes: Array<Route> = [
         meta: { roles: null },
       }, // doctor - Dane lekarza - lekarz
       {
-        path: "passwordreset", // JAKIS NIEDOROBIONY KLON(StaffPasswordReset) recepcja - Zmień hasło - recepcjonista
+        path: "passwordreset", // lekarz - Zmień hasło - lekarz / dorobic weryfikacje starego hasla
         component: DoctorPasswordReset,
         meta: { roles: null },
       },
@@ -213,16 +212,16 @@ export const routes: Array<Route> = [
     meta: { roles: null },
     children: [
       {
-        path: "passwordreset2", // guest - Podaj nowe hasło
-        component: GuestPasswordReset2,
-        meta: { roles: null },
-      },
-      {
         path: "passwordreset", // guest - Potwierdzenie przypomnienia
         component: GuestPasswordReset,
         meta: { roles: null },
       },
     ],
+  },
+  {
+    path: "/auth/password-reset", // guest - Podaj nowe hasło
+    component: GuestPasswordReset2,
+    meta: { roles: null },
   },
 ];
 

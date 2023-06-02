@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Przychodnia.Webapi.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
+using Przychodnia.Webapi.CustomTokenProviders;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -16,10 +17,10 @@ namespace Przychodnia.Webapi.Controllers
     {
         private IUserService<RegisterDto, LoginDto> _patientService;
         private IUserService<RegisterEmployeeDto, LoginDto> _employeeService;
-        private UserManager<Patient> _patientManager; 
+        private UserManager<Patient> _patientManager;
         private UserManager<Employee> _employeeManager;
 
-        public AuthController(IUserService<RegisterDto, LoginDto> patientService, 
+        public AuthController(IUserService<RegisterDto, LoginDto> patientService,
             IUserService<RegisterEmployeeDto, LoginDto> employeeService,
             UserManager<Patient> patientManager, UserManager<Employee> employeeManager)
         {
@@ -31,9 +32,9 @@ namespace Przychodnia.Webapi.Controllers
 
         // /api/auth/register
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody]RegisterDto model)
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var result = await _patientService.RegisterUserAsync(model);
 
@@ -73,7 +74,7 @@ namespace Przychodnia.Webapi.Controllers
 
         // /api/auth/login
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync([FromBody]LoginDto model)
+        public async Task<IActionResult> LoginAsync([FromBody] LoginDto model)
         {
             if (ModelState.IsValid)
             {
@@ -87,7 +88,11 @@ namespace Przychodnia.Webapi.Controllers
                 if (result.IsSuccess)
                     return Ok(result);
                 if (!result.Errors.IsNullOrEmpty())
+                {
+                    await ResendEmail(new ConfirmEmailDto { Email = model.Email });
                     return StatusCode(403, "Email not confirmed");
+                }
+
 
                 return Unauthorized("Login error");
             }
@@ -113,7 +118,7 @@ namespace Przychodnia.Webapi.Controllers
 
         // /api/auth/login-employee
         [HttpPost("login-employee")]
-        public async Task<IActionResult> LoginEmployeeAsync([FromBody]LoginDto model)
+        public async Task<IActionResult> LoginEmployeeAsync([FromBody] LoginDto model)
         {
             if (ModelState.IsValid)
             {
@@ -129,21 +134,21 @@ namespace Przychodnia.Webapi.Controllers
         }
 
         [HttpPost("send-reset-link")]
-        public async Task<IActionResult> SendResetPasswordLink([FromBody]string email)
+        public async Task<IActionResult> SendResetPasswordLink([FromBody] ConfirmEmailDto dto)
         {
-            if (email == null) return BadRequest("Email is null");
-            var user = await _patientManager.FindByEmailAsync(email);
+            if (dto.Email == null) return BadRequest("Email is null");
+            var user = await _patientManager.FindByEmailAsync(dto.Email);
             if (user == null) return BadRequest("User not found");
 
             var token = await _patientManager.GeneratePasswordResetTokenAsync(user);
 
             UriBuilder baseUri = new UriBuilder("localhost:8080/auth/password-reset");
-            baseUri.Query = "query=" + token + "&id=" + user.Id;
+            baseUri.Query = "token=" + token + "&id=" + user.Id;
 
-            string mailFrom = "kartinghappywheels@gmail.com";
+            string mailFrom = "przychodniaspaghettimafia@gmail.com";
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Przychodnia Studencka", mailFrom));
-            message.To.Add(new MailboxAddress(email, email));
+            message.To.Add(new MailboxAddress(user.FirstName, dto.Email));
             message.Subject = "Reset hasła do konta w przychodni";
             var body = new BodyBuilder();
             body.HtmlBody = "<h3>Link do zmiany hasła</h3>" + "<a href =http://" + baseUri + ">" + baseUri + "</a>";
@@ -151,19 +156,18 @@ namespace Przychodnia.Webapi.Controllers
             using (var client = new MailKit.Net.Smtp.SmtpClient())
             {
                 client.Connect("smtp.gmail.com", 587, false);
-                client.Authenticate(mailFrom, "affpkqulzykvaima");
+                client.Authenticate(mailFrom, "fegdvxpcrnsjwlvn");
                 client.Send(message);
                 client.Disconnect(true);
             }
 
             return Ok("Email sent");
-
         }
 
         [HttpPatch("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
-            if (dto.Password == null) return BadRequest("Password is null");
+            if (dto.Password == null ) return BadRequest("Password is null");
 
             var user = await _patientManager.FindByIdAsync(dto.Id);
             if (user == null) return NotFound("User not found");

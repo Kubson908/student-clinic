@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { passwordRules } from '@/validation';
-import { router } from "@/main";
+import { ref } from "vue";
+import { passwordRules } from "@/validation";
+import { router, snackbar, unauthorized } from "@/main";
 const pass = ref<string>("");
 const visible = ref<boolean>(false);
 const visible_repeat = ref<boolean>(false);
-
+const token = router.currentRoute.value.query.token;
+const id = router.currentRoute.value.query.id;
 const repeatPasswordRules = [
   (value: string) => {
     if (value) return true;
@@ -16,6 +17,27 @@ const repeatPasswordRules = [
     else return "Hasła muszą się zgadzać";
   },
 ];
+const submit = async () => {
+  try {
+    await unauthorized.patch("/auth/reset-password", {
+      id: id,
+      token: token,
+      password: pass.value,
+    });
+    snackbar.text = "Pomyślnie zmieniono hasło";
+    snackbar.error = false;
+    snackbar.showing = true;
+  } catch (error: any) {
+    console.log(error);
+    snackbar.text =
+      error.response && error.response.status == 400
+        ? "Link do zmiany hasła wygasł"
+        : "Wystąpił nieznany błąd";
+    snackbar.error = true;
+  } finally {
+    snackbar.showing = true;
+  }
+};
 </script>
 
 <template>
@@ -38,7 +60,7 @@ const repeatPasswordRules = [
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
-      <v-form @submit.prevent>
+      <v-form @submit.prevent="submit">
         <v-container>
           <v-text-field
             v-model="pass"
@@ -66,7 +88,6 @@ const repeatPasswordRules = [
             required
           >
           </v-text-field>
-          
         </v-container>
 
         <v-row justify="center">
@@ -83,6 +104,7 @@ const repeatPasswordRules = [
           </v-col>
           <v-col justify="center" class="text-right">
             <v-btn
+              type="submit"
               xs="12"
               sm="6"
               md="3"

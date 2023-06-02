@@ -25,7 +25,7 @@ namespace Przychodnia.Webapi.Services
         {
             var token = await _userManager.GenerateUserTokenAsync(user, "EmailConfirmationTokenProvider", UserManager<object>.ConfirmEmailTokenPurpose);
 
-            string mailFrom = "kartinghappywheels@gmail.com";
+            string mailFrom = "przychodniaspaghettimafia@gmail.com";
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Przychodnia Studencka", mailFrom));
             message.To.Add(new MailboxAddress(user.Email, user.Email));
@@ -36,7 +36,7 @@ namespace Przychodnia.Webapi.Services
             using (var client = new MailKit.Net.Smtp.SmtpClient())
             {
                 client.Connect("smtp.gmail.com", 587, false);
-                client.Authenticate(mailFrom, "affpkqulzykvaima");
+                client.Authenticate(mailFrom, "fegdvxpcrnsjwlvn");
                 client.Send(message);
                 client.Disconnect(true);
             }

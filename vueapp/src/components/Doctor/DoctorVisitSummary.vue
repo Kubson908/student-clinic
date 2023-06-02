@@ -71,7 +71,7 @@ console.log(props.data?.select);
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> {{ props.data?.symptoms }} </v-col>
+            <v-col class="text-left"> {{ props.data?.symptoms ? props.data?.symptoms : "Nie podano" }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -80,7 +80,7 @@ console.log(props.data?.select);
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> {{ props.data?.medicines }} </v-col>
+            <v-col class="text-left"> {{ props.data?.medicines ? props.data?.medicines: "Nie podano" }} </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
           <v-row>
@@ -96,7 +96,7 @@ console.log(props.data?.select);
             </v-col>
             <v-col class="text-left">
               <!-- Pacjent choruje na bakteryjne zapalenie zatok. -->
-              {{ props.data?.diagnose }}
+              {{ props.data?.diagnose ? props.data?.diagnose : "Nie podano" }}
             </v-col>
           </v-row>
           <v-row>
@@ -106,7 +106,7 @@ console.log(props.data?.select);
             >
               Leki
             </v-col>
-            <v-col class="text-left"> {{ props.data?.meds }}</v-col>
+            <v-col class="text-left"> {{ props.data?.meds ? props.data?.meds : "Nie podano" }}</v-col>
           </v-row>
           <v-row>
             <v-col
@@ -116,10 +116,10 @@ console.log(props.data?.select);
               Zalecenia
             </v-col>
             <v-col class="text-left">
-              {{ props.data?.recomendations }}
+              {{ props.data?.recomendations ? props.data?.recomendations : "Nie podano" }}
             </v-col>
           </v-row>
-          <v-row v-if="props.data?.controlVisit">
+          <v-row v-if="props.data?.dateHour && props.data.dateDay && props.data?.controlVisit">
             <v-col
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
@@ -128,8 +128,7 @@ console.log(props.data?.select);
             </v-col>
             <!-- 31.01.2023, 17:30 -->
             <v-col class="text-left">
-              {{ new Date(props.data?.date).toLocaleDateString() }},
-              {{ `${props.data?.dateDay}, ${props.data?.dateHour}` }}
+              {{ `${props.data?.dateDay.toLocaleDateString()}, ${props.data?.dateHour}` }}
             </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>

@@ -26,7 +26,6 @@ const unavailable_dates = ref<any>();
 const current_month = ref<number>(date.value.getMonth());
 const hours_ready = ref<boolean>(false);
 const days_ready = ref<boolean>(false);
-const specialization = props.specialization;
 // eslint-disable-next-line
 defineExpose({
   date,
@@ -57,7 +56,7 @@ const getUnavailableHours = async () => {
     let res = await authorized.get(
       `/appointment/available-hours/${
         date.value.toISOString().split("T")[0]
-      }/specialization/${specialization}`
+      }/specialization/${props.specialization}`
     );
     unavailable_hours.value = res.data;
   } catch (e) {
@@ -87,9 +86,9 @@ const getUnavailableDays = async (month: number) => {
   try {
     days_ready.value = false;
     let res = await authorized.get(
-      `http://localhost:7042/api/appointment/specialization/${specialization}/year/${date.value.getFullYear()}/month/${
-        month + 1
-      }`
+      `http://localhost:7042/api/appointment/specialization/${
+        props.specialization
+      }/year/${date.value.getFullYear()}/month/${month + 1}`
     );
     unavailable_dates.value = res.data;
   } catch (e) {

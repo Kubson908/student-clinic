@@ -3,7 +3,7 @@ import { ref } from "vue";
 import DoctorVisitProgress from "./DoctorVisitProgress.vue";
 import DoctorVisitSummary from "./DoctorVisitSummary.vue";
 import DoctorVisitControl from "./DoctorVisitControl.vue";
-import { router } from "@/main";
+import { router, snackbar, authorized } from "@/main";
 const loading = ref<boolean>(true);
 
 const progress = ref<any>();
@@ -23,11 +23,45 @@ const getData = () => {
     select: progress.value.select,
     specialization: progress.value.doctorSpecialization,
     controlVisit: progress.value.control_visit,
-    dateDay: control.value.date,
-    dateHour: control.value.hour,
+    dateDay: control.value ? control.value.date : undefined,
+    dateHour: control.value ? control.value.hour : undefined,
   };
 };
-const onSubmit = () => {};
+const onSubmit = async () => {
+  try {
+    loading.value = true;
+    const req_data = getData();
+    const res = await authorized.patch(`Appointment/finish/${appointment_id}`, {
+      finished: true,
+      diagnosis: req_data.diagnose,
+      recommmendations: req_data.recomendations,
+      medicines: req_data.meds,
+      date:
+        req_data.dateDay && req_data.dateHour
+          ? `${("0" + req_data.dateDay.toLocaleDateString())
+              .slice(-10)
+              .split(".")
+              .reverse()
+              .join("-")}T${req_data.dateHour}:00.000Z`
+          : null,
+    });
+    if (res.status === 200) {
+      snackbar.text = "Pomyślnie ukończono wizytę";
+      snackbar.error = false;
+    }
+  } catch (e: any) {
+    console.log(e);
+    if (e.response && e.response.status === 406) {
+      snackbar.text = "Niedostępny termin wizyty kontrolnej"
+    } else {
+      snackbar.text = "Wystąpił błąd przy kończeniu wizyty";
+    }
+    snackbar.error = true;
+  } finally {
+    loading.value = false;
+    snackbar.showing = true;
+  }
+};
 const page = ref<number>(1);
 </script>
 <template>
@@ -57,7 +91,7 @@ const page = ref<number>(1);
         <DoctorVisitControl
           @page="(arg) => (page += arg)"
           ref="control"
-          :specialization="getData().specialization"
+          :specialization="progress.doctorSpecialization"
         />
       </v-window-item>
       <v-window-item :value="3">

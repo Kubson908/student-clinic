@@ -43,7 +43,7 @@ namespace Przychodnia.Webapi.Controllers
         [HttpGet("patient-card")]
         [ProducesResponseType(typeof(Patient), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPatientCard([FromRoute] string? id )
+        public async Task<IActionResult> GetPatientCard([FromRoute] string? id)
         {
             string? role = HttpContext.User.FindFirstValue(ClaimTypes.Role);
             string patientId = string.Empty;

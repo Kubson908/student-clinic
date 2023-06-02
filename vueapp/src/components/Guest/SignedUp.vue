@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { unauthorized, snackbar, router } from "@/main";
+import { unauthorized, snackbar, router, user } from "@/main";
+import { connect } from "@/socket";
 import { ref } from "vue";
 const code = ref<string>("");
 // eslint-disable-next-line
 const props = defineProps({
-  email_to_confirm: null,
+  email_to_confirm: String,
+  password: String,
+  remember_me: Boolean,
 });
 const codeRules = [
   (value: string) => {
@@ -12,24 +15,49 @@ const codeRules = [
     else return "Podaj kod";
   },
 ];
+const loading = ref<boolean>(false);
 
 const verify = async () => {
   if (code.value.length != 6) return;
   try {
-    console.log(props.email_to_confirm);
     await unauthorized.post("/auth/confirm-email", {
       email: props.email_to_confirm,
       token: code.value,
     });
     snackbar.text = "Zweryfikowano adres email";
     snackbar.error = false;
-    router.push("/login");
+    if (router.currentRoute.value.path === "/login") {
+      loading.value = true;
+      const res = await unauthorized.post("/auth/login", {
+        email: props.email_to_confirm,
+        password: props.password,
+      });
+
+      await localStorage.setItem("token", res.data.accessToken);
+      if (props.remember_me)
+        localStorage.setItem("expireDate", res.data.expireDate);
+      else {
+        let time = new Date(Date.now());
+        time.setTime(time.getTime() + 60 * 60 * 1000);
+        localStorage.setItem("expireDate", time.toString());
+      }
+      localStorage.setItem("user", res.data.user);
+      localStorage.setItem("roles", JSON.stringify(res.data.roles));
+      user.name = res.data.user;
+      user.isLoggedIn = true;
+      user.roles = res.data.roles;
+      connect(); // To change
+      router.push("/");
+    } else router.push("/login");
+    snackbar.showing = true;
   } catch (e) {
     console.log(e);
     snackbar.error = true;
     snackbar.text = "Błąd weryfikacji";
+    loading.value = false;
   } finally {
     snackbar.showing = true;
+    loading.value = false;
   }
 };
 
@@ -52,7 +80,7 @@ const resend = async () => {
 </script>
 
 <template>
-  <v-card>
+  <v-card :loading="loading">
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card

@@ -7,6 +7,7 @@ import { ref } from "vue";
 
 const name = ref<string>("");
 const lastName = ref<string>("");
+const medicines = ref<string>("");
 const phoneNumber = ref<string>("");
 const email = ref<string>("");
 const pesel = ref<string>("");
@@ -18,7 +19,7 @@ const treatmentHistory = ref<
 onBeforeMount(async () => {
   // const res = await authorized.get("/appointment");
   const patientId = router.currentRoute.value.params["id"] as string;
-  console.log(patientId);
+  //console.log(patientId);
   let card = null;
   if (patientId == undefined)
     card = await authorized.get("/patient/patient-card");
@@ -26,11 +27,13 @@ onBeforeMount(async () => {
   const data = card.data;
   name.value = data.firstName;
   lastName.value = data.lastName;
+  medicines.value = data.medicines;
   phoneNumber.value = data.phoneNumber;
   email.value = data.email;
   pesel.value = data.pesel;
   dateOfBirth.value = data.dateOfBirth;
   treatmentHistory.value = data.treatmentHistory;
+  console.log(card.data);
 });
 </script>
 
@@ -102,12 +105,7 @@ onBeforeMount(async () => {
 
           <v-row>
             <v-col class="font-weight-bold text-blue-darken-1 text-left">
-              Quinilaril Azagel
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="font-weight-bold text-blue-darken-1 text-left">
-              Silvalozin
+              {{ medicines }}
             </v-col>
           </v-row>
         </v-container>

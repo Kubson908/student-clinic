@@ -130,8 +130,8 @@ const getAppointmentData = async () => {
             <v-col class="text-left">
               {{
                 appointment_data
-                  ? appointment_data.medicines !== ""
-                    ? appointment_data.medicines
+                  ? appointment_data.symptoms !== ""
+                    ? appointment_data.symptoms
                     : "Nie podano"
                   : "Wczytywanie..."
               }}
@@ -147,8 +147,8 @@ const getAppointmentData = async () => {
             <v-col class="text-left">
               {{
                 appointment_data
-                  ? appointment_data.symptoms !== ""
-                    ? appointment_data.symptoms
+                  ? appointment_data.medicines !== ""
+                    ? appointment_data.medicines
                     : "Nie podano"
                   : "Wczytywanie..."
               }}

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import VueDatePicker from "@vuepic/vue-datepicker";
 import { router, authorized, snackbar } from "@/main";
-import { ref, onBeforeMount, onMounted, computed, watch } from "vue";
-import { notNull } from "@/validation";
+import { ref, onBeforeMount } from "vue";
 // eslint-disable-next-line
 const emit = defineEmits(["page", "loaded"]);
 const change_page = async (arg: number) => {
@@ -23,6 +21,7 @@ const meds = ref<string>();
 const diagnose = ref<string>();
 const recomendations = ref<string>();
 const control_visit = ref<boolean>(true);
+const loading = ref<boolean>(true);
 
 const doctorSpecialization = ref<number>();
 
@@ -45,18 +44,13 @@ onBeforeMount(async () => {
     snackbar.text = "Wystąpił błąd przy pobieraniu danych wizyty";
     snackbar.showing = true;
   } finally {
+    loading.value = false;
     emit("loaded");
   }
 });
 
 const select = ref<any>();
-const picker = ref<any>();
 const date = ref<any>(new Date());
-const unavailable_hours = ref<Array<string>>([]);
-const unavailable_dates = ref<any>();
-const current_month = ref<number>(date.value.getMonth());
-const hours_ready = ref<boolean>(false);
-const days_ready = ref<boolean>(false);
 // eslint-disable-next-line
 defineExpose({
   appointmentDate,
@@ -105,8 +99,9 @@ defineExpose({
               Informacje o wizycie
             </v-col>
             <v-col class="text-left">
-              {{ new Date(appointmentDate as string).toLocaleDateString() }},
-              {{
+              
+              {{ loading ? "Wczytywanie..." : new Date(appointmentDate as string).toLocaleDateString() }},
+              {{ loading ? "" :
                 new Date(appointmentDate as string)
                   .toLocaleTimeString()
                   .substring(0, 5)
@@ -120,7 +115,7 @@ defineExpose({
             >
               Pacjent
             </v-col>
-            <v-col class="text-left"> {{ patientName }} </v-col>
+            <v-col class="text-left"> {{ loading ? "Wczytywanie" : patientName }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -129,7 +124,9 @@ defineExpose({
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> {{ symptoms }} </v-col>
+            <v-col class="text-left">
+              {{ loading ? "Wczytywanie..." : symptoms ? symptoms : "Nie podano" }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -138,7 +135,9 @@ defineExpose({
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> {{ medicines }} </v-col>
+            <v-col class="text-left">
+              {{ loading ? "Wczytywanie..." : medicines ? medicines : "Nie podano" }}
+            </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
           <v-spacer></v-spacer>
@@ -150,7 +149,6 @@ defineExpose({
                 v-model="diagnose"
                 variant="solo"
                 auto-grow
-                :rules="notNull"
                 label="Diagnoza"
                 rows="5"
                 row-height="20"

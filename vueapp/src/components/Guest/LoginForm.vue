@@ -14,18 +14,25 @@ const form_reset = ref<typeof VForm | null>(null);
 
 const email = ref<string>("");
 const pass = ref<string>("");
-const email_reset = ref<string>("");
 const remember_me = ref<boolean>(false);
 const email_to_confirm = ref<string>("");
+const passProp = ref<string>("");
+const remember_meProp = ref<boolean>(false);
 const page = ref<number>(1);
 
-const send_mail = () => {}; // TODO: do dokończenia
+const send_mail = async () => {
+  await unauthorized.post("/auth/send-reset-link", {
+    email: email_to_confirm.value,
+  });
+}; // TODO: do dokończenia
 
 const submit = async (data: SubmitEvent) => {
   await data;
   const login = await form_login.value?.validate();
   const reset = await form_reset.value?.validate();
+  passProp.value = pass.value;
   email_to_confirm.value = email.value;
+  remember_meProp.value = remember_me.value;
   if (login && login.valid) {
     try {
       loading.value = true;
@@ -51,14 +58,14 @@ const submit = async (data: SubmitEvent) => {
       router.push("/");
     } catch (error: any) {
       snackbar.text =
-        error.response && error.response.status == 401
+        error.response && error.response.data == 401
           ? "Błędny e-mail lub hasło"
           : error.response && error.response.status == 403
           ? "Zweryfikuj adres email"
           : "Wystąpił nieznany błąd";
       snackbar.error = true;
       snackbar.showing = true;
-      if (error.response.status == 403) page.value = 4;
+      if (error.response && error.response.status == 403) page.value = 4;
     } finally {
       loading.value = false;
     }
@@ -67,13 +74,27 @@ const submit = async (data: SubmitEvent) => {
   }
   if (reset && reset.valid) {
     loading.value = true;
-    alert(`E-mail: ${email_reset.value}`);
-    page.value++;
-    loading.value = false;
+    try {
+      await send_mail();
+      page.value++;
+      loading.value = false;
+      snackbar.text = "Na podany adres email wysłano link do zmiany hasła";
+      snackbar.error = true;
+      snackbar.showing = true;
+    } catch (error: any) {
+      console.log(error);
+      snackbar.text =
+        error.response && error.response.data == "User not found"
+          ? "Błędny adres email"
+          : "Wystąpił nieznany błąd";
+      snackbar.error = true;
+      snackbar.showing = true;
+    } finally {
+      loading.value = false;
+    }
     form_reset.value?.reset();
     form_login.value?.reset();
   }
-  loading.value = false;
 };
 
 const emailRules = [
@@ -194,14 +215,14 @@ const passwordRules = [
                   ></v-icon>
                 </v-card>
               </v-container>
-              <v-card-title>Przypomnij hasło</v-card-title>
+              <v-card-title>Nie pamiętam hasła</v-card-title>
               <v-card-subtitle>Podaj e-mail</v-card-subtitle>
             </v-card-item>
             <v-spacer></v-spacer>
             <v-card-text>
               <v-form ref="form_reset" @submit.prevent="submit">
                 <v-text-field
-                  v-model="email_reset"
+                  v-model="email"
                   type="email"
                   label="E-mail"
                   variant="solo"
@@ -246,7 +267,7 @@ const passwordRules = [
                   ></v-icon>
                 </v-card>
               </v-container>
-              <v-card-title>Przypomnij hasło</v-card-title>
+              <v-card-title>Nie pamiętam hasła</v-card-title>
               <v-card-subtitle>Na podany e-mail przesłano link</v-card-subtitle>
             </v-card-item>
             <v-spacer></v-spacer>
@@ -268,10 +289,10 @@ const passwordRules = [
                     >
                     <v-row justify="center">
                       <v-btn
+                        @click="send_mail"
                         variant="text"
                         size="small"
                         class="mt-4"
-                        @click="send_mail"
                         >Wyślij e-mail ponownie</v-btn
                       >
                     </v-row>
@@ -281,7 +302,11 @@ const passwordRules = [
             </v-card-text>
           </v-window-item>
           <v-window-item :value="4">
-            <SignedUp :email_to_confirm="email_to_confirm" />
+            <SignedUp
+              :email_to_confirm="email_to_confirm"
+              :password="passProp"
+              :remember_me="remember_meProp"
+            />
           </v-window-item>
         </v-window>
       </v-card>

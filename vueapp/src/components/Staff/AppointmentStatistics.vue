@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DatePicker from "@vuepic/vue-datepicker";
-import { reactive, ref } from "vue";
-import { specializations } from "@/main";
+import { reactive, ref, onBeforeMount, watch } from "vue";
+import { specializations, authorized, snackbar } from "@/main";
 import {
   Chart as ChartJS,
   Title,
@@ -13,7 +13,6 @@ import {
 } from "chart.js";
 
 import { Bar } from "vue-chartjs";
-import { watch } from "vue";
 
 ChartJS.register(
   CategoryScale,
@@ -24,43 +23,108 @@ ChartJS.register(
   Legend
 );
 
-const statistics_options: Array<{ id: number; title: string }> = [
-  {
-    id: 0,
-    title: "Wizyty wg specjalności",
-  },
-  {
-    id: 1,
-    title: "Wizyty wg lekarza",
-  },
-];
-
 const specialization_labels: Array<string> = specializations.map(
   (specialization) => specialization.title
 );
 
 const data = reactive({
   labels: specialization_labels,
-  datasets: [{ data: [40, 20, 12] }],
+  datasets: [{ data: [] }],
 });
 const options: any = {
   responsive: true,
 };
-const date = ref<any>({
+const date = reactive({
   month: new Date().getMonth(),
   year: new Date().getFullYear(),
 });
 const picker = ref<any>(null);
 const selected = ref<number>(0);
-watch(selected, (n, o) => {
-  console.log(n, o);
-});
-//console.log(date);
+const loading = ref<boolean>(true);
+const appointments = ref<Array<any>>([]);
+
+const appointmentsBySpecialization = () => {
+  const result: any[] = [];
+  for (const specialization of specializations ) {
+    result.push(() => {
+      return appointments.value.reduce((acc: number, curr: number) => {
+
+      })
+    })
+  }
+  return result;
+};
+
+const appointmentsByDoctor = () => {};
+
+const statistics_options: Array<{
+  id: number;
+  title: string;
+  function: CallableFunction;
+}> = [
+  {
+    id: 0,
+    title: "Wizyty wg specjalności",
+    function: appointmentsBySpecialization,
+  },
+  {
+    id: 1,
+    title: "Wizyty wg lekarza",
+    function: appointmentsByDoctor,
+  },
+];
+
+const renderStatistics = () => {
+  statistics_options[selected.value].function();
+};
+
+const fetchData = async () => {
+  try {
+    loading.value = true;
+    const res = await authorized.get(
+      `/Appointment/statistics/${date.year}/${date.month+1}`
+    );
+    console.log(res.data);
+    appointments.value = res.data;
+  } catch (e: any) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = "Wystąpił błąd przy pobieraniu danych statystyki";
+    snackbar.showing = true;
+  } finally {
+    loading.value = false;
+  }
+};
+
+watch(
+  date,
+  (newDate, oldDate: any) => {
+    if (!oldDate || newDate !== oldDate || newDate !== oldDate) {
+      fetchData();
+    }
+  },
+  { immediate: true, deep: true }
+);
+watch(
+  [appointments, selected],
+  (newData, oldData) => {
+    renderStatistics();
+  },
+  { deep: true }
+);
 </script>
 <template>
   <v-row justify="center" no-gutters>
     <v-col cols="12" sm="6" md="6" align-self="center">
       <v-card elevation="5" class="rounded-lg">
+        <template #loader>
+          <v-progress-linear
+            :active="loading"
+            color="deep-purple"
+            height="4"
+            indeterminate
+          ></v-progress-linear>
+        </template>
         <v-card-item>
           <v-container class="d-flex justify-center align-center">
             <h1>Statystyka</h1>

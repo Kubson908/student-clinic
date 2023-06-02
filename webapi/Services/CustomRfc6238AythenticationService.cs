@@ -10,10 +10,7 @@ namespace Przychodnia.Webapi.Services
         private static readonly TimeSpan _timestep = TimeSpan.FromMinutes(3);
         private static readonly Encoding _encoding = new UTF8Encoding(false, true);
 
-        internal static int ComputeTotp(
-        HashAlgorithm hashAlgorithm,
-            ulong timestepNumber,
-            byte[]? modifierBytes)
+        internal static int ComputeTotp( HashAlgorithm hashAlgorithm, ulong timestepNumber, byte[]? modifierBytes)
         {
             // # of 0's = length of pin
             const int Mod = 1000000;
@@ -21,7 +18,7 @@ namespace Przychodnia.Webapi.Services
             // See https://tools.ietf.org/html/rfc4226
             // We can add an optional modifier
             var timestepAsBytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((long)timestepNumber));
-            var hash = hashAlgorithm.ComputeHash(ApplyModifier(timestepAsBytes, modifierBytes));
+            var hash = hashAlgorithm.ComputeHash(ApplyModifier(timestepAsBytes, modifierBytes ?? _encoding.GetBytes("something")));
 
             // Generate DT string
             var offset = hash[hash.Length - 1] & 0xf;

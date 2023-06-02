@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Identity;
 using Przychodnia.Webapi.Services;
 using System.Globalization;
 
