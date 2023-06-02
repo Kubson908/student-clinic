@@ -36,10 +36,10 @@ onBeforeMount(async () => {
   allergies.value = data.allergies;
   meds.value = data.medicines;
 });
-
-const update = async () => {
-  await authorized.patch();
-};
+// TODO: dokończyć
+// const update = async () => {
+//   await authorized.patch();
+// };
 
 const submit = async (data: SubmitEvent) => {
   const valid = await (form.value?.validate()).valid;

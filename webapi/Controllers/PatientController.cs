@@ -5,6 +5,7 @@ using Przychodnia.Webapi.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Przychodnia.Shared;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -78,17 +79,34 @@ namespace Przychodnia.Webapi.Controllers
         [Authorize(Roles = "Staff")]
         [HttpPatch("update")]
         [HttpPatch("update/{patientId}")]
-        public async Task<IActionResult> VerifyPatient([FromRoute] string? patientId)
+        public async Task<IActionResult> VerifyPatient([FromRoute] string? patientId, [FromBody] UpdatePatientDto dto)
         {
             string id = string.Empty;
             if (patientId == null) id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
             else id = patientId;
             var patient = await _patientManager.FindByIdAsync(id);
             if (patient == null) return NotFound("Patient not found");
-            patient.Verified = true;
-            _db.Entry(patient).Property("Verified").IsModified = true;
-            await _db.SaveChangesAsync();
-            return Ok("Patient verified");
+            foreach (var prop in typeof(Patient).GetProperties())
+            {
+                var fromProp = typeof(UpdatePatientDto).GetProperty(prop.Name);
+                var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;
+                if (toValue != null)
+                {
+                    prop.SetValue(patient, toValue, null);
+                }
+            }
+            foreach (var prop in typeof(IdentityUser).GetProperties())
+            {
+                var fromProp = typeof(UpdatePatientDto).GetProperty(prop.Name);
+                var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;
+                if (toValue != null)
+                {
+                    prop.SetValue(patient, toValue, null);
+                }
+            }
+            var result = await _patientManager.UpdateAsync(patient);
+            if (!result.Succeeded) return BadRequest("Error");
+            return Ok("Patient updated");
         }
     }
 }
