@@ -62,7 +62,8 @@ onBeforeMount(async () => {
                     v-slot="{ navigate }"
                   >
                     <v-btn
-                      class="mt-2 mx-2 button hp-dark"
+                      class="mt-2 mx-2 button "
+                      color="blue-darken-2"
                       size="small"
                       :value="'/staff/appointments/' + visit.id + '/assign'"
                       @click="navigate"

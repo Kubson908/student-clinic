@@ -25,14 +25,19 @@ interface IApppointment {
 var appointments: IApppointment[] = [];
 
 onBeforeMount(async () => {
-  if (checkRole("Staff")) {
-    const res = await authorized.get(`${prefix}/api/Appointment/everySchedule`);
-    appointments = res.data;
-  } else if (checkRole("Employee")) {
-    const res = await authorized.get(`${prefix}/api/Appointment/schedule`);
-    appointments = res.data;
-  }
-  date.value = new Date();//Sprawia, że computed się odpala przez zmianę wartości
+  const id = router.currentRoute.value.params["id"] ?? null;
+  const res = id
+    ? await authorized.get("/Appointment/schedule/" + id)
+    : await authorized.get(`/Appointment/schedule`);
+  appointments = res.data;
+  // if (checkRole("Staff")) {
+  //   const res = await authorized.get(`${prefix}/api/Appointment/everySchedule`);
+  //   appointments = res.data;
+  // } else if (checkRole("Employee")) {
+  //   const res = await authorized.get(`${prefix}/api/Appointment/schedule`);
+  //   appointments = res.data;
+  // }
+  date.value = new Date(); //Sprawia, że computed się odpala przez zmianę wartości
   //console.log(appointments);
 });
 
@@ -40,14 +45,13 @@ const format = (date: Date) => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  
 
   return `${day}/${month}/${year}`;
 };
 const formatTime = (date: Date) => {
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  if(minutes == 0){
+  if (minutes == 0) {
     return `${hours}:00`;
   }
   return `${hours}:${minutes}`;
@@ -93,8 +97,7 @@ const filteredAppointments = computed(() => {
             >
               <v-row>
                 <v-col xs="2" md="4">
-                  <v-container class="d-flex  flex-column left">
-                    
+                  <v-container class="d-flex flex-column left">
                     {{ formatTime(new Date(appointment.date)) }}
                     {{ appointment.patient }}
                     {{ format(new Date(appointment.date)) }}
@@ -103,7 +106,7 @@ const filteredAppointments = computed(() => {
                 <v-col xs="10" md="8">
                   <v-container class="right">
                     <router-link
-                    :to="'/doctor/appointment/' + appointment.id + '/finish'"
+                      :to="'/doctor/appointment/' + appointment.id + '/finish'"
                       custom
                       v-slot="{ navigate }"
                     >

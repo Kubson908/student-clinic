@@ -4,6 +4,7 @@ using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -12,9 +13,11 @@ namespace Przychodnia.Webapi.Controllers
     public class PatientController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public PatientController(ApplicationDbContext db)
+        private readonly UserManager<Patient> _patientManager;
+        public PatientController(ApplicationDbContext db, UserManager<Patient> patientManager)
         {
             _db = db;
+            _patientManager = patientManager;
         }
 
         [Authorize(Roles = "Employee, Staff")]
@@ -61,6 +64,7 @@ namespace Przychodnia.Webapi.Controllers
                     p.DateOfBirth,
                     p.Allergies,
                     p.Medicines,
+                    p.Verified,
                     TreatmentHistory = p.Appointments.Where(a => a.Finished).Select(a => new
                     {
                         a.Id,
@@ -69,6 +73,22 @@ namespace Przychodnia.Webapi.Controllers
                     })
                 }).FirstOrDefaultAsync();
             return patient == null ? NotFound("Patient not found") : Ok(patient);
+        }
+
+        [Authorize(Roles = "Staff")]
+        [HttpPatch("update")]
+        [HttpPatch("update/{patientId}")]
+        public async Task<IActionResult> VerifyPatient([FromRoute] string? patientId)
+        {
+            string id = string.Empty;
+            if (patientId == null) id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            else id = patientId;
+            var patient = await _patientManager.FindByIdAsync(id);
+            if (patient == null) return NotFound("Patient not found");
+            patient.Verified = true;
+            _db.Entry(patient).Property("Verified").IsModified = true;
+            await _db.SaveChangesAsync();
+            return Ok("Patient verified");
         }
     }
 }

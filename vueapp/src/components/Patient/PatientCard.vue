@@ -50,7 +50,7 @@ onBeforeMount(async () => {
           <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
         </v-card>
       </v-container>
-      <v-card-title font-size="56">Karta pacjenta</v-card-title>
+      <v-card-title font-size="56">Dane pacjenta</v-card-title>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>

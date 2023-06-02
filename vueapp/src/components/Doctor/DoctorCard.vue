@@ -47,13 +47,21 @@ const props = defineProps<{
               >Profil</v-btn
             >
           </router-link>
+          <router-link
+            :to="`/staff/doctors/harmonogram/${doctor.id}`"
+            custom
+            v-slot="{ navigate }"
+          >
           <v-btn
             size="small"
             color="blue-darken-2"
             variant="elevated"
             class="text-body-2 mt-2"
+            :value="`staff/doctors/harmonogram/${doctor.id}`"
+            @click="navigate"
             >Harmonogram</v-btn
           >
+          </router-link>
         </v-card-actions>
       </v-col>
     </v-row>

@@ -114,7 +114,7 @@ const available_hours = computed(() => {
 onMounted(async () => {
   getUnavailableHours();
   getUnavailableDays(new Date().getMonth() + 1);
-  if (available_hours && (available_hours.value as string[]).length > 0) {
+  if (available_hours.value && (available_hours.value as string[]).length > 0) {
     hour.value = (available_hours.value as string[])[0];
   }
 });

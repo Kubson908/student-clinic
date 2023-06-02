@@ -18,6 +18,9 @@ namespace Przychodnia.Webapi.Models
         [StringLength(11)]
         public string Pesel { get; set; } = string.Empty;
 
+        [Required]
+        public bool Verified { get; set; } = false;
+
         public string? Medicines { get; set; }
         public string? Allergies { get; set; }
 

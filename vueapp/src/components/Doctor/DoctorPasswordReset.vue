@@ -2,13 +2,11 @@
 import { ref } from "vue";
 import { authorized, snackbar, router } from "@/main";
 import { passwordRules } from "@/validation";
-//Wojtek
 const form = ref<any>();
 const oldPass = ref<string>("");
 const newPass = ref<string>("");
 const newPassRepeat = ref<string>("");
 const loading = ref<boolean>(false);
-const doctorPass = ref<string>("");
 const submit = async (data: SubmitEvent) => {
   const valid = ((await data) as any).valid;
   if (!valid) return;

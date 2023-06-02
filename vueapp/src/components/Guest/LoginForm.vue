@@ -24,12 +24,14 @@ const send_mail = async () => {
   await unauthorized.post("/auth/send-reset-link", {
     email: email_to_confirm.value,
   });
+  snackbar.text = "Na podany adres email wysłano link do zmiany hasła";
+  snackbar.error = false;
+  snackbar.showing = true;
 }; // TODO: do dokończenia
 
 const submit = async (data: SubmitEvent) => {
   await data;
   const login = await form_login.value?.validate();
-  const reset = await form_reset.value?.validate();
   passProp.value = pass.value;
   email_to_confirm.value = email.value;
   remember_meProp.value = remember_me.value;
@@ -72,15 +74,16 @@ const submit = async (data: SubmitEvent) => {
     form_reset.value?.reset();
     form_login.value?.reset();
   }
+};
+
+const reset = async () => {
+  const reset = await form_reset.value?.validate();
   if (reset && reset.valid) {
     loading.value = true;
     try {
       await send_mail();
       page.value++;
       loading.value = false;
-      snackbar.text = "Na podany adres email wysłano link do zmiany hasła";
-      snackbar.error = true;
-      snackbar.showing = true;
     } catch (error: any) {
       console.log(error);
       snackbar.text =

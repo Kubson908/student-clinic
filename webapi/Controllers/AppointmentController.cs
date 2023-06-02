@@ -83,6 +83,36 @@ namespace Przychodnia.Webapi.Controllers
                 .Where(g => g.available == false).ToListAsync()).Select(h => h.key);
             return Ok(hours);
         }
+        
+        [HttpGet("doctor/year/{year}/month/{month}")]
+        public async Task<IActionResult> GetAvailableDaysInMonthByDoctor([FromRoute] int year, [FromRoute] int month)
+        {
+            var doctorId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var slots_week = 16;
+            var slots_saturday = 10;
+            var appointments_month = (await _db.Appointments
+                .Where(a => a.Date.Year == year && a.Date.Month == month && a.DoctorId == doctorId)
+                .Select(a => new { a.Specialization, a.Date }).GroupBy(a => a.Date)
+                .Select(g => new { key = DateOnly.FromDateTime(g.Key), available = 
+                    g.Key.DayOfWeek == DayOfWeek.Saturday ? g.Count() < slots_saturday : 
+                    g.Key.DayOfWeek == DayOfWeek.Sunday ? false :
+                    g.Count() < slots_week }).ToListAsync())
+                    .Where(a => a.available == false).Select(a => a.key);
+            return Ok(appointments_month);
+        }
+
+        [HttpGet("doctor/available-hours/{receivedDate}")]
+        public async Task<IActionResult> GetAvailableHoursBydoctor([FromRoute] string receivedDate)
+        {
+            DateTime date = DateTime.Parse(receivedDate);
+            var doctorId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var hours = (await _db.Appointments
+                .Where(a => a.Date.Date.CompareTo(date) == 0 && a.DoctorId == doctorId)
+                .Select(a => new { a.Date.TimeOfDay }).GroupBy(a => a.TimeOfDay)
+                .Select(g => new { key = g.Key, available = g.Count() < 1 })
+                .Where(g => g.available == false).ToListAsync()).Select(h => h.key);
+            return Ok(hours);
+        }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Appointment), StatusCodes.Status200OK)]
@@ -191,9 +221,12 @@ namespace Przychodnia.Webapi.Controllers
         }
         [Authorize(Roles = "Employee")]
         [HttpGet("schedule")]
-        public async Task<IActionResult> GetDoctorSchedule([FromBody] string? date)
+        [HttpGet("schedule/{doctorId}")]
+        public async Task<IActionResult> GetDoctorSchedule([FromBody] string? date, [FromRoute] string? doctorId)
         {
-            string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? id = string.Empty;
+            if (doctorId != null) id = doctorId;
+            else id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (id == null) return NotFound("User not found");
             if (date != null)
@@ -368,7 +401,7 @@ namespace Przychodnia.Webapi.Controllers
         public async Task<IActionResult> GetStatistics([FromRoute] int year, [FromRoute] int month)
         {
             var appointments = await _db.Appointments.Where(a => a.Date.Year == year && a.Date.Month == month).ToListAsync();
-            if (appointments.Count() == 0) return NotFound("No appointments found");
+            if (appointments.Count() == 0) return NoContent();
             return Ok(appointments);
         }
     }

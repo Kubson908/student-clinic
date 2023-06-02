@@ -22,7 +22,8 @@ const phone = ref<string>("");
 const meds = ref<string>("");
 const allergies = ref<string>("");
 const birthDate = ref<string>("");
-// const specialization = ref<number>(0);
+const form = ref<typeof VForm | null>(null);
+
 onBeforeMount(async () => {
   const res = await authorized.get(`/Patient/patient-card`);
   const data = res.data;
@@ -34,17 +35,18 @@ onBeforeMount(async () => {
   birthDate.value = data.dateOfBirth;
   allergies.value = data.allergies;
   meds.value = data.medicines;
-  // specialization.value = data.specialization;
 });
 
-// const submit = async (data: SubmitEvent) => {
-//   const valid = ((await data) as any).valid;
-//   if (!valid) return;
-//   alert(
-//     `Imię: ${name.value}\nNazwisko: ${surname.value}\nData urodzenia: ${birth_date.value}\nPesel: ${pesel.value}\nHasło: ${pass.value}\nPowtórzone hasło: ${rpass.value}\n`
-//   );
-//   form.value?.reset();
-// };
+const update = async () => {
+  await authorized.patch();
+};
+
+const submit = async (data: SubmitEvent) => {
+  const valid = await (form.value?.validate()).valid;
+  if (!valid) return;
+
+  form.value?.reset();
+};
 </script>
 
 <template>
@@ -82,6 +84,7 @@ onBeforeMount(async () => {
                 :rules="nameRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -94,6 +97,7 @@ onBeforeMount(async () => {
                 :rules="surnameRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -108,6 +112,7 @@ onBeforeMount(async () => {
                 :rules="dateRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -120,6 +125,7 @@ onBeforeMount(async () => {
                 :rules="peselRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -134,6 +140,7 @@ onBeforeMount(async () => {
                 :rules="emailRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -190,7 +197,6 @@ onBeforeMount(async () => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col> </v-col>
           <v-col>
             <router-link
               to="/doctor/passwordreset"

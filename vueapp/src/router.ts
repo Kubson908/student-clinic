@@ -23,7 +23,6 @@ import {
 
 import {
   GuestPasswordReset,
-  GuestPasswordReset2,
   GuestView,
   LoginForm,
   SignUp,
@@ -175,7 +174,7 @@ export const routes: Array<Route> = [
         meta: { roles: ["Staff", "Employee"] },
       },
       {
-        path: "patient/:id/edit", // JAKIES MOCNO NIEDOROBIONE recepcja - Dane pacjenta - recepcjonista / pacjent - Dane pacjenta
+        path: "patient/edit/:id", // JAKIES MOCNO NIEDOROBIONE recepcja - Dane pacjenta - recepcjonista / pacjent - Dane pacjenta
         component: PatientDataReceptionEdit,
         meta: { roles: null },
       },
@@ -200,6 +199,11 @@ export const routes: Array<Route> = [
         meta: { roles: null },
       }, // doctor - Dane lekarza - lekarz
       {
+        path: "doctors/harmonogram/:id",
+        component: VisitHarmonogram,
+        meta: { roles: null },
+      }, // doctor - harmonogram - lekarz
+      {
         path: "profile",
         component: DoctorData,
         meta: { roles: null },
@@ -207,20 +211,8 @@ export const routes: Array<Route> = [
     ],
   },
   {
-    path: "/guest",
-    component: GuestView,
-    meta: { roles: null },
-    children: [
-      {
-        path: "passwordreset", // guest - Potwierdzenie przypomnienia
-        component: GuestPasswordReset,
-        meta: { roles: null },
-      },
-    ],
-  },
-  {
     path: "/auth/password-reset", // guest - Podaj nowe hasło
-    component: GuestPasswordReset2,
+    component: GuestPasswordReset,
     meta: { roles: null },
   },
 ];

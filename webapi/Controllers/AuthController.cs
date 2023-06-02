@@ -171,7 +171,9 @@ namespace Przychodnia.Webapi.Controllers
 
             var user = await _patientManager.FindByIdAsync(dto.Id);
             if (user == null) return NotFound("User not found");
-            var result = await _patientManager.ResetPasswordAsync(user, dto.Token ?? "", dto.Password);
+            var token = dto.Token.Replace(" ", "+");
+            var result = await _patientManager.ResetPasswordAsync(user, token, dto.Password);
+            Console.WriteLine(dto.Token.ToString() + "\n" + token);
             if (result.Succeeded) return Ok("Success");
             return BadRequest("Token is invalid");
         }

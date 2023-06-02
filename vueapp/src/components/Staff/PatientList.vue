@@ -57,9 +57,18 @@ const filteredPatients = computed(() => {
               </template>
               <template #append>
                 <v-row no-gutters v-if="checkRole('Staff')">
+                  
+                  <router-link
+                    :to="`/staff/patient/edit/${patient.id} `"
+                    custom
+                    v-slot="{ navigate }"
+                  >
                   <v-btn class="ma-2 button" color="blue-darken-2"
+                  :value="`/staff/patient/edit/${patient.id} `"
+                  @click="navigate"
                     >Dane pacjenta</v-btn
                   >
+                  </router-link>
                   <router-link
                     :to="'/staff/patient/' + patient.id + '/card'"
                     custom
@@ -79,9 +88,12 @@ const filteredPatients = computed(() => {
                     custom
                     v-slot="{ navigate }"
                   >
-                    <v-btn class="ma-2 button hp-dark" @click="navigate"
-                      >Karta pacjenta</v-btn
-                    >
+                    <v-btn
+                      class="ma-2 button"
+                      color="blue-darken-2"
+                      @click="navigate"
+                      >Karta pacjenta
+                    </v-btn> 
                   </router-link>
                 </v-row>
               </template>

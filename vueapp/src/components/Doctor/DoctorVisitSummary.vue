@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// eslint-disable-next-line
 const emit = defineEmits(["page", "submit"]);
 const change_page = (arg: number) => {
   emit("page", arg);

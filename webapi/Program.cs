@@ -42,10 +42,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 
 builder.Services.AddIdentityCore<Patient>(config =>
 {
-    config.Tokens.PasswordResetTokenProvider = nameof(PasswordResetTokenProvider<Patient>);
+    config.Tokens.PasswordResetTokenProvider = "passwordReset";
     config.Tokens.EmailConfirmationTokenProvider = nameof(EmailConfirmationTokenProvider<Patient>);
 }).AddDefaultTokenProviders()
-    .AddTokenProvider<PasswordResetTokenProvider<Patient>>(nameof(PasswordResetTokenProvider<Patient>))
+    .AddTokenProvider<PasswordResetTokenProvider<Patient>>("passwordReset")
     .AddTokenProvider<EmailConfirmationTokenProvider<Patient>>(nameof(EmailConfirmationTokenProvider<Patient>))
     .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddIdentityCore<Employee>()
