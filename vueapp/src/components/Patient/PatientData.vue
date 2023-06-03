@@ -1,140 +1,66 @@
 <script lang="ts" setup>
-import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
+import { authorized, snackbar, user } from "@/main";
+import { onBeforeMount, ref } from "vue";
+import {
+  dateRules,
+  peselRules,
+  phoneRules,
+  surnameRules,
+  nameRules,
+  emailRules,
+} from "@/validation";
+import { router } from "@/main";
 // const visible = ref(false);
 // const visible2 = ref(false);
 
-const form = ref<typeof VForm | null>(null);
 const name = ref<string>("");
-const surname = ref<string>("");
-const birth_date = ref<string>("");
-const pesel = ref<string>("");
+const lastName = ref<string>("");
 const email = ref<string>("");
+const pesel = ref<string>("");
 const phone = ref<string>("");
-const pass = ref<string>("");
-const rpass = ref<string>("");
+const meds = ref<string>("");
+const allergies = ref<string>("");
+const birthDate = ref<string>("");
+const form = ref<typeof VForm | null>(null);
 
-const submit = async (data: SubmitEvent) => {
-  const valid = ((await data) as any).valid;
-  if (!valid) return;
-  alert(
-    `Imię: ${name.value}\nNazwisko: ${surname.value}\nData urodzenia: ${birth_date.value}\nPesel: ${pesel.value}\nHasło: ${pass.value}\nPowtórzone hasło: ${rpass.value}\n`
-  );
-  form.value?.reset();
+onBeforeMount(async () => {
+  const res = await authorized.get(`/Patient/patient-card`);
+  const data = res.data;
+  name.value = data.firstName;
+  lastName.value = data.lastName;
+  pesel.value = data.pesel;
+  email.value = data.email;
+  phone.value = data.phoneNumber;
+  birthDate.value = data.dateOfBirth;
+  allergies.value = data.allergies;
+  meds.value = data.medicines;
+});
+
+const update = async () => {
+  await authorized.patch("/patient/update", {
+    phoneNumber: phone.value,
+    allergies: allergies.value,
+    medicines: meds.value,
+  });
 };
 
-// const passwordRules = [
-//   (value: string) => {
-//     if (value) return true;
-//     else return "Pole jest wymagane";
-//   },
-//   (value: string) => {
-//     if (value.toLowerCase() !== value && /\d/.test(value) && value.length >= 8)
-//       return true;
-//     else
-//       return "Hasło musi zawierać przynajmniej 8 znaków, małą literę, dużą literę i cyfrę";
-//   },
-// ];
-const nameRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (
-      value[0].toLowerCase() !== value[0] &&
-      value.slice(1).toLowerCase() === value.slice(1)
-    )
-      return true;
-    else return "Imię powinno zaczynać się od wielkiej litery";
-  },
-  (value: string) => {
-    if (
-      !/\d/.test(value) &&
-      !/[^a-zA-Z0-9\u0118\u0119\u00F3\u00D3\u0141\u0142\u0104\u0105\u017B\u017C\u017A\u0179\u0106\u0107\u0143\u0144\u015A\u015B]/.test(
-        value
-      ) &&
-      !/_/.test(value)
-    )
-      return true;
-    else return "Imię może zawierać tylko litery";
-  },
-];
-const surnameRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (
-      value[0].toLowerCase() !== value[0] &&
-      value.slice(1).toLowerCase() === value.slice(1)
-    )
-      return true;
-    else return "Nazwisko powinno zaczynać się od wielkiej litery";
-  },
-  (value: string) => {
-    if (
-      !/\d/.test(value) &&
-      !/[^a-zA-Z0-9\u0118\u0119\u00F3\u00D3\u0141\u0142\u0104\u0105\u017B\u017C\u017A\u0179\u0106\u0107\u0143\u0144\u015A\u015B]/.test(
-        value
-      ) &&
-      !/_/.test(value)
-    )
-      return true;
-    else return "Nazwisko może zawierać tylko litery";
-  },
-];
-const peselRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (!/\D/.test(value) && value.length === 11) return true;
-    else return "Pesel musi składać się z 11 cyfr";
-  },
-];
-// const repeatPasswordRules = [
-//   (value: string) => {
-//     if (value) return true;
-//     else return "Pole jest wymagane";
-//   },
-//   (value: string) => {
-//     if (value === pass.value) return true;
-//     else return "Hasła muszą się zgadzać";
-//   },
-// ];
-const emailRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) =>
-    /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-    "Nieprawidłowy e-mail",
-];
-const phoneRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (!/\D/.test(value) && value.length === 9) return true;
-    else return "Numer telefonu musi składać się z cyfr";
-  },
-];
-const dateRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    const dateFromValue: Date = new Date(value);
-    if (dateFromValue < new Date()) return true;
-    else return "Podaj prawidłową datę";
-  },
-];
+const submit = async (data: SubmitEvent) => {
+  await data;
+  const valid = (await form.value?.validate()).valid;
+  if (!valid) return;
+  try {
+    await update();
+    snackbar.text = "Zaktualizowano dane";
+    snackbar.error = false;
+    snackbar.showing = true;
+  } catch (error: any) {
+    console.log(error);
+    snackbar.text = "Wystąpił błąd";
+    snackbar.error = true;
+    snackbar.showing = true;
+  }
+};
 </script>
 
 <template>
@@ -155,8 +81,8 @@ const dateRules = [
           <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
         </v-card>
       </v-container>
-      <v-card-title>Zarejestruj się</v-card-title>
-      <v-card-subtitle>Podaj dane rejestracji</v-card-subtitle>
+      <v-card-title>Dane Pacjenta</v-card-title>
+      <v-card-subtitle>Edytuj dane pacjenta</v-card-subtitle>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
@@ -172,18 +98,20 @@ const dateRules = [
                 :rules="nameRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
             <v-col class="py-1">
               <v-text-field
                 type="input"
-                v-model="surname"
+                v-model="lastName"
                 label="Nazwisko"
                 variant="solo"
                 :rules="surnameRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -193,11 +121,12 @@ const dateRules = [
               <v-text-field
                 type="Date"
                 label="Data urodzenia"
-                v-model="birth_date"
+                v-model="birthDate"
                 variant="solo"
                 :rules="dateRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -210,6 +139,7 @@ const dateRules = [
                 :rules="peselRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -224,6 +154,7 @@ const dateRules = [
                 :rules="emailRules"
                 color="blue-darken-2"
                 required
+                disabled
               >
               </v-text-field>
             </v-col>
@@ -242,33 +173,67 @@ const dateRules = [
           </v-row>
           <v-row>
             <v-textarea
-                variant="filled"
-                auto-grow
-                label="Przyjmowane Leki"
-                rows="2"
-                row-height="20"
-                
-              ></v-textarea>
+              variant="filled"
+              auto-grow
+              label="Przyjmowane leki"
+              v-model="meds"
+              rows="2"
+              row-height="20"
+            ></v-textarea>
           </v-row>
           <v-row>
             <v-textarea
-                variant="filled"
-                auto-grow
-                label="alergia"
-                rows="2"
-                row-height="20"
-              ></v-textarea>
+              variant="filled"
+              auto-grow
+              label="Alergie"
+              v-model="allergies"
+              rows="2"
+              row-height="20"
+            ></v-textarea>
           </v-row>
         </div>
-        <v-row justify="center">
-          <v-btn type="submit" color="blue-darken-2" class="mt-2 button"
-            >Zarejestruj się</v-btn
-          >
+        <v-row justify="start">
+          <v-col align-self="center" class="text-left">
+            <v-btn
+              variant="outlined"
+              size="large"
+              class="mt-2 button"
+              color="blue-darken-2"
+              @click="router.back()"
+            >
+              Wstecz
+            </v-btn>
+          </v-col>
+          <v-col>
+            <v-btn
+              size="large"
+              class="mt-2 button"
+              color="blue-darken-2"
+              type="submit"
+            >
+              zapisz
+            </v-btn>
+          </v-col>
         </v-row>
-        <v-row justify="center">
-          <v-btn variant="text" size="small" class="mt-2 button"
-            >Mam już konto</v-btn
-          >
+        <v-row>
+          <v-col>
+            <router-link
+              to="/patient/change-password"
+              custom
+              v-slot="{ navigate }"
+            >
+              <v-btn
+                variant="text"
+                align-self="center"
+                size="small"
+                class="mt-2 button"
+                value="/patient/change-password"
+                @click="navigate"
+              >
+                Zmień hasło
+              </v-btn>
+            </router-link>
+          </v-col>
         </v-row>
       </v-form>
     </v-card-text>

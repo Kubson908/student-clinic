@@ -1,30 +1,25 @@
 <script setup lang="ts">
 import { ref } from "vue";
-
+import { computed, onBeforeMount } from "vue";
+import { authorized, user, router } from "@/main";
 const search = ref<string>("");
-
-const patients = [
-  {
-    id: 1,
-    name: "Jan Ambroziak",
-  },
-  {
-    id: 2,
-    name: "Jan Ambroziak",
-  },
-  {
-    id: 3,
-    name: "Jan Ambroziak",
-  },
-  {
-    id: 4,
-    name: "Jan Ambroziak",
-  },
-  {
-    id: 5,
-    name: "Jan Ambroziak",
-  },
-];
+const patients = ref<any>(null);
+onBeforeMount(async () => {
+  const card = await authorized.get("/patient/");
+  patients.value = card.data.map((patient: any) => {
+    return { id: patient.id, name: patient.firstName + " " + patient.lastName };
+  });
+});
+const checkRole = (role: string) => {
+  const roles = user.roles!;
+  return roles.includes(role);
+};
+const filteredPatients = computed(() => {
+  if (!patients.value) return [];
+  return patients.value.filter((patient: any) => {
+    return patient.name.toLowerCase().indexOf(search.value.toLowerCase()) != -1;
+  });
+});
 </script>
 <template>
   <v-row justify="center" no-gutters>
@@ -50,8 +45,8 @@ const patients = [
           <v-divider></v-divider>
           <v-list height="50vh">
             <v-list-item
-              v-for="patient in patients"
-              :key="patient.id"
+              v-for="(patient, idx) in filteredPatients"
+              :key="idx"
               class="mx-8 my-4 pa-4 rounded-lg"
               elevation="3"
             >
@@ -61,17 +56,57 @@ const patients = [
                 }}</v-list-item-title>
               </template>
               <template #append>
-                <v-btn class="ma-2 button hp-dark">Dane pacjenta</v-btn>
-                <v-btn variant="outlined" class="ma-2 button hp-bright"
-                  >Karta pacjenta</v-btn
-                >
+                <v-row no-gutters v-if="checkRole('Staff')">
+                  
+                  <router-link
+                    :to="`/staff/patient/edit/${patient.id} `"
+                    custom
+                    v-slot="{ navigate }"
+                  >
+                  <v-btn class="ma-2 button" color="blue-darken-2"
+                  :value="`/staff/patient/edit/${patient.id} `"
+                  @click="navigate"
+                    >Dane pacjenta</v-btn
+                  >
+                  </router-link>
+                  <router-link
+                    :to="'/staff/patient/' + patient.id + '/card'"
+                    custom
+                    v-slot="{ navigate }"
+                  >
+                    <v-btn
+                      variant="outlined"
+                      class="ma-2 button hp-bright"
+                      @click="navigate"
+                      >Karta pacjenta</v-btn
+                    >
+                  </router-link>
+                </v-row>
+                <v-row no-gutters v-else-if="checkRole('Employee')">
+                  <router-link
+                    :to="'/doctor/patient/' + patient.id + '/card'"
+                    custom
+                    v-slot="{ navigate }"
+                  >
+                    <v-btn
+                      class="ma-2 button"
+                      color="blue-darken-2"
+                      @click="navigate"
+                      >Karta pacjenta
+                    </v-btn> 
+                  </router-link>
+                </v-row>
               </template>
             </v-list-item>
           </v-list>
           <v-divider></v-divider>
         </v-card-text>
         <v-card-actions>
-          <v-btn variant="outlined" color="blue-darken-2" class="mx-8 my-2"
+          <v-btn
+            variant="outlined"
+            color="blue-darken-2"
+            class="mx-8 my-2"
+            @click="router.back()"
             >Wstecz</v-btn
           >
         </v-card-actions>

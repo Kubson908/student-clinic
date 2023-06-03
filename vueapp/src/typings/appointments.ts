@@ -8,5 +8,6 @@ export type Appointments = {
     medicines: string;
     recommendations: string;
     symptoms: string;
+    specialization?: number
   }>;
 };

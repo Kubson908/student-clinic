@@ -8,6 +8,8 @@ using Przychodnia.Webapi.Services;
 using Przychodnia.Webapi.Models;
 using Przychodnia.Shared;
 using System.Text.Json.Serialization;
+using Przychodnia.Webapi.CustomTokenProviders;
+using Przychodnia.Webapi.Websocket;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,21 +37,20 @@ var connectionString = builder.Configuration.GetConnectionString("SqlServer")
     ?? throw new InvalidOperationException("Connection string 'SqlServer' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedEmail = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddIdentityCore<Patient>(config =>
 {
-    config.Tokens.PasswordResetTokenProvider = nameof(PasswordResetTokenProvider<Patient>);
-    /*config.Tokens.ProviderMap.Add("CustomPasswordResetToken",
-        new TokenProviderDescriptor(
-            typeof(PasswordResetTokenProvider<Patient>)));
-    config.Tokens.PasswordResetTokenProvider = "CustomPasswordResetToken";*/
-}).AddTokenProvider<PasswordResetTokenProvider<Patient>>(nameof(PasswordResetTokenProvider<Patient>))
-    .AddDefaultTokenProviders().AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddIdentityCore<Employee>().AddDefaultTokenProviders()
+    config.Tokens.PasswordResetTokenProvider = "passwordReset";
+    config.Tokens.EmailConfirmationTokenProvider = nameof(EmailConfirmationTokenProvider<Patient>);
+}).AddDefaultTokenProviders()
+    .AddTokenProvider<PasswordResetTokenProvider<Patient>>("passwordReset")
+    .AddTokenProvider<EmailConfirmationTokenProvider<Patient>>(nameof(EmailConfirmationTokenProvider<Patient>))
     .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentityCore<Employee>()
+    .AddTokenProvider<PasswordResetTokenProvider<Employee>>(nameof(PasswordResetTokenProvider<Employee>))
+    .AddDefaultTokenProviders().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddRazorPages();
 
@@ -72,6 +73,8 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.AllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
+
+    options.SignIn.RequireConfirmedEmail = true;
 });
 
 builder.Services.AddAuthentication(auth =>
@@ -95,6 +98,7 @@ builder.Services.AddAuthentication(auth =>
 builder.Services.AddScoped<IUserService<RegisterDto, LoginDto>, PatientService>();
 builder.Services.AddScoped<IUserService<RegisterEmployeeDto, LoginDto>, EmployeeService>();
 builder.Services.AddScoped<PasswordResetTokenProvider<Patient>>();
+builder.Services.AddScoped<PasswordResetTokenProvider<Employee>>();
 
 var app = builder.Build();
 
@@ -105,7 +109,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-/*app.UseHttpsRedirection();*/  // POTEM ODKOMENTOWA�
+/*app.UseHttpsRedirection();*/  // POTEM ODKOMENTOWAC
 
 app.UseCors("_myAllowSpecificOrigins");
 
@@ -117,17 +121,11 @@ var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(5)
 };
+webSocketOptions.AllowedOrigins.Add("http://localhost:8080");
 
 app.UseWebSockets(webSocketOptions);
+app.UseMiddleware<WebSocketMiddleware>();
 
 app.MapControllers();
 
-app.Run(/*async (context) =>
-{
-    using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-    var socketFinishetTcs = new TaskCompletionSource<object>();
-
-    BackgroundSocketProcessor.AddSocket(webSocket, socketFinishetTcs);
-
-    await socketFinishedTcs.Task;
-}*/);
+app.Run();

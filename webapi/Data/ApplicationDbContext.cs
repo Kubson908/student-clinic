@@ -13,8 +13,8 @@ namespace Przychodnia.Webapi.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<Patient>(entity => { entity.ToTable("Patients"); });
-            builder.Entity<Employee>(entity => { entity.ToTable("Employees"); });
+            builder.Entity<Patient>(entity => { entity.ToTable("Patients").HasIndex(p => p.Pesel).IsUnique(); });
+            builder.Entity<Employee>(entity => { entity.ToTable("Employees").HasIndex(e => e.Pesel).IsUnique(); });
         }
 
 

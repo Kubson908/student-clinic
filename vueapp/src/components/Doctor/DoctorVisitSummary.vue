@@ -1,15 +1,23 @@
 <script setup lang="ts">
-//import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+// eslint-disable-next-line
+const emit = defineEmits(["page", "submit"]);
+const change_page = (arg: number) => {
+  emit("page", arg);
+};
+
+const submit = () => {
+  emit("submit");
+};
+// eslint-disable-next-line
+const props = defineProps({
+  data: Object,
+});
+console.log(props.data);
+console.log(props.data?.select);
 </script>
 
 <template>
-  <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+  <v-card>
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -39,7 +47,14 @@
             >
               Informacje o wizycie
             </v-col>
-            <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
+            <v-col class="text-left">
+              {{ new Date(props.data?.appointmentDate).toLocaleDateString() }},
+              {{
+                new Date(props.data?.appointmentDate)
+                  .toLocaleTimeString()
+                  .substring(0, 5)
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -48,7 +63,7 @@
             >
               Pacjent
             </v-col>
-            <v-col class="text-left"> Jan ambroziak </v-col>
+            <v-col class="text-left"> {{ props.data?.patientName }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -57,7 +72,7 @@
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> Kaszel, katar, gorączka </v-col>
+            <v-col class="text-left"> {{ props.data?.symptoms ? props.data?.symptoms : "Nie podano" }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -66,7 +81,7 @@
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> Riposton </v-col>
+            <v-col class="text-left"> {{ props.data?.medicines ? props.data?.medicines: "Nie podano" }} </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
           <v-row>
@@ -81,7 +96,8 @@
               Diagnoza
             </v-col>
             <v-col class="text-left">
-              Pacjent choruje na bakteryjne zapalenie zatok.
+              <!-- Pacjent choruje na bakteryjne zapalenie zatok. -->
+              {{ props.data?.diagnose ? props.data?.diagnose : "Nie podano" }}
             </v-col>
           </v-row>
           <v-row>
@@ -91,7 +107,7 @@
             >
               Leki
             </v-col>
-            <v-col class="text-left"> Augmentin 1000mg </v-col>
+            <v-col class="text-left"> {{ props.data?.meds ? props.data?.meds : "Nie podano" }}</v-col>
           </v-row>
           <v-row>
             <v-col
@@ -101,17 +117,20 @@
               Zalecenia
             </v-col>
             <v-col class="text-left">
-              Augmentin, dawkowanie - 2 tabletki/doba.
+              {{ props.data?.recomendations ? props.data?.recomendations : "Nie podano" }}
             </v-col>
           </v-row>
-          <v-row>
+          <v-row v-if="props.data?.dateHour && props.data.dateDay && props.data?.controlVisit">
             <v-col
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
               Wizyta kontrolna
             </v-col>
-            <v-col class="text-left"> 31.01.2023, 17:30 </v-col>
+            <!-- 31.01.2023, 17:30 -->
+            <v-col class="text-left">
+              {{ `${props.data?.dateDay.toLocaleDateString()}, ${props.data?.dateHour}` }}
+            </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
@@ -123,6 +142,7 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="change_page(props.data?.controlVisit ? -1 : -2)"
             >
               Wstecz
             </v-btn>
@@ -133,6 +153,7 @@
               sm="6"
               md="3"
               align-self="center"
+              @click="submit()"
               size="large"
               class="mt-2 button"
               color="blue-darken-2"

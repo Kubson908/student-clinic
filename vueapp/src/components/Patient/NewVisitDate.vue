@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { ref, onMounted, computed, watch } from "vue";
-import axios from "axios";
-
-//Do poprawy:
-//przełączanie miesiąca nie zawsze prawidłowo odświeża listę dostępnych dni
+import { authorized, snackbar } from "@/main";
+import { notNull } from "@/validation";
 
 const hours = [
-  "9:00",
-  "9:30",
+  "09:00",
+  "09:30",
   "10:00",
   "10:30",
   "11:00",
@@ -31,40 +29,76 @@ const date = ref<any>(new Date());
 const unavailable_hours = ref<Array<string>>([]);
 const unavailable_dates = ref<any>();
 const current_month = ref<number>(date.value.getMonth());
-
+const form = ref<any>();
+const hours_ready = ref<boolean>(false);
+const days_ready = ref<boolean>(false);
+// eslint-disable-next-line
+defineExpose({
+  date,
+  select,
+});
+// eslint-disable-next-line
+const props = defineProps({
+  specialization: Number,
+});
 const getUnavailableHours = async () => {
-  let token = await localStorage.getItem("token");
-  let res = await axios.get(
-    `http://localhost:7042/api/appointment/available-hours/${
-      date.value.toISOString().split("T")[0]
-    }/specialization/0`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  try {
+    hours_ready.value = false;
+    let res = await authorized.get(
+      `/appointment/available-hours/${
+        date.value.toISOString().split("T")[0]
+      }/specialization/${props.specialization}`
+    );
+    unavailable_hours.value = res.data;
+  } catch (e) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = "Wystąpił błąd przy wczytywaniu dostępnych godzin";
+    snackbar.showing = true;
+  } finally {
+      // if selected date is today
+    if (
+      date.value.getTime() - Date.now() < 86400000 &&
+      date.value.getDate() === new Date().getDate()
+    ) {
+      const to_slice =
+        (new Date().getHours() - 9) * 2 +
+        5 +
+        (new Date().getMinutes() >= 30 ? 1 : 0);
+      unavailable_hours.value = unavailable_hours.value.concat(
+        hours.slice(0, to_slice).map((hour) => hour + ":00")
+      );
     }
-  );
-  unavailable_hours.value = res.data;
+    hours_ready.value = true;
+  }
 };
 
 const getUnavailableDays = async (month: number) => {
-  let token = await localStorage.getItem("token");
-  let res = await axios.get(
-    `http://localhost:7042/api/appointment/specialization/0/year/${date.value.getFullYear()}/month/${
-      month + 1
-    }`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  unavailable_dates.value = res.data;
+  try {
+    days_ready.value = false;
+    let res = await authorized.get(
+      `http://localhost:7042/api/appointment/specialization/${
+        props.specialization
+      }/year/${date.value.getFullYear()}/month/${month + 1}`
+    );
+    unavailable_dates.value = res.data;
+  } catch (e) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = "Wystąpił błąd przy wczytywaniu dostępnych godzin";
+    snackbar.showing = true;
+  } finally {
+    days_ready.value = true;
+  }
 };
 
 // eslint-disable-next-line
 const emit = defineEmits(["page"]);
-const change_page = (arg: number) => {
+const change_page = async (arg: number) => {
+  if (arg > 0) {
+    const valid = ((await form.value.validate()) as any).valid;
+    if (!valid) return;
+  }
   emit("page", arg);
 };
 
@@ -80,23 +114,11 @@ const available_hours = computed(() => {
 });
 
 onMounted(async () => {
-  let token = await localStorage.getItem("token");
-  let today = new Date();
-  let res = await axios.get(
-    `http://localhost:7042/api/appointment/specialization/0/year/${today.getFullYear()}/month/${
-      today.getMonth() + 1
-    }`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  unavailable_dates.value = res.data;
+  getUnavailableHours();
+  getUnavailableDays(new Date().getMonth() + 1);
 });
 
 watch(date, (newDate, oldDate) => {
-  console.log(newDate);
   if (oldDate && newDate && oldDate.getDate() != newDate.getDate())
     getUnavailableHours();
   select.value = undefined;
@@ -131,18 +153,21 @@ watch(current_month, (newMonth, oldMonth) => {
         <v-container>
           <v-row no-gutters>
             <v-col cols="12" class="pa-4">
+              <!-- 2592000000ms = 30 days -->
               <VueDatePicker
                 v-model="date"
                 locale="pl"
                 :six-weeks="true"
                 :enable-time-picker="false"
                 :min-date="new Date()"
+                :max-date="new Date(Date.now() + 2592000000)"
                 no-today
                 :hide-offset-dates="true"
                 inline
-                highlight-disabled-days
+                :highlight-disabled-days="true"
                 :disabled-dates="unavailable_dates"
                 auto-apply
+                :disabled="!days_ready"
                 ref="picker"
                 :disabled-week-days="[0]"
                 position="center"
@@ -153,14 +178,21 @@ watch(current_month, (newMonth, oldMonth) => {
               />
             </v-col>
             <v-col cols="12" class="my-4 d-flex justify-center">
-              <!-- <VueDatePicker ref="minutesPicker" v-model="time" time-picker :min-time="{ hours: 8, minutes: 59 }" :max-time="{ hours: 16, minutes: 59 }" :start-time="{hours: 0, minutes: 0}" minutes-increment="15" minutes-grid-increment="16" inline auto-apply/> -->
-              <v-select
-                class="w-75"
-                variant="solo"
-                label="Wybierz godzinę"
-                :items="available_hours"
-                v-model="select"
-              ></v-select>
+              <v-form class="w-100" ref="form" validate-on="input">
+                <v-select
+                  variant="solo"
+                  :label="
+                    (available_hours as string[]).length !== 0
+                      ? 'Wybierz godzinę'
+                      : 'Dzień niedostępny'
+                  "
+                  :disabled="!hours_ready"
+                  :items="available_hours"
+                  no-data-text="Brak godzin w danym dniu"
+                  v-model="select"
+                  :rules="notNull"
+                ></v-select>
+              </v-form>
             </v-col>
           </v-row>
         </v-container>
@@ -208,3 +240,4 @@ watch(current_month, (newMonth, oldMonth) => {
   height: 48px;
 }
 </style>
+

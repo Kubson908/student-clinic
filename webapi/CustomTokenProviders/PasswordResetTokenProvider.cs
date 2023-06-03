@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace Przychodnia.Webapi.Services
+namespace Przychodnia.Webapi.CustomTokenProviders
 {
     public class PasswordResetTokenProvider<TUser> : DataProtectorTokenProvider<TUser> where TUser : class
     {
@@ -11,7 +11,7 @@ namespace Przychodnia.Webapi.Services
             ILogger<DataProtectorTokenProvider<TUser>> logger)
             : base(dataProtectionProvider, options, logger)
         {
-            
+
         }
 
         public class PasswordResetTokenProviderOptions : DataProtectionTokenProviderOptions

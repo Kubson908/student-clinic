@@ -11,6 +11,7 @@ namespace Przychodnia.Shared
         public bool Finished { get; set; }
         public string? Diagnosis { get; set; }
         public string? Recommendations { get; set; }
-        public int? AppointmentId { get; set; } = null;
+        public string? Medicines { get; set; }
+        public DateTime? Date { get; set; }
     }
 }

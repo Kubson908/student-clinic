@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+import { router } from "@/main";
 
 const form = ref<HTMLFormElement | null>(null);
 const email = ref<string>("");
@@ -48,7 +49,7 @@ const submit = async (data: SubmitEvent) => {
         <v-row>
           <v-col cols="auto" class="me-auto">
             <v-sheet class="pa-2 ma-2">
-              <v-btn type="submit" color="white" class="mt-2 button"
+              <v-btn type="submit" color="white" class="mt-2 button" @click="router.back()"
                 >Wstecz</v-btn
               >
             </v-sheet>

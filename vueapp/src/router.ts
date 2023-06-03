@@ -1,127 +1,212 @@
-import SignUp from "./components/Guest/SignUp.vue";
-import AppointmentList from "./components/Patient/AppointmentList.vue";
-import LoginForm from "./components/Guest/LoginForm.vue";
-import HomePage from "./components/HomePage.vue";
-import { Component } from "vue";
-import VisitHarmonogram from "./components/Doctor/VisitHarmonogram.vue";
-import VisitDetails from "./components/Doctor/VisitDetails.vue";
-import VisitSummary from "./components/Doctor/VisitSummary.vue";
-import PatientCard from "./components/Patient/PatientCard.vue";
-import DoctorData from "./components/Doctor/DoctorData.vue";
-import PatientData from "./components/Patient/PatientData.vue";
-import PatientCancelVisit from "./components/Patient/PatientCancelVisit.vue";
-import PatientChangePassword from "./components/Patient/ChangePassword.vue";
-import GuestPasswordReset2 from "./components/Guest/GuestPasswordReset2.vue";
-import GuestPasswordReset from "./components/Guest/GuestPasswordReset.vue";
-import DoctorPasswordReset from "./components/Doctor/DoctorPasswordReset.vue";
-import UnauthorizedView from "./components/UnauthorizedView.vue";
-import DoctorDataEdit from "./components/Doctor/DoctorDataEdit.vue";
-import DoctorPage from "./components/Doctor/DoctorPage.vue";
-import DoctorVisitDetails from "./components/Doctor/DoctorVisitDetails.vue";
-import VisitAssign from "./components/Doctor/VisitAssign.vue";
-import PatientDataReceptionEdit from "./components/Doctor/PatientDataReceptionEdit.vue";
-import AwaitingAppointments from "./components/Staff/AwaitingAppointments.vue";
-import AppointmentStatistics from "./components/Staff/AppointmentStatistics.vue";
-import PatientList from "./components/Staff/PatientList.vue";
-import NewVisit from "./components/Patient/NewVisit.vue";
+import { Route } from "./typings";
 
-export const routes: Array<{
-  path: string;
-  component: Component;
-  meta: { roles: Array<string> | null };
-}> = [
+import {
+  AppointmentStatistics,
+  AwaitingAppointments,
+  StaffPasswordReset,
+  PatientList,
+  VisitAssign,
+  PatientDataReceptionEdit,
+  StaffView,
+} from "./components/Staff";
+
+import {
+  PatientPasswordReset,
+  NewVisit,
+  PatientCancelVisit,
+  PatientCard,
+  PatientData,
+  AppointmentList,
+  PatientView,
+} from "./components/Patient";
+
+import { GuestPasswordReset, LoginForm, SignUp } from "./components/Guest";
+
+import {
+  VisitHarmonogram,
+  DoctorVisit,
+  DoctorVisitSummary,
+  DoctorData,
+  DoctorDataEdit,
+  DoctorPage,
+  DoctorPasswordReset,
+  DoctorView,
+} from "./components/Doctor";
+
+import { VisitDetails, ChangePassword } from "./components/Shared";
+
+import { HomePage, UnauthorizedView } from "./components";
+
+export const routes: Array<Route> = [
   { path: "/", component: HomePage, meta: { roles: null } },
   { path: "/unauthorized", component: UnauthorizedView, meta: { roles: null } },
+  { path: "/login", component: LoginForm, meta: { roles: null } }, // guest - Logowanie
+  { path: "/signup", component: SignUp, meta: { roles: null } }, // guest - rejestracja
   {
-    path: "/patient/appointments",
-    component: AppointmentList,
-    meta: { roles: null },
-  },
-  { path: "/login", component: LoginForm, meta: { roles: null } },
-  { path: "/signup", component: SignUp, meta: { roles: null } },
-  { path: "/patient/new_visit", component: NewVisit, meta: { roles: null } },
-  {
-    path: "/doctor/visit_harmonogram",
-    component: VisitHarmonogram,
-    meta: { roles: null },
-  },
-  { path: "/doctor/visit", component: VisitDetails, meta: { roles: null } },
-  {
-    path: "/doctor/visitsummary",
-    component: VisitSummary,
-    meta: { roles: null },
-  },
-  {
-    path: "/patient/patientcard",
-    component: PatientCard,
-    meta: { roles: null },
-  },
-  { path: "/doctor/doctordata", component: DoctorData, meta: { roles: null } },
-  {
-    path: "/doctordata/passwordreset",
-    component: DoctorPasswordReset,
-    meta: { roles: null },
-  },
-  { path: "/doctor/doctorpage", component: DoctorPage, meta: { roles: null } },
-  {
-    path: "/doctor/doctordataedit",
-    component: DoctorDataEdit,
-    meta: { roles: null },
-  },
-  {
-    path: "/patient/patientdata",
-    component: PatientData,
-    meta: { roles: null },
-  },
-
-  {
-    path: "/patient/cancelvisit",
-    component: PatientCancelVisit,
-    meta: { roles: null },
+    path: "/patient",
+    component: PatientView,
+    meta: { roles: ["Patient", "Employee"] },
+    children: [
+      {
+        path: "appointments", // pacjent - Lista wizyt
+        component: AppointmentList,
+        meta: { roles: null },
+      },
+      { path: "appointments/new", component: NewVisit, meta: { roles: null } }, // pacjent - Nowa wizyta 2 / pacjent - Nowa wizyta 1 / pacjent - Podsumowanie wizyty
+      {
+        path: "card", // doctor - Karta pacjenta / pacjent - Karta pacjenta - pacjent
+        component: PatientCard,
+        meta: { roles: null },
+      },
+      {
+        path: "profile", // pacjent - Dane pacjenta / Dane pacjenta - recepcjonista ???? jakies niedorobione
+        component: PatientData,
+        meta: { roles: null },
+      },
+      {
+        path: "appointment/:id/cancel", // pacjent - Anuluj wizytę
+        component: PatientCancelVisit,
+        meta: { roles: null },
+      },
+      {
+        path: "appointment/:id", // pacjent - Szczegóły wizyty - pacjent / pacjent - Szczegóły wizyty - pacjent 2
+        component: VisitDetails,
+        meta: { roles: null },
+      },
+      {
+        path: "change-password", // pacjent - Zmień hasło
+        component: ChangePassword,
+        meta: { roles: null },
+      },
+      {
+        path: "passwordreset", // guest - Reset hasła
+        component: PatientPasswordReset,
+        meta: { roles: null },
+      },
+    ],
   },
   {
-    path: "/patient/changepassword",
-    component: PatientChangePassword,
-    meta: { roles: null },
+    path: "/doctor",
+    component: DoctorView,
+    meta: { roles: ["Employee"] },
+    children: [
+      {
+        path: "harmonogram", // doctor - Harmonogram wizyt
+        component: VisitHarmonogram,
+        meta: { roles: null },
+      },
+      {
+        path: "appointment/:id/finish",
+        component: DoctorVisit,
+        meta: { roles: null },
+      }, // doctor - Wizyta
+      {
+        path: "profile",
+        component: DoctorData,
+        meta: { roles: null },
+      }, // doctor - Dane lekarza - lekarz
+      {
+        path: "passwordreset", // lekarz - Zmień hasło - lekarz / dorobic weryfikacje starego hasla
+        component: DoctorPasswordReset,
+        meta: { roles: null },
+      },
+      {
+        path: "doctors",
+        component: DoctorPage,
+        meta: { roles: null },
+      }, // recepcja - Panel admina - recepcja
+      {
+        path: "profile/edit", // recepcja - Dane lekarza - recepcjonista
+        component: DoctorDataEdit,
+        meta: { roles: null },
+      },
+      {
+        path: "appointment/:id", // doctor - Szczegóły wizyty - z harmonogramu / doctor - Szczegóły wizyty (recipe)
+        component: VisitDetails,
+        meta: { roles: null },
+      },
+      {
+        path: "patient/:id/card",
+        component: PatientCard,
+        meta: { roles: null },
+      },
+      {
+        path: "patients", // recepcja - Pacjenci - recepcjonista
+        component: PatientList,
+        meta: { roles: ["Staf", "Employee"] },
+      },
+    ],
   },
   {
-    path: "/guest/passwordreset2",
-    component: GuestPasswordReset2,
-    meta: { roles: null },
+    path: "/staff",
+    component: StaffView,
+    meta: { roles: ["Staff"] },
+    children: [
+      {
+        path: "appointments/:id", // doctor - Szczegóły wizyty - z harmonogramu / doctor - Szczegóły wizyty (recipe)
+        component: VisitDetails,
+        meta: { roles: null },
+      },
+      {
+        path: "appointments/:id/assign", // recepcja - Przydziel wizytę(visitassign)
+        component: VisitAssign,
+        meta: { roles: null },
+      },
+      {
+        path: "appointments/awaiting", // recepcja - Oczekujące wizyty
+        component: AwaitingAppointments,
+        meta: { roles: null },
+      },
+      {
+        path: "statistics", // recepcja - Statystyka
+        component: AppointmentStatistics,
+        meta: { roles: null },
+      },
+      {
+        path: "patients", // recepcja - Pacjenci - recepcjonista
+        component: PatientList,
+        meta: { roles: ["Staff", "Employee"] },
+      },
+      {
+        path: "patient/edit/:id", // JAKIES MOCNO NIEDOROBIONE recepcja - Dane pacjenta - recepcjonista / pacjent - Dane pacjenta
+        component: PatientDataReceptionEdit,
+        meta: { roles: null },
+      },
+      {
+        path: "passwordreset", // recepcja - Zmień hasło - recepcjonista
+        component: StaffPasswordReset,
+        meta: { roles: null },
+      },
+      {
+        path: "patient/:id/card",
+        component: PatientCard,
+        meta: { roles: null },
+      },
+      {
+        path: "doctors",
+        component: DoctorPage,
+        meta: { roles: null },
+      },
+      {
+        path: "doctors/profile/:id",
+        component: DoctorDataEdit,
+        meta: { roles: null },
+      }, // doctor - Dane lekarza - lekarz
+      {
+        path: "doctors/harmonogram/:id",
+        component: VisitHarmonogram,
+        meta: { roles: null },
+      }, // doctor - harmonogram - lekarz
+      {
+        path: "profile",
+        component: DoctorData,
+        meta: { roles: null },
+      }, // doctor - Dane lekarza - lekarz
+    ],
   },
   {
-    path: "/guest/passwordreset",
+    path: "/auth/password-reset", // guest - Podaj nowe hasło
     component: GuestPasswordReset,
-    meta: { roles: null },
-  },
-  {
-    path: "/visitdetails",
-    component: DoctorVisitDetails,
-    meta: { roles: null },
-  },
-  {
-    path: "/doctor/visit_assign",
-    component: VisitAssign,
-    meta: { roles: null },
-  },
-  {
-    path: "/doctor/patient_reception_edit",
-    component: PatientDataReceptionEdit,
-    meta: { roles: null },
-  },
-  {
-    path: "/staff/awaitingappointments",
-    component: AwaitingAppointments,
-    meta: { roles: null },
-  },
-  {
-    path: "/staff/statistics",
-    component: AppointmentStatistics,
-    meta: { roles: null },
-  },
-  {
-    path: "/staff/patientlist",
-    component: PatientList,
     meta: { roles: null },
   },
 ];

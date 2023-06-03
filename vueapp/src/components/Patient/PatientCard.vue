@@ -1,10 +1,39 @@
 <script setup lang="ts">
 //import VueDatePicker from "@vuepic/vue-datepicker";
-import axios from "axios";
+import { authorized, specializations, router } from "@/main";
 import { onBeforeMount } from "vue";
+import { ref } from "vue";
+// let test = {};
+
+const name = ref<string>("");
+const lastName = ref<string>("");
+const medicines = ref<string>("");
+const phoneNumber = ref<string>("");
+const email = ref<string>("");
+const pesel = ref<string>("");
+const dateOfBirth = ref<string>("");
+const treatmentHistory = ref<
+  Array<{ id: number; date: string; specialization: number }>
+>([]);
+// const lastName = ref<string>("");
 onBeforeMount(async () => {
-  const res = await axios.get("http://localhost:7042/api/appointment");
-  console.log(res.data);
+  // const res = await authorized.get("/appointment");
+  const patientId = router.currentRoute.value.params["id"] as string;
+  //console.log(patientId);
+  let card = null;
+  if (patientId == undefined)
+    card = await authorized.get("/patient/patient-card");
+  else card = await authorized.get("/patient/patient-card/" + patientId);
+  const data = card.data;
+  name.value = data.firstName;
+  lastName.value = data.lastName;
+  medicines.value = data.medicines;
+  phoneNumber.value = data.phoneNumber;
+  email.value = data.email;
+  pesel.value = data.pesel;
+  dateOfBirth.value = data.dateOfBirth;
+  treatmentHistory.value = data.treatmentHistory;
+  console.log(card.data);
 });
 </script>
 
@@ -21,7 +50,7 @@ onBeforeMount(async () => {
           <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
         </v-card>
       </v-container>
-      <v-card-title font-size="56">Karta pacjenta</v-card-title>
+      <v-card-title font-size="56">Dane pacjenta</v-card-title>
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
@@ -38,11 +67,11 @@ onBeforeMount(async () => {
             >
               Imię i Nazwisko
             </v-col>
-            <v-col class="text-left"> Jan Ambroziak </v-col>
+            <v-col class="text-left"> {{ name }} {{ lastName }} </v-col>
             <v-col class="font-weight-bold text-blue-darken-1 text-left"
-              >telefon</v-col
+              >Telefon</v-col
             >
-            <v-col>574987248</v-col>
+            <v-col>{{ phoneNumber }}</v-col>
           </v-row>
           <v-row>
             <v-col
@@ -51,11 +80,11 @@ onBeforeMount(async () => {
             >
               Data urodzenia
             </v-col>
-            <v-col class="text-left"> 15.07.1980 </v-col>
+            <v-col class="text-left"> {{ dateOfBirth }} </v-col>
             <v-col class="font-weight-bold text-blue-darken-1 text-left"
               >Adres e-mail</v-col
             >
-            <v-col> jan.am1@poczta.pl</v-col>
+            <v-col> {{ email }}</v-col>
           </v-row>
           <v-row>
             <v-col
@@ -64,7 +93,7 @@ onBeforeMount(async () => {
             >
               PESEL
             </v-col>
-            <v-col class="text-left"> 80071545579 </v-col>
+            <v-col class="text-left"> {{ pesel }} </v-col>
           </v-row>
         </v-container>
 
@@ -76,12 +105,7 @@ onBeforeMount(async () => {
 
           <v-row>
             <v-col class="font-weight-bold text-blue-darken-1 text-left">
-              Quinilaril Azagel
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="font-weight-bold text-blue-darken-1 text-left">
-              Silvalozin
+              {{ medicines }}
             </v-col>
           </v-row>
         </v-container>
@@ -90,23 +114,23 @@ onBeforeMount(async () => {
             <p class="font-weight-bold">Historia Leczenia</p>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
-          <v-row>
+          <v-row
+            v-for="appointment in treatmentHistory"
+            :key="appointment.specialization"
+          >
             <v-col
               class="font-weight-bold text-blue-darken-1 text-left"
               cols="4"
             >
-              Pulmonolog
+              {{
+                specializations.find(
+                  (elem: any) => elem.value === appointment.specialization
+                )?.title
+              }}
             </v-col>
-            <v-col class="text-left"> 13.02.2023 </v-col>
-          </v-row>
-          <v-row>
-            <v-col
-              class="font-weight-bold text-blue-darken-1 text-left"
-              cols="4"
-            >
-              Internista
+            <v-col class="text-left" cols="4">
+              {{ new Date(appointment.date).toLocaleString() }}
             </v-col>
-            <v-col class="text-left"> 17.03.2023</v-col>
           </v-row>
         </v-container>
         <v-row justify="center" class="mt-4">
@@ -115,6 +139,7 @@ onBeforeMount(async () => {
               variant="outlined"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>

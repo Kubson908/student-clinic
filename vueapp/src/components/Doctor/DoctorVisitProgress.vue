@@ -1,15 +1,74 @@
 <script setup lang="ts">
-import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+import { router, authorized, snackbar } from "@/main";
+import { ref, onBeforeMount } from "vue";
+// eslint-disable-next-line
+const emit = defineEmits(["page", "loaded"]);
+const change_page = async (arg: number) => {
+  if (arg > 0) {
+    const valid = ((await form.value.validate()) as any).valid;
+    if (!valid) return;
+  }
+  emit("page", arg);
+};
+
+const medicines = ref<string>();
+const symptoms = ref<string>();
+const appointmentDate = ref<string>();
+const patientName = ref<string>();
+
+const form = ref<any>();
+const meds = ref<string>();
+const diagnose = ref<string>();
+const recomendations = ref<string>();
+const control_visit = ref<boolean>(true);
+const loading = ref<boolean>(true);
+
+const doctorSpecialization = ref<number>();
+
+onBeforeMount(async () => {
+  try {
+    let appointmentId = router.currentRoute.value.params["id"] as string;
+    let res = await authorized.get(`Appointment/${appointmentId}`);
+    const appointmentData = res.data;
+    appointmentDate.value = appointmentData.date;
+    patientName.value =
+      appointmentData.patient.firstName +
+      " " +
+      appointmentData.patient.lastName;
+    symptoms.value = appointmentData.symptoms;
+    medicines.value = appointmentData.medicines;
+    doctorSpecialization.value = appointmentData.specialization;
+  } catch (error) {
+    console.log(error);
+    snackbar.error = true;
+    snackbar.text = "Wystąpił błąd przy pobieraniu danych wizyty";
+    snackbar.showing = true;
+  } finally {
+    loading.value = false;
+    emit("loaded");
+  }
+});
+
+const select = ref<any>();
+const date = ref<any>(new Date());
+// eslint-disable-next-line
+defineExpose({
+  appointmentDate,
+  patientName,
+  symptoms,
+  medicines,
+  meds,
+  diagnose,
+  recomendations,
+  date,
+  select,
+  doctorSpecialization,
+  control_visit,
+});
 </script>
 
 <template>
-  <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+  <v-card>
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -26,7 +85,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
-      <v-form @submit.prevent>
+      <v-form @submit.prevent ref="form">
         <v-container>
           <v-row>
             <p class="font-weight-bold">Informacje o wizycie</p>
@@ -39,7 +98,15 @@ import VueDatePicker from "@vuepic/vue-datepicker";
             >
               Informacje o wizycie
             </v-col>
-            <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
+            <v-col class="text-left">
+              
+              {{ loading ? "Wczytywanie..." : new Date(appointmentDate as string).toLocaleDateString() }},
+              {{ loading ? "" :
+                new Date(appointmentDate as string)
+                  .toLocaleTimeString()
+                  .substring(0, 5)
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -48,7 +115,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
             >
               Pacjent
             </v-col>
-            <v-col class="text-left"> Jan ambroziak </v-col>
+            <v-col class="text-left"> {{ loading ? "Wczytywanie" : patientName }} </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -57,7 +124,9 @@ import VueDatePicker from "@vuepic/vue-datepicker";
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> Kaszel, katar, gorączka </v-col>
+            <v-col class="text-left">
+              {{ loading ? "Wczytywanie..." : symptoms ? symptoms : "Nie podano" }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -66,7 +135,9 @@ import VueDatePicker from "@vuepic/vue-datepicker";
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> Riposton </v-col>
+            <v-col class="text-left">
+              {{ loading ? "Wczytywanie..." : medicines ? medicines : "Nie podano" }}
+            </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
           <v-spacer></v-spacer>
@@ -75,7 +146,8 @@ import VueDatePicker from "@vuepic/vue-datepicker";
           <v-row>
             <v-col cols="12" sm="6">
               <v-textarea
-                variant="filled"
+                v-model="diagnose"
+                variant="solo"
                 auto-grow
                 label="Diagnoza"
                 rows="5"
@@ -84,7 +156,8 @@ import VueDatePicker from "@vuepic/vue-datepicker";
             </v-col>
             <v-col cols="12" sm="6">
               <v-textarea
-                variant="filled"
+                v-model="meds"
+                variant="solo"
                 auto-grow
                 label="Leki"
                 rows="5"
@@ -92,20 +165,15 @@ import VueDatePicker from "@vuepic/vue-datepicker";
               ></v-textarea>
             </v-col>
           </v-row>
-          <v-textarea label="Zalecenia"></v-textarea>
-
-          <v-row>
-            <p class="font-weight-bold">Termin wizyty kontrolnej</p>
-            <v-divider></v-divider>
-          </v-row>
-          <v-row>
-            <v-col>
-              <VueDatePicker auto-apply> </VueDatePicker>
-            </v-col>
-            <v-col>
-              <v-checkbox label=""></v-checkbox>
-            </v-col>
-          </v-row>
+          <v-textarea
+            variant="solo"
+            label="Zalecenia"
+            v-model="recomendations"
+          ></v-textarea>
+          <v-checkbox
+            v-model="control_visit"
+            label="Wizyta kontrolna"
+          ></v-checkbox>
         </v-container>
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
@@ -114,6 +182,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>
@@ -127,8 +196,9 @@ import VueDatePicker from "@vuepic/vue-datepicker";
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="change_page(control_visit ? 1 : 2)"
             >
-              Zakończ wizytę
+              {{ control_visit ? "Dalej" : "Zakończ" }}
             </v-btn>
           </v-col>
         </v-row>

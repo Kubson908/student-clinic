@@ -1,15 +1,65 @@
 <script setup lang="ts">
-//import VueDatePicker from "@vuepic/vue-datepicker";
-// let date = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-//   .toISOString()
-//   .substr(0, 10);
-// let menu = false;
-// let modal = false;
-// let menu2 = false;
+import { authorized, snackbar, router, specializations } from "@/main";
+import { onBeforeMount, ref } from "vue";
+
+let appointment_id: string = "";
+const appointment_data = ref<any>(null);
+
+const waiting = ref<boolean>(true);
+
+onBeforeMount(async () => {
+  appointment_id = router.currentRoute.value.params["id"] as string;
+  await getAppointmentData();
+});
+
+const getAppointmentData = async () => {
+  try {
+    const res = await authorized.get(`/appointment/${appointment_id}`);
+    appointment_data.value = res.data;
+  } catch (e: any) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = "Wystąpił błąd przy pobieraniu danych z serwera";
+  } finally {
+    waiting.value = false;
+  }
+};
+
+const deleteAppointment = async () => {
+  try {
+    waiting.value = true;
+    const res = await authorized.delete(
+      `/appointment/cancel-appointment/${appointment_id}`
+    );
+    if (res.status === 200) {
+      snackbar.error = false;
+      snackbar.text = "Pomyślnie anulowano wizytę";
+      router.push("/patient/appointments");
+    }
+  } catch (e: any) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text =
+      e.status === 409
+        ? "Nie możesz już anulować tej wizyty"
+        : "Wystąpił błąd przy anulowaniu wizyty";
+  } finally {
+    snackbar.showing = true;
+    waiting.value = false;
+  }
+};
 </script>
 
 <template>
   <v-card width="560px" location="center" elevation="5" class="rounded-lg">
+    <template #loader>
+      <v-progress-linear
+        :active="waiting"
+        color="deep-purple"
+        height="4"
+        indeterminate
+      ></v-progress-linear>
+    </template>
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
         <v-card
@@ -28,7 +78,6 @@
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
-      <v-form @submit.prevent>
         <v-container>
           <v-row>
             <p class="font-weight-bold">Informacje o wizycie</p>
@@ -41,7 +90,19 @@
             >
               Data wizyty
             </v-col>
-            <v-col class="text-left"> 17.03.2023, 17:30 </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? `${new Date(
+                      appointment_data.date
+                    ).toLocaleDateString()}, ${new Date(
+                      appointment_data.date
+                    ).getHours()}:${(
+                      "0" + new Date(appointment_data.date).getMinutes()
+                    ).slice(-2)}`
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -50,7 +111,21 @@
             >
               Lekarz
             </v-col>
-            <v-col class="text-left"> Maciej Kowalczyk </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? appointment_data.doctor
+                    ? appointment_data.doctor.firstName +
+                      " " +
+                      appointment_data.doctor.lastName
+                    : specializations.find(
+                        (specialization) =>
+                          specialization.value ===
+                          appointment_data.specialization
+                      )!.title
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -59,7 +134,15 @@
             >
               Pacjent
             </v-col>
-            <v-col class="text-left"> Jan Kowalski </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? appointment_data.patient.firstName +
+                    " " +
+                    appointment_data.patient.lastName
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -68,7 +151,15 @@
             >
               Podane objawy
             </v-col>
-            <v-col class="text-left"> Kaszel, katar, gorączka </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? appointment_data.symptoms !== ""
+                    ? appointment_data.symptoms
+                    : "Nie podano"
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -77,7 +168,15 @@
             >
               Przyjmowane leki
             </v-col>
-            <v-col class="text-left"> Riposton </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data
+                  ? appointment_data.medicines !== ""
+                    ? appointment_data.medicines
+                    : "Nie podano"
+                  : "Wczytywanie..."
+              }}
+            </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
@@ -89,6 +188,7 @@
               size="large"
               class="mt-2 button"
               color="blue-darken-2"
+              @click="router.back()"
             >
               Wstecz
             </v-btn>
@@ -102,12 +202,12 @@
               size="large"
               class="mt-2 button"
               color="red-darken-2"
+              @click="deleteAppointment"
             >
               Potwierdź
             </v-btn>
           </v-col>
         </v-row>
-      </v-form>
     </v-card-text>
   </v-card>
 </template>
