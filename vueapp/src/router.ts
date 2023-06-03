@@ -26,14 +26,16 @@ import {
   VisitHarmonogram,
   DoctorVisit,
   DoctorVisitSummary,
-  DoctorData,
   DoctorDataEdit,
   DoctorPage,
-  DoctorPasswordReset,
   DoctorView,
 } from "./components/Doctor";
 
-import { VisitDetails, ChangePassword } from "./components/Shared";
+import {
+  VisitDetails,
+  ChangePassword,
+  EmployeeData,
+} from "./components/Shared";
 
 import { HomePage, UnauthorizedView } from "./components";
 
@@ -102,12 +104,12 @@ export const routes: Array<Route> = [
       }, // doctor - Wizyta
       {
         path: "profile",
-        component: DoctorData,
+        component: EmployeeData,
         meta: { roles: null },
       }, // doctor - Dane lekarza - lekarz
       {
-        path: "passwordreset", // lekarz - Zmień hasło - lekarz / dorobic weryfikacje starego hasla
-        component: DoctorPasswordReset,
+        path: "change-password", // lekarz - Zmień hasło - lekarz / dorobic weryfikacje starego hasla
+        component: ChangePassword,
         meta: { roles: null },
       },
       {
@@ -199,7 +201,7 @@ export const routes: Array<Route> = [
       }, // doctor - harmonogram - lekarz
       {
         path: "profile",
-        component: DoctorData,
+        component: EmployeeData,
         meta: { roles: null },
       }, // doctor - Dane lekarza - lekarz
     ],

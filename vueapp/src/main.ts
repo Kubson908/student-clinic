@@ -14,7 +14,6 @@ import { prefix } from "./config";
 import * as labsComponents from "vuetify/labs/components";
 
 export const user = reactive<User>({
-  id: 0,
   name: localStorage.getItem("user") ?? "Niezalogowany",
   isLoggedIn: localStorage.getItem("user") ? true : false,
   roles: localStorage.getItem("roles")

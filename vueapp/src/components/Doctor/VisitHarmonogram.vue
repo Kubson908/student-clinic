@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import Datepicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
-import { computed } from "vue";
+import { watch } from "vue";
 import { onBeforeMount } from "vue";
-import { authorized, user, router } from "@/main";
-import { prefix } from "@/config";
+import { authorized, router, snackbar } from "@/main";
 
-const checkRole = (role: string) => {
-  const roles = user.roles!;
-  return roles.includes(role);
-};
-
-// const date = ref(new Date());
-// date.value.setHours(0, 0, 0, 0);
 const date = ref(new Date());
 
 interface IApppointment {
@@ -22,24 +14,49 @@ interface IApppointment {
   date: Date;
 }
 
-var appointments: IApppointment[] = [];
+const appointments = ref<IApppointment[]>([]);
+const loading = ref<boolean>(true);
 
-onBeforeMount(async () => {
+const fetchData = async () => {
   const id = router.currentRoute.value.params["id"] ?? null;
-  const res = id
-    ? await authorized.get("/Appointment/schedule/" + id)
-    : await authorized.get(`/Appointment/schedule`);
-  appointments = res.data;
-  // if (checkRole("Staff")) {
-  //   const res = await authorized.get(`${prefix}/api/Appointment/everySchedule`);
-  //   appointments = res.data;
-  // } else if (checkRole("Employee")) {
-  //   const res = await authorized.get(`${prefix}/api/Appointment/schedule`);
-  //   appointments = res.data;
-  // }
-  date.value = new Date(); //Sprawia, że computed się odpala przez zmianę wartości
-  //console.log(appointments);
-});
+  if (id !== null) {
+    try {
+      loading.value = true;
+      const res = await authorized.get(
+        `/Appointment/doctor/${id}/schedule/${date.value.getFullYear()}/${
+          date.value.getMonth() + 1
+        }/${date.value.getDate()}`
+      );
+      appointments.value = res.data;
+    } catch (e) {
+      console.log(e);
+      snackbar.error = true;
+      snackbar.text =
+        "Wystąpił błąd przy sprawdzaniu harmonogramu na dany dzień";
+      showing = true;
+    } finally {
+      loading.value = false;
+    }
+  } else {
+    try {
+      loading.value = true;
+      const res = await authorized.get(
+        `/Appointment/schedule/${date.value.getFullYear()}/${
+          date.value.getMonth() + 1
+        }/${date.value.getDate()}`
+      );
+      appointments.value = res.data;
+    } catch (e) {
+      console.log(e);
+      snackbar.error = true;
+      snackbar.text =
+        "Wystąpił błąd przy sprawdzaniu harmonogramu na dany dzień";
+      showing = true;
+    } finally {
+      loading.value = false;
+    }
+  }
+};
 
 const format = (date: Date) => {
   const day = date.getDate();
@@ -57,19 +74,19 @@ const formatTime = (date: Date) => {
   return `${hours}:${minutes}`;
 };
 
-const filteredAppointments = computed(() => {
-  const d = date.value; //Don't question it
-  //console.log(date.value.toDateString());
-  return appointments.filter(
-    (it) => new Date(it.date).toDateString() == d.toDateString()
-  );
-});
+watch(
+  date,
+  (newDate, oldDate) => {
+    fetchData();
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
   <v-row justify="center" no-gutters>
     <v-col xs="12" sm="6" md="6" align-self="center">
-      <v-card elevation="5" class="rounded-lg" height="70vh">
+      <v-card elevation="5" class="rounded-lg" height="80vh">
         <v-card-item>
           <v-container class="d-flex justify-center align-center">
             <h1>Harmonogram wizyt</h1>
@@ -80,18 +97,37 @@ const filteredAppointments = computed(() => {
                 v-model="date"
                 :teleport="true"
                 :enable-time-picker="false"
-                :format="format"
-              />
+                auto-apply
+                locale="pl-PL"
+                :disabled="loading"
+              >
+                <template #trigger>
+                  <v-text-field
+                    class="pa-0"
+                    variant="solo"
+                    type="text"
+                    readonly
+                    append-inner-icon="mdi-calendar-month"
+                    label="Miesiąc i rok"
+                    :disabled="loading"
+                    :model-value="
+                      date ? `${date.toLocaleDateString()}` : 'Brak'
+                    "
+                  ></v-text-field></template
+              ></Datepicker>
             </v-col>
           </v-row>
         </v-card-item>
-
+        <v-divider> </v-divider>
         <div class="card">
           <v-list class="d-flex flex-column justify-center align-center">
+            <v-row no-gutters v-if="appointments.length === 0">
+              <v-col class="text-grey"> Brak wizyt w tym dniu </v-col>
+            </v-row>
             <v-list-item
               elevation="3"
               class="rounded-lg my-2"
-              v-for="appointment in filteredAppointments"
+              v-for="appointment in appointments"
               :key="appointment.id"
               width="90%"
             >
@@ -138,7 +174,7 @@ const filteredAppointments = computed(() => {
             </v-list-item>
           </v-list>
         </div>
-
+        <v-divider></v-divider>
         <v-container class="d-flex justify-center align-center bottom">
           <div width="90%" class="space-between">
             <v-btn
@@ -159,7 +195,7 @@ const filteredAppointments = computed(() => {
 <style>
 .card {
   overflow: auto !important;
-  max-height: 60%;
+  height: 55%;
 }
 .button {
   max-width: fit-content !important;
@@ -182,33 +218,5 @@ const filteredAppointments = computed(() => {
 .bottom {
   position: absolute;
   bottom: 0;
-}
-
-/* width */
-.card::-webkit-scrollbar {
-  width: 0px;
-}
-::-webkit-scrollbar {
-  width: 0px;
-}
-.card::-webkit-scrollbar {
-  width: 0px;
-}
-
-/* Track */
-.card::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  display: none;
-}
-
-/* Handle */
-.background::-webkit-scrollbar-thumb {
-  background: #888;
-  display: none;
-}
-
-/* Handle on hover */
-.background::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }
 </style>

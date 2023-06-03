@@ -6,6 +6,7 @@ using Przychodnia.Webapi.Models;
 using Przychodnia.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using NuGet.Protocol;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -68,20 +69,17 @@ namespace Przychodnia.Webapi.Controllers
             {
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null) return BadRequest("User not found");
-/*                user.Email = dto.Email;
-                user.NormalizedEmail = dto.Email.Normalize();
-                user.UserName = dto.Email;
-                user.NormalizedEmail = dto.Email.Normalize();
-                user.FirstName = dto.FirstName;
-                user.LastName = dto.LastName;
-                user.PhoneNumber = dto.PhoneNumber;
-                user.DateOfBirth = dto.DateOfBirth;
-                user.Specialization = dto.Specialization;
-                user.Pesel = dto.Pesel;
-
-                var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded) return Ok("Updated");*/
                 foreach (var prop in typeof(Employee).GetProperties())
+                {
+                    var fromProp = typeof(UpdateEmployeeDto).GetProperty(prop.Name);
+                    var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;
+                    if (toValue != null)
+                    {
+                        prop.SetValue(user, toValue, null);
+                        _db.Entry(user).Property(prop.Name).IsModified = true;
+                    }
+                }
+                foreach (var prop in typeof(IdentityUser).GetProperties())
                 {
                     var fromProp = typeof(UpdateEmployeeDto).GetProperty(prop.Name);
                     var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;

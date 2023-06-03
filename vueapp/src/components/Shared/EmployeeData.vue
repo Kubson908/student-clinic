@@ -175,20 +175,6 @@ const submitData = async () => {
               </v-text-field>
             </v-col>
           </v-row>
-          <v-row v-if="specialization != ''">
-            <v-select v-model="specialization" label="Specjalizacja">
-            </v-select>
-
-            <!-- <v-col
-              class="font-weight-bold text-blue-darken-1 text-left"
-              cols="4"
-            >
-              Specjalizacja
-            </v-col>
-            <v-col class="text-left"> {{specializations.find(
-                      (s) => s.value === specialization
-                    )?.title}} </v-col> -->
-          </v-row>
           <v-row><v-divider></v-divider></v-row>
         </v-container>
 
@@ -218,7 +204,7 @@ const submitData = async () => {
         <v-row>
           <v-col class="text-right">
             <router-link
-              to="/doctor/passwordreset"
+              to="/doctor/change-password"
               custom
               v-slot="{ navigate }"
             >
@@ -227,7 +213,7 @@ const submitData = async () => {
                 align-self="center"
                 size="small"
                 class="mt-2 button"
-                value="/doctor/passwordreset"
+                value="/doctor/change-password"
                 @click="navigate"
               >
                 Zmień hasło
@@ -338,7 +324,7 @@ const submitData = async () => {
               Wstecz
             </v-btn>
             <router-link
-              to="/doctor/passwordreset"
+              to="/doctor/change-password"
               custom
               v-slot="{ navigate }"
             >
@@ -347,7 +333,7 @@ const submitData = async () => {
                 align-self="center"
                 size="small"
                 class="mt-2 button"
-                value="/doctor/passwordreset"
+                value="/doctor/change-password"
                 @click="navigate"
               >
                 Zmień hasło

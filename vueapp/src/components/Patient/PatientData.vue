@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { VForm } from "vuetify/lib/components/index";
-import { authorized, snackbar, user } from "@/main";
+import { authorized, snackbar } from "@/main";
 import { onBeforeMount, ref } from "vue";
 import {
   dateRules,

@@ -245,23 +245,43 @@ namespace Przychodnia.Webapi.Controllers
                         a.Medicines,
                         a.Recommendations,
                         a.Symptoms,
-                        a.ControlAppointment
+                        ControlAppointment = a.AppointmentId != null ? new
+                        {
+                            a.ControlAppointment!.Date,
+                            a.ControlAppointment.Id,
+                            a.ControlAppointment.Finished,
+                            a.ControlAppointment.Medicines,
+                            a.ControlAppointment.Recommendations,
+                            a.ControlAppointment.Symptoms,
+                            a.PatientId,
+                            a.ControlAppointment.DoctorId,
+                        } : null
                     }).ToListAsync(); // chyba działa
                 return Ok(appointments);
             }
             else
             {
                 var appointments = await _db.Appointments.Where(a => a.DoctorId == id).Select(a => new
-                   {
-                       Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
-                       a.Date,
-                       a.Id,
-                       a.Finished,
-                       a.Medicines,
-                       a.Recommendations,
-                       a.Symptoms,
-                       a.ControlAppointment
-                   }).ToListAsync(); // chyba działa
+                {
+                    Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
+                    a.Date,
+                    a.Id,
+                    a.Finished,
+                    a.Medicines,
+                    a.Recommendations,
+                    a.Symptoms,
+                    ControlAppointment = a.AppointmentId != null ? new
+                    {
+                        a.ControlAppointment!.Date,
+                        a.ControlAppointment.Id,
+                        a.ControlAppointment.Finished,
+                        a.ControlAppointment.Medicines,
+                        a.ControlAppointment.Recommendations,
+                        a.ControlAppointment.Symptoms,
+                        a.PatientId,
+                        a.ControlAppointment.DoctorId,
+                    } : null
+                }).ToListAsync(); // chyba działa
                 return Ok(appointments);
             }
         }

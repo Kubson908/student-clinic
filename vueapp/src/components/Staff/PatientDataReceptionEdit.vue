@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { authorized, router } from "@/main";
-import { ref,onBeforeMount } from "vue";
+import { VForm } from "vuetify/lib/components/index";
+import { authorized, router, snackbar } from "@/main";
+import { ref, onBeforeMount } from "vue";
 
 const name = ref<string>("");
 const lastName = ref<string>("");
@@ -9,12 +10,14 @@ const pesel = ref<string>("");
 const phone = ref<string>("");
 const birthDate = ref<string>("");
 const terms = ref<boolean>(false);
+const form = ref<typeof VForm | null>(null);
+const id = ref<string>("");
 
-  onBeforeMount(async () => {
+onBeforeMount(async () => {
   // const res = await authorized.get("/appointment");
-  const patientId = router.currentRoute.value.params["id"] as string;
+  id.value = router.currentRoute.value.params["id"] as string;
   //console.log(patientId);
-  let card = await authorized.get("/patient/patient-card/" + patientId);
+  let card = await authorized.get("/patient/patient-card/" + id.value);
   const data = card.data;
   name.value = data.firstName;
   lastName.value = data.lastName;
@@ -25,9 +28,34 @@ const terms = ref<boolean>(false);
   terms.value = data.verified;
   console.log(card.data);
 });
-
-
-const submit = () => {};
+const update = async () => {
+  await authorized.patch("/patient/update/" + id.value, {
+    firstName: name.value,
+    lastName: lastName.value,
+    phoneNumber: phone.value,
+    email: email.value,
+    pesel: pesel.value,
+    dateOfBirth: birthDate.value,
+    verified: terms.value,
+  });
+};
+const submit = async (data: SubmitEvent) => {
+  await data;
+  const valid = (await form.value?.validate()).valid;
+  if (!valid) return;
+  try {
+    await update();
+    router.push("/staff/patients");
+    snackbar.text = "Zaktualizowano dane";
+    snackbar.error = false;
+    snackbar.showing = true;
+  } catch (error: any) {
+    console.log(error);
+    snackbar.text = "Wystąpił błąd";
+    snackbar.error = true;
+    snackbar.showing = true;
+  }
+};
 </script>
 
 <template>
@@ -49,83 +77,81 @@ const submit = () => {};
     </v-card-item>
     <v-spacer></v-spacer>
     <v-card-text>
-      <v-form @submit.prevent>
+      <v-form @submit.prevent="submit" ref="form">
         <v-container>
           <v-card-text>
-            <v-form @submit.prevent="submit" ref="form">
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    type="input"
-                    label="Imie"
-                    v-model="name"
-                    variant="solo"
-                    color="blue-darken-2"
-                    required
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    type="input"
-                    label="Nazwisko"
-                    v-model="lastName"
-                    variant="solo"
-                    color="blue-darken-2"
-                    required
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    type="input"
-                    label="Pesel"
-                    v-model="pesel"
-                    variant="solo"
-                    color="blue-darken-2"
-                    required
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    type="input"
-                    label="Email"
-                    v-model="email"
-                    variant="solo"
-                    color="blue-darken-2"
-                    required
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    type="input"
-                    label="Telefon"
-                    v-model="phone"
-                    variant="solo"
-                    color="blue-darken-2"
-                    required
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    type="input"
-                    label="Data urodzenia"
-                    v-model="birthDate"
-                    variant="solo"
-                    color="blue-darken-2"
-                    required
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-            </v-form>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  type="input"
+                  label="Imie"
+                  v-model="name"
+                  variant="solo"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  type="input"
+                  label="Nazwisko"
+                  v-model="lastName"
+                  variant="solo"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  type="input"
+                  label="Pesel"
+                  v-model="pesel"
+                  variant="solo"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  type="input"
+                  label="Email"
+                  v-model="email"
+                  variant="solo"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  type="input"
+                  label="Telefon"
+                  v-model="phone"
+                  variant="solo"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  type="date"
+                  label="Data urodzenia"
+                  v-model="birthDate"
+                  variant="solo"
+                  color="blue-darken-2"
+                  required
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-row>
             <v-col>
@@ -142,7 +168,6 @@ const submit = () => {};
           <v-col cols="auto" class="me-auto">
             <v-sheet class="pa-2 ma-2">
               <v-btn
-                type="submit"
                 variant="outlined"
                 text="blue-darken"
                 color="blue-darken-2"

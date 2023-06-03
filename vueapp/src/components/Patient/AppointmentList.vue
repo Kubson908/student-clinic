@@ -146,31 +146,5 @@ const sortedByDate = computed(() => {
   bottom: 0;
 }
 
-/* width */
-.card::-webkit-scrollbar {
-  width: 0px;
-}
-::-webkit-scrollbar {
-  width: 0px;
-}
-.card::-webkit-scrollbar {
-  width: 0px;
-}
 
-/* Track */
-.card::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  display: none;
-}
-
-/* Handle */
-.background::-webkit-scrollbar-thumb {
-  background: #888;
-  display: none;
-}
-
-/* Handle on hover */
-.background::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
 </style>
