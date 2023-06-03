@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { VForm } from "vuetify/lib/components/index";
-import { authorized } from "@/main";
+import { authorized, snackbar, user } from "@/main";
 import { onBeforeMount, ref } from "vue";
 import {
   dateRules,
@@ -36,16 +36,30 @@ onBeforeMount(async () => {
   allergies.value = data.allergies;
   meds.value = data.medicines;
 });
-// TODO: dokończyć
-// const update = async () => {
-//   await authorized.patch();
-// };
+
+const update = async () => {
+  await authorized.patch("/patient/update", {
+    phoneNumber: phone.value,
+    allergies: allergies.value,
+    medicines: meds.value,
+  });
+};
 
 const submit = async (data: SubmitEvent) => {
-  const valid = await (form.value?.validate()).valid;
+  await data;
+  const valid = (await form.value?.validate()).valid;
   if (!valid) return;
-
-  form.value?.reset();
+  try {
+    await update();
+    snackbar.text = "Zaktualizowano dane";
+    snackbar.error = false;
+    snackbar.showing = true;
+  } catch (error: any) {
+    console.log(error);
+    snackbar.text = "Wystąpił błąd";
+    snackbar.error = true;
+    snackbar.showing = true;
+  }
 };
 </script>
 
@@ -161,7 +175,7 @@ const submit = async (data: SubmitEvent) => {
             <v-textarea
               variant="filled"
               auto-grow
-              label="Przyjmowane Leki"
+              label="Przyjmowane leki"
               v-model="meds"
               rows="2"
               row-height="20"
@@ -171,7 +185,7 @@ const submit = async (data: SubmitEvent) => {
             <v-textarea
               variant="filled"
               auto-grow
-              label="alergia"
+              label="Alergie"
               v-model="allergies"
               rows="2"
               row-height="20"
@@ -191,7 +205,12 @@ const submit = async (data: SubmitEvent) => {
             </v-btn>
           </v-col>
           <v-col>
-            <v-btn size="large" class="mt-2 button" color="blue-darken-2">
+            <v-btn
+              size="large"
+              class="mt-2 button"
+              color="blue-darken-2"
+              type="submit"
+            >
               zapisz
             </v-btn>
           </v-col>
@@ -199,7 +218,7 @@ const submit = async (data: SubmitEvent) => {
         <v-row>
           <v-col>
             <router-link
-              to="/doctor/passwordreset"
+              to="/patient/change-password"
               custom
               v-slot="{ navigate }"
             >
@@ -208,7 +227,7 @@ const submit = async (data: SubmitEvent) => {
                 align-self="center"
                 size="small"
                 class="mt-2 button"
-                value="/doctor/passwordreset"
+                value="/patient/change-password"
                 @click="navigate"
               >
                 Zmień hasło

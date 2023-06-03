@@ -76,14 +76,16 @@ namespace Przychodnia.Webapi.Controllers
             return patient == null ? NotFound("Patient not found") : Ok(patient);
         }
 
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff, Patient")]
         [HttpPatch("update")]
         [HttpPatch("update/{patientId}")]
-        public async Task<IActionResult> VerifyPatient([FromRoute] string? patientId, [FromBody] UpdatePatientDto dto)
+        public async Task<IActionResult> UpdatePatient([FromRoute] string? patientId, [FromBody] UpdatePatientDto dto)
         {
-            string id = string.Empty;
-            if (patientId == null) id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
-            else id = patientId;
+            string id;
+            string? role = HttpContext.User.FindFirstValue(ClaimTypes.Role);
+            if (role != null && role.Contains("Patient")) id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            else if (patientId != null) id = patientId;
+            else return BadRequest("Patient id is null");
             var patient = await _patientManager.FindByIdAsync(id);
             if (patient == null) return NotFound("Patient not found");
             foreach (var prop in typeof(Patient).GetProperties())

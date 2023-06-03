@@ -2,16 +2,35 @@
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
 import { passwordRules } from "@/validation";
+import { authorized, router, snackbar } from "@/main";
 
 const form = ref<typeof VForm | null>(null);
 const oldPassword = ref<string>("");
 const newPassword = ref<string>("");
 const newPasswordRepeat = ref<string>("");
-
+const visible = ref(false);
+const visibleNew = ref(false);
+const visibleNewRepeat = ref(false);
 const submit = async (data: SubmitEvent) => {
   const valid = ((await data) as any).valid;
   if (!valid) return;
-
+  try {
+    await authorized.patch("/auth/change-password", {
+      CurrentPassword: oldPassword.value,
+      NewPassword: newPassword.value,
+    });
+    snackbar.text = "Hasło zostało zmienione";
+    snackbar.error = false;
+  } catch (error: any) {
+    console.log(error);
+    snackbar.text =
+      error.response && error.response.status == 409
+        ? "Nowe hasło nie może być takie samo jak stare hasło"
+        : "Wystąpił błąd";
+    snackbar.error = true;
+  } finally {
+    snackbar.showing = true;
+  }
   form.value?.reset();
 };
 
@@ -55,9 +74,11 @@ const repeatPasswordRules = [
             <div class="cont">
               <v-row no-gutters>
                 <v-text-field
-                  type="password"
+                  :type="visible ? 'text' : 'password'"
+                  :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+                  @click:append-inner="() => (visible = !visible)"
                   v-model="oldPassword"
-                  label="Stare haslo"
+                  label="Stare hasło"
                   variant="solo"
                   :rules="passwordRules"
                   color="blue-darken-2"
@@ -67,9 +88,11 @@ const repeatPasswordRules = [
               </v-row>
               <v-row no-gutters>
                 <v-text-field
-                  type="password"
+                  :type="visibleNew ? 'text' : 'password'"
+                  :append-inner-icon="visibleNew ? 'mdi-eye-off' : 'mdi-eye'"
+                  @click:append-inner="() => (visibleNew = !visibleNew)"
                   v-model="newPassword"
-                  label="Nowe haslo"
+                  label="Nowe hasło"
                   variant="solo"
                   :rules="passwordRules"
                   color="blue-darken-2"
@@ -79,7 +102,13 @@ const repeatPasswordRules = [
               </v-row>
               <v-row no-gutters>
                 <v-text-field
-                  type="password"
+                  :type="visibleNewRepeat ? 'text' : 'password'"
+                  :append-inner-icon="
+                    visibleNewRepeat ? 'mdi-eye-off' : 'mdi-eye'
+                  "
+                  @click:append-inner="
+                    () => (visibleNewRepeat = !visibleNewRepeat)
+                  "
                   v-model="newPasswordRepeat"
                   label="Powtórz nowe hasło"
                   variant="solo"
@@ -92,10 +121,16 @@ const repeatPasswordRules = [
             </div>
             <v-row no-gutters class="mt-2">
               <v-col cols="12" class="d-flex justify-space-between">
-                <v-btn variant="outlined" color="blue-darken-2" class="button" @click="router.back()"
+                <v-btn
+                  variant="outlined"
+                  color="blue-darken-2"
+                  class="button"
+                  @click="router.back()"
                   >Wstecz</v-btn
                 >
-                <v-btn color="blue-darken-2" class="button">Zapisz</v-btn>
+                <v-btn type="submit" color="blue-darken-2" class="button"
+                  >Zapisz</v-btn
+                >
               </v-col>
             </v-row>
           </v-form>

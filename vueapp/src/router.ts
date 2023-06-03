@@ -13,7 +13,6 @@ import {
 import {
   PatientPasswordReset,
   NewVisit,
-  PatientChangePassword,
   PatientCancelVisit,
   PatientCard,
   PatientData,
@@ -21,12 +20,7 @@ import {
   PatientView,
 } from "./components/Patient";
 
-import {
-  GuestPasswordReset,
-  GuestView,
-  LoginForm,
-  SignUp,
-} from "./components/Guest";
+import { GuestPasswordReset, LoginForm, SignUp } from "./components/Guest";
 
 import {
   VisitHarmonogram,
@@ -39,7 +33,7 @@ import {
   DoctorView,
 } from "./components/Doctor";
 
-import { VisitDetails } from "./components/Shared";
+import { VisitDetails, ChangePassword } from "./components/Shared";
 
 import { HomePage, UnauthorizedView } from "./components";
 
@@ -80,8 +74,8 @@ export const routes: Array<Route> = [
         meta: { roles: null },
       },
       {
-        path: "changepassword", // pacjent - Zmień hasło
-        component: PatientChangePassword,
+        path: "change-password", // pacjent - Zmień hasło
+        component: ChangePassword,
         meta: { roles: null },
       },
       {

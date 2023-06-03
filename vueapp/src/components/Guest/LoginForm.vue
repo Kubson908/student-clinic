@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SignedUp from "./SignedUp.vue";
 import { unauthorized } from "../../main";
-import { ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { VForm } from "vuetify/lib/components/index";
 import { router, user } from "../../main";
 import { snackbar } from "../../main";
@@ -20,6 +20,10 @@ const passProp = ref<string>("");
 const remember_meProp = ref<boolean>(false);
 const page = ref<number>(1);
 
+onBeforeMount(() => {
+  if (user.isLoggedIn) router.push("/");
+});
+
 const send_mail = async () => {
   await unauthorized.post("/auth/send-reset-link", {
     email: email_to_confirm.value,
@@ -32,9 +36,6 @@ const send_mail = async () => {
 const submit = async (data: SubmitEvent) => {
   await data;
   const login = await form_login.value?.validate();
-  passProp.value = pass.value;
-  email_to_confirm.value = email.value;
-  remember_meProp.value = remember_me.value;
   if (login && login.valid) {
     try {
       loading.value = true;
@@ -76,8 +77,13 @@ const submit = async (data: SubmitEvent) => {
   }
 };
 
-const reset = async () => {
+const reset = async (data: SubmitEvent) => {
+  await data;
   const reset = await form_reset.value?.validate();
+  passProp.value = pass.value;
+  email_to_confirm.value = email.value;
+  remember_meProp.value = remember_me.value;
+  console.log(reset.valid);
   if (reset && reset.valid) {
     loading.value = true;
     try {
@@ -223,7 +229,7 @@ const passwordRules = [
             </v-card-item>
             <v-spacer></v-spacer>
             <v-card-text>
-              <v-form ref="form_reset" @submit.prevent="submit">
+              <v-form ref="form_reset" @submit.prevent="reset">
                 <v-text-field
                   v-model="email"
                   type="email"
@@ -275,7 +281,7 @@ const passwordRules = [
             </v-card-item>
             <v-spacer></v-spacer>
             <v-card-text>
-              <v-form ref="form_reset" @submit.prevent="submit">
+              <v-form ref="form_reset" @submit.prevent="reset">
                 <v-row>
                   <v-col>
                     <v-btn

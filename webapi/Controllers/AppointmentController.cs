@@ -219,21 +219,24 @@ namespace Przychodnia.Webapi.Controllers
 
 
         }
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee, Staff")]
+        [HttpGet("schedule/{year}/{month}/{day}")]
         [HttpGet("schedule")]
-        [HttpGet("schedule/{doctorId}")]
-        public async Task<IActionResult> GetDoctorSchedule([FromBody] string? date, [FromRoute] string? doctorId)
+        [HttpGet("doctor/{doctorId}/schedule/{year}/{month}/{day}")]
+        [HttpGet("doctor/{doctorId}/schedule")]
+        public async Task<IActionResult> GetDoctorSchedule([FromRoute] int? year, [FromRoute] int? month, [FromRoute] int? day, [FromRoute] string? doctorId)
         {
-            string? id = string.Empty;
-            if (doctorId != null) id = doctorId;
-            else id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (id == null) return NotFound("User not found");
-            if (date != null)
+            var claims = ((ClaimsIdentity)User.Identity!).Claims;
+            var role = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value.ToString()).ToList();
+            string id;
+            if (doctorId != null && role.Contains("Staff")) id = doctorId;
+            else if (!role.Contains("Staff")) id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            else return BadRequest("Error");
+            if (year != null && month != null && day != null)
             {
-                DateTime newDate = DateTime.Parse(date);
+                DateTime newDate = DateTime.Parse(year + "-" + month + "-" + day);
                 var appointments = await _db.Appointments.Where(a => a.DoctorId == id &&
-                    a.Date.CompareTo(newDate) == 0).Select(a => new
+                    a.Date.Date.CompareTo(newDate) == 0).Select(a => new
                     {
                         Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
                         a.Date,
@@ -265,37 +268,62 @@ namespace Przychodnia.Webapi.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpGet("everySchedule")]
-        public async Task<IActionResult> GetAllDoctorsSchedule([FromBody] string? date)
+        [HttpGet("everySchedule/{year}/{month}/{day}")]
+        public async Task<IActionResult> GetAllDoctorsSchedule([FromRoute] int? year, [FromRoute] int? month, [FromRoute] int? day)
         {
-            if (date != null)
+            if (year != null && month != null && day != null)
             {
-                DateTime newDate = DateTime.Parse(date);
-                var appointments = await _db.Appointments.Where(a=> a.Date.CompareTo(newDate) == 0).Select(a => new
+                DateTime newDate = DateTime.Parse(year + "-" + month + "-" + day);
+                var appointments = await _db.Appointments.Where(a => a.Date.Date.CompareTo(newDate) == 0).Select(a => new
+                {
+                    Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
+                    a.Date,
+                    a.Id,
+                    a.Finished,
+                    a.Medicines,
+                    a.Recommendations,
+                    a.Symptoms,
+                    a.PatientId,
+                    a.DoctorId,
+                    ControlAppointment = a.AppointmentId != null ? new
                     {
-                        Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
-                        a.Date,
-                        a.Id,
-                        a.Finished,
-                        a.Medicines,
-                        a.Recommendations,
-                        a.Symptoms,
-                        a.ControlAppointment
-                    }).ToListAsync(); 
+                        a.ControlAppointment!.Date,
+                        a.ControlAppointment.Id,
+                        a.ControlAppointment.Finished,
+                        a.ControlAppointment.Medicines,
+                        a.ControlAppointment.Recommendations,
+                        a.ControlAppointment.Symptoms,
+                        a.PatientId,
+                        a.ControlAppointment.DoctorId,
+                    } : null
+                }).ToListAsync(); 
                 return Ok(appointments);
             }
             else
             {
                 var appointments = await _db.Appointments.Select(a => new
-                   {
-                       Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
-                       a.Date,
-                       a.Id,
-                       a.Finished,
-                       a.Medicines,
-                       a.Recommendations,
-                       a.Symptoms,
-                       a.ControlAppointment
-                   }).ToListAsync(); 
+                {
+                    Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
+                    a.Date,
+                    a.Id,
+                    a.Finished,
+                    a.Medicines,
+                    a.Recommendations,
+                    a.Symptoms,
+                    a.PatientId,
+                    a.DoctorId,
+                    ControlAppointment = a.AppointmentId != null ? new
+                    {
+                        a.ControlAppointment!.Date,
+                        a.ControlAppointment.Id,
+                        a.ControlAppointment.Finished,
+                        a.ControlAppointment.Medicines,
+                        a.ControlAppointment.Recommendations,
+                        a.ControlAppointment.Symptoms,
+                        a.PatientId,
+                        a.ControlAppointment.DoctorId,
+                    } : null
+                }).ToListAsync(); 
                 return Ok(appointments);
             }
         }
@@ -335,10 +363,11 @@ namespace Przychodnia.Webapi.Controllers
         public async Task<IActionResult> AssignAppointment([FromRoute] string appointmentId, [FromBody] DoctorIdDto doctorId)
         {
             if (doctorId == null) return BadRequest("Doctor id is null");
-
-            string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var doctor = await _db.Employees.FindAsync(doctorId.DoctorId);
+            if (doctor == null) return NotFound("Doctor not found");
             var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == Int32.Parse(appointmentId));
             if (appointment == null) return NotFound("Appointment not found");
+            if (appointment.Specialization != doctor.Specialization) return Conflict("Cannot assign this appointment to this doctor");
             appointment.DoctorId = doctorId.DoctorId;
             _db.Entry(appointment).Property(p => p.DoctorId).IsModified = true;
             await _db.SaveChangesAsync();

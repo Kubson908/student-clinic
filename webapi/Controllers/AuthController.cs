@@ -8,6 +8,7 @@ using Przychodnia.Webapi.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Przychodnia.Webapi.CustomTokenProviders;
+using System.Security.Claims;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -190,6 +191,29 @@ namespace Przychodnia.Webapi.Controllers
             var result = await _employeeManager.ResetPasswordAsync(user, token, dto.Password);
             if (result.Succeeded) return Ok("Success");
             return BadRequest("Token is invalid");
+        }
+
+        [HttpPatch("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            if (dto.CurrentPassword == dto.NewPassword) return Conflict("New password cannot be the same as current password");
+            string ? role = HttpContext.User.FindFirstValue(ClaimTypes.Role);
+            string? id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (id == null || role == null) return BadRequest("Error");
+            IdentityResult result;
+            if (role.Contains("Patient"))
+            {
+                var user = await _patientManager.FindByIdAsync(id);
+                result = await _patientManager.ChangePasswordAsync(user!, dto.CurrentPassword, dto.NewPassword);
+            }
+            else 
+            {
+                var user = await _employeeManager.FindByIdAsync(id);
+                result = await _employeeManager.ChangePasswordAsync(user!, dto.CurrentPassword, dto.NewPassword);
+            }
+            Console.WriteLine(result.Succeeded);
+            if (result.Succeeded) return Ok("Password changed");
+            return BadRequest("Cannot change password");
         }
 
         [HttpPatch("delete-patient")]
