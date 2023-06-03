@@ -1,4 +1,3 @@
-export { default as DoctorDataEdit } from "./DoctorDataEdit.vue";
 export { default as DoctorPage } from "./DoctorPage.vue";
 export { default as DoctorVisit } from "./DoctorVisit.vue";
 export { default as VisitHarmonogram } from "./VisitHarmonogram.vue";

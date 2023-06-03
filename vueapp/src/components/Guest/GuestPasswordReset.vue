@@ -21,7 +21,6 @@ const repeatPasswordRules = [
   },
 ];
 const submit = async () => {
-  console.log(token);
   try {
     await unauthorized.patch("/auth/reset-password", {
       id: id,

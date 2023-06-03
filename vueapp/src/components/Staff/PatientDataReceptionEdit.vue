@@ -2,6 +2,14 @@
 import { VForm } from "vuetify/lib/components/index";
 import { authorized, router, snackbar } from "@/main";
 import { ref, onBeforeMount } from "vue";
+import {
+  dateRules,
+  peselRules,
+  phoneRules,
+  surnameRules,
+  nameRules,
+  emailRules,
+} from "@/validation";
 
 const name = ref<string>("");
 const lastName = ref<string>("");
@@ -14,9 +22,7 @@ const form = ref<typeof VForm | null>(null);
 const id = ref<string>("");
 
 onBeforeMount(async () => {
-  // const res = await authorized.get("/appointment");
   id.value = router.currentRoute.value.params["id"] as string;
-  //console.log(patientId);
   let card = await authorized.get("/patient/patient-card/" + id.value);
   const data = card.data;
   name.value = data.firstName;
@@ -86,6 +92,7 @@ const submit = async (data: SubmitEvent) => {
                   type="input"
                   label="Imie"
                   v-model="name"
+                  :rules="nameRules"
                   variant="solo"
                   color="blue-darken-2"
                   required
@@ -97,6 +104,7 @@ const submit = async (data: SubmitEvent) => {
                   type="input"
                   label="Nazwisko"
                   v-model="lastName"
+                  :rules="surnameRules"
                   variant="solo"
                   color="blue-darken-2"
                   required
@@ -110,6 +118,7 @@ const submit = async (data: SubmitEvent) => {
                   type="input"
                   label="Pesel"
                   v-model="pesel"
+                  :rules="peselRules"
                   variant="solo"
                   color="blue-darken-2"
                   required
@@ -121,6 +130,7 @@ const submit = async (data: SubmitEvent) => {
                   type="input"
                   label="Email"
                   v-model="email"
+                  :rules="emailRules"
                   variant="solo"
                   color="blue-darken-2"
                   required
@@ -134,6 +144,7 @@ const submit = async (data: SubmitEvent) => {
                   type="input"
                   label="Telefon"
                   v-model="phone"
+                  :rules="phoneRules"
                   variant="solo"
                   color="blue-darken-2"
                   required
@@ -145,6 +156,7 @@ const submit = async (data: SubmitEvent) => {
                   type="date"
                   label="Data urodzenia"
                   v-model="birthDate"
+                  :rules="dateRules"
                   variant="solo"
                   color="blue-darken-2"
                   required

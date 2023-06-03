@@ -2,7 +2,7 @@
 import { router, authorized, snackbar } from "@/main";
 import { ref, onBeforeMount } from "vue";
 // eslint-disable-next-line
-const emit = defineEmits(["page", "loaded"]);
+const emit = defineEmits(["page", "loaded", "save"]);
 const change_page = async (arg: number) => {
   if (arg > 0) {
     const valid = ((await form.value.validate()) as any).valid;
@@ -19,11 +19,15 @@ const patientName = ref<string>();
 const form = ref<any>();
 const meds = ref<string>();
 const diagnose = ref<string>();
-const recomendations = ref<string>();
+const recommendations = ref<string>();
 const control_visit = ref<boolean>(true);
 const loading = ref<boolean>(true);
 
 const doctorSpecialization = ref<number>();
+
+const onSaveAndExitClick = () => {
+  emit("save");
+};
 
 onBeforeMount(async () => {
   try {
@@ -59,7 +63,7 @@ defineExpose({
   medicines,
   meds,
   diagnose,
-  recomendations,
+  recommendations,
   date,
   select,
   doctorSpecialization,
@@ -99,12 +103,17 @@ defineExpose({
               Informacje o wizycie
             </v-col>
             <v-col class="text-left">
-              
-              {{ loading ? "Wczytywanie..." : new Date(appointmentDate as string).toLocaleDateString() }},
-              {{ loading ? "" :
-                new Date(appointmentDate as string)
-                  .toLocaleTimeString()
-                  .substring(0, 5)
+              {{
+                loading
+                  ? "Wczytywanie..."
+                  : new Date(appointmentDate as string).toLocaleDateString()
+              }},
+              {{
+                loading
+                  ? ""
+                  : new Date(appointmentDate as string)
+                      .toLocaleTimeString()
+                      .substring(0, 5)
               }}
             </v-col>
           </v-row>
@@ -115,7 +124,9 @@ defineExpose({
             >
               Pacjent
             </v-col>
-            <v-col class="text-left"> {{ loading ? "Wczytywanie" : patientName }} </v-col>
+            <v-col class="text-left">
+              {{ loading ? "Wczytywanie" : patientName }}
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -125,7 +136,9 @@ defineExpose({
               Podane objawy
             </v-col>
             <v-col class="text-left">
-              {{ loading ? "Wczytywanie..." : symptoms ? symptoms : "Nie podano" }}
+              {{
+                loading ? "Wczytywanie..." : symptoms ? symptoms : "Nie podano"
+              }}
             </v-col>
           </v-row>
           <v-row>
@@ -136,7 +149,13 @@ defineExpose({
               Przyjmowane leki
             </v-col>
             <v-col class="text-left">
-              {{ loading ? "Wczytywanie..." : medicines ? medicines : "Nie podano" }}
+              {{
+                loading
+                  ? "Wczytywanie..."
+                  : medicines
+                  ? medicines
+                  : "Nie podano"
+              }}
             </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>
@@ -168,7 +187,7 @@ defineExpose({
           <v-textarea
             variant="solo"
             label="Zalecenia"
-            v-model="recomendations"
+            v-model="recommendations"
           ></v-textarea>
           <v-checkbox
             v-model="control_visit"
@@ -209,6 +228,7 @@ defineExpose({
               align-self="center"
               size="small"
               class="mt-2 button"
+              @click="onSaveAndExitClick()"
             >
               Zapisz i wyjdź
             </v-btn>

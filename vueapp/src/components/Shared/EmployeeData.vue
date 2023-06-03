@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { router, authorized, specializations, user, snackbar } from "@/main";
+import { prefix } from "@/config";
 import { onBeforeMount, ref } from "vue";
 import {
   nameRules,
@@ -88,7 +89,7 @@ const submitData = async () => {
             <v-col align="center">
               <v-img
                 height="200"
-                src="https://st2.depositphotos.com/1010683/5848/i/950/depositphotos_58482379-stock-photo-male-asian-doctor.jpg"
+                :src="`${prefix}/StaticFiles/${employeeId}.png`"
               >
               </v-img>
             </v-col>
@@ -244,7 +245,7 @@ const submitData = async () => {
             <v-col align="center">
               <v-img
                 height="200"
-                src="https://st2.depositphotos.com/1010683/5848/i/950/depositphotos_58482379-stock-photo-male-asian-doctor.jpg"
+                :src="`${prefix}/StaticFiles/${employeeId}.png`"
               >
               </v-img>
             </v-col>

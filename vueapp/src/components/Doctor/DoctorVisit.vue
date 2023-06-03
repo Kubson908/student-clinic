@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import DoctorVisitProgress from "./DoctorVisitProgress.vue";
 import DoctorVisitSummary from "./DoctorVisitSummary.vue";
 import DoctorVisitControl from "./DoctorVisitControl.vue";
@@ -16,7 +16,7 @@ const getData = () => {
     symptoms: progress.value.symptoms,
     diagnose: progress.value.diagnose,
     patientName: progress.value.patientName,
-    recomendations: progress.value.recomendations,
+    recommendations: progress.value.recommendations,
     appointmentDate: progress.value.appointmentDate,
     meds: progress.value.meds,
     date: progress.value.date,
@@ -27,6 +27,18 @@ const getData = () => {
     dateHour: control.value ? control.value.hour : undefined,
   };
 };
+const saveAndExit = () => {
+  const data = getData();
+  sessionStorage.setItem(
+    appointment_id,
+    JSON.stringify({
+      meds: data.meds,
+      recommendations: data.recommendations,
+      diagnose: data.diagnose,
+    })
+  );
+  router.push("/doctor/harmonogram");
+};
 const onSubmit = async () => {
   try {
     loading.value = true;
@@ -34,7 +46,7 @@ const onSubmit = async () => {
     const res = await authorized.patch(`Appointment/finish/${appointment_id}`, {
       finished: true,
       diagnosis: req_data.diagnose,
-      recommmendations: req_data.recomendations,
+      recommendations: req_data.recommendations,
       medicines: req_data.meds,
       date:
         req_data.dateDay && req_data.dateHour
@@ -48,11 +60,12 @@ const onSubmit = async () => {
     if (res.status === 200) {
       snackbar.text = "Pomyślnie ukończono wizytę";
       snackbar.error = false;
+      router.push("/doctor/harmonogram");
     }
   } catch (e: any) {
     console.log(e);
     if (e.response && e.response.status === 406) {
-      snackbar.text = "Niedostępny termin wizyty kontrolnej"
+      snackbar.text = "Niedostępny termin wizyty kontrolnej";
     } else {
       snackbar.text = "Wystąpił błąd przy kończeniu wizyty";
     }
@@ -63,6 +76,16 @@ const onSubmit = async () => {
   }
 };
 const page = ref<number>(1);
+onMounted(() => {
+  const saved = sessionStorage.getItem(appointment_id);
+  if (saved !== null) {
+    const data: { meds: string; recommendations: string; diagnose: string } =
+      JSON.parse(saved as string);
+    progress.value.meds = data.meds;
+    progress.value.recommendations = data.recommendations;
+    progress.value.diagnose = data.diagnose;
+  }
+});
 </script>
 <template>
   <v-card
@@ -85,6 +108,7 @@ const page = ref<number>(1);
           @page="(arg) => (page += arg)"
           ref="progress"
           @loaded="loading = false"
+          @save="saveAndExit()"
         />
       </v-window-item>
       <v-window-item :value="2">

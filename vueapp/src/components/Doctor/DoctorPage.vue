@@ -38,7 +38,7 @@ onBeforeMount(async () => {
               class="d-flex justify-center"
             >
               <DoctorCard
-                img="https://img.favpng.com/24/11/9/physician-medicine-stock-photography-health-care-clinic-png-favpng-U8PcYt9GTDcuyNQMGgUhAhivX.jpg"
+                :img="'http://localhost:7042/StaticFiles/' + doctor.id + '.png'"
                 :doctor="doctor"
                 :disabled="false"
               >

@@ -154,68 +154,69 @@ const getAppointmentData = async () => {
               }}
             </v-col>
           </v-row>
-          <v-row><v-divider></v-divider></v-row>
-          <v-container v-if="appointment_data && appointment_data.finished">
-            <v-row>
-              <p class="font-weight-bold">Informacje od lekarza</p>
-            </v-row>
-            <v-row><v-divider></v-divider></v-row>
+        </v-container>
 
-            <v-row>
-              <v-col
-                class="font-weight-bold text-blue-darken-1 text-left"
-                cols="4"
-              >
-                Diagnoza
-              </v-col>
-              <v-col class="text-left">
-                {{
-                  appointment_data.diagnosis !== ""
-                    ? appointment_data.diagnosis
-                    : "Nie podano"
-                }}
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col
-                class="font-weight-bold text-blue-darken-1 text-left"
-                cols="4"
-              >
-                Leki
-              </v-col>
-              <v-col class="text-left">
-                {{
-                  appointment_data.medicines !== ""
-                    ? appointment_data.medicines
-                    : "Nie podano"
-                }}
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col
-                cols="4"
-                class="font-weight-bold text-blue-darken-1 text-left"
-              >
-                Zalecenia
-              </v-col>
-              <v-col class="text-left">
-                {{
-                  appointment_data.recommendations !== ""
-                    ? appointment_data.recommendations
-                    : "Nie podano"
-                }}
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col
-                class="font-weight-bold text-blue-darken-1 text-left"
-                cols="4"
-              >
-                Wizyta kontrolna
-              </v-col>
-              <v-col class="text-left"> 31.03.2023, 8:00 </v-col>
-            </v-row>
-          </v-container>
+        <v-container v-if="appointment_data && appointment_data.finished">
+          <v-row>
+            <p class="font-weight-bold">Informacje od lekarza</p>
+          </v-row>
+          <v-row><v-divider></v-divider></v-row>
+
+          <v-row>
+            <v-col
+              class="font-weight-bold text-blue-darken-1 text-left"
+              cols="4"
+            >
+              Diagnoza
+            </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data.diagnosis !== ""
+                  ? appointment_data.diagnosis
+                  : "Nie podano"
+              }}
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col
+              class="font-weight-bold text-blue-darken-1 text-left"
+              cols="4"
+            >
+              Leki
+            </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data.medicines !== ""
+                  ? appointment_data.medicines
+                  : "Nie podano"
+              }}
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col
+              cols="4"
+              class="font-weight-bold text-blue-darken-1 text-left"
+            >
+              Zalecenia
+            </v-col>
+            <v-col class="text-left">
+              {{
+                appointment_data.recommendations !== ""
+                  ? appointment_data.recommendations
+                  : "Nie podano"
+              }}
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col
+              class="font-weight-bold text-blue-darken-1 text-left"
+              cols="4"
+            >
+              Wizyta kontrolna
+            </v-col>
+            <v-col class="text-left"> 31.03.2023, 8:00 </v-col>
+          </v-row>
+
           <v-row><v-divider></v-divider></v-row>
         </v-container>
 

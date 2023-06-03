@@ -36,7 +36,7 @@ watch(
     <NavBar />
     <router-view v-slot="{ Component }">
       <v-fade-transition mode="out-in">
-        <component :is="Component"
+        <component class="mt-12" :is="Component"
       /></v-fade-transition>
     </router-view>
     <!-- <FooterBar class="align-end"/> -->
@@ -62,6 +62,9 @@ watch(
 :root {
   --secondary: #fff;
   --primary: rgb(89, 126, 221);
+  scrollbar-width: thin;
+  scrollbar-color: #888;
+  scrollbar-track-color: #f1f1f1;
 }
 
 .body {
@@ -115,6 +118,7 @@ watch(
 
 div::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
   display: block;
 }
 

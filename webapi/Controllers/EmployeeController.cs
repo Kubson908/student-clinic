@@ -7,6 +7,7 @@ using Przychodnia.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using NuGet.Protocol;
+using System;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -16,11 +17,13 @@ namespace Przychodnia.Webapi.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<Employee> _userManager;
+        private readonly IWebHostEnvironment _environment;
         
-        public EmployeeController(ApplicationDbContext db, UserManager<Employee> userManager)
+        public EmployeeController(ApplicationDbContext db, UserManager<Employee> userManager, IWebHostEnvironment environment)
         {
             _db = db;
             _userManager = userManager;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -114,6 +117,27 @@ namespace Przychodnia.Webapi.Controllers
 
             /*var test = _db.Employees.Select(e => e.Appointments.Select(a => a.Date));*/
             return Ok(doctors);
+        }
+
+        [Authorize(Roles = "Staff, Employee")]
+        [HttpPost("upload-image/{doctorId}")]
+        public async Task<IActionResult> UploadImage([FromRoute] string? doctorId, [FromForm] IFormFile postedFile)
+        {
+            if (postedFile == null) return BadRequest("File is null");
+            string fileName;
+            if (doctorId != null) fileName = doctorId + ".png";
+            else fileName = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)! + ".png";
+            string path = Path.Combine(_environment.ContentRootPath, "StaticFiles");
+            if (postedFile.Length > 0)
+            {
+                string upload = Path.Combine(path, fileName);
+                using (Stream fileStream = new FileStream(upload, FileMode.Create))
+                {
+                    await postedFile.CopyToAsync(fileStream);
+                }
+                return Ok("Image updated");
+            }
+            return BadRequest("File is empty");
         }
     }
 }

@@ -8,6 +8,7 @@ import {
   VisitAssign,
   PatientDataReceptionEdit,
   StaffView,
+  DoctorDataEdit,
 } from "./components/Staff";
 
 import {
@@ -26,7 +27,6 @@ import {
   VisitHarmonogram,
   DoctorVisit,
   DoctorVisitSummary,
-  DoctorDataEdit,
   DoctorPage,
   DoctorView,
 } from "./components/Doctor";
@@ -61,7 +61,7 @@ export const routes: Array<Route> = [
         meta: { roles: null },
       },
       {
-        path: "profile", // pacjent - Dane pacjenta / Dane pacjenta - recepcjonista ???? jakies niedorobione
+        path: "profile", // pacjent - Dane pacjenta / Dane pacjenta - recepcjonista
         component: PatientData,
         meta: { roles: null },
       },
@@ -170,7 +170,7 @@ export const routes: Array<Route> = [
         meta: { roles: ["Staff", "Employee"] },
       },
       {
-        path: "patient/edit/:id", // JAKIES MOCNO NIEDOROBIONE recepcja - Dane pacjenta - recepcjonista / pacjent - Dane pacjenta
+        path: "patient/edit/:id", // recepcja - Dane pacjenta - recepcjonista / pacjent - Dane pacjenta
         component: PatientDataReceptionEdit,
         meta: { roles: null },
       },
@@ -207,7 +207,7 @@ export const routes: Array<Route> = [
     ],
   },
   {
-    path: "/auth/password-reset", // guest - Podaj nowe hasło
+    path: "/auth/password-reset", // guest - zapomniałem hasła
     component: GuestPasswordReset,
     meta: { roles: null },
   },

@@ -11,8 +11,8 @@ const props = defineProps<{
 <template>
   <v-card width="288" height="192" class="round-lg" :class="disabled">
     <v-row no-gutters class="fill-height">
-      <v-col cols="6">
-        <v-img cover class="fill-height" :src="img"></v-img>
+      <v-col cols="6" class="fill-height max-height">
+        <v-img cover class="fill-height max-height" :src="img" />
       </v-col>
       <v-col cols="6" class="d-flex flex-column">
         <v-card-item class="text-left pa-2">
@@ -52,15 +52,15 @@ const props = defineProps<{
             custom
             v-slot="{ navigate }"
           >
-          <v-btn
-            size="small"
-            color="blue-darken-2"
-            variant="elevated"
-            class="text-body-2 mt-2"
-            :value="`staff/doctors/harmonogram/${doctor.id}`"
-            @click="navigate"
-            >Harmonogram</v-btn
-          >
+            <v-btn
+              size="small"
+              color="blue-darken-2"
+              variant="elevated"
+              class="text-body-2 mt-2"
+              :value="`staff/doctors/harmonogram/${doctor.id}`"
+              @click="navigate"
+              >Harmonogram</v-btn
+            >
           </router-link>
         </v-card-actions>
       </v-col>
@@ -72,5 +72,9 @@ const props = defineProps<{
 .doctor-disabled {
   filter: brightness(0.75);
   user-select: None;
+}
+.max-img-height {
+  max-height: 192px !important;
+  min-height: 192px !important;
 }
 </style>

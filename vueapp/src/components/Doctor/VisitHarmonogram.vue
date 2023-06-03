@@ -2,7 +2,6 @@
 import Datepicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
 import { watch } from "vue";
-import { onBeforeMount } from "vue";
 import { authorized, router, snackbar } from "@/main";
 
 const date = ref(new Date());
@@ -33,7 +32,7 @@ const fetchData = async () => {
       snackbar.error = true;
       snackbar.text =
         "Wystąpił błąd przy sprawdzaniu harmonogramu na dany dzień";
-      showing = true;
+      snackbar.showing = true;
     } finally {
       loading.value = false;
     }
@@ -51,7 +50,7 @@ const fetchData = async () => {
       snackbar.error = true;
       snackbar.text =
         "Wystąpił błąd przy sprawdzaniu harmonogramu na dany dzień";
-      showing = true;
+      snackbar.showing = true;
     } finally {
       loading.value = false;
     }
@@ -76,7 +75,7 @@ const formatTime = (date: Date) => {
 
 watch(
   date,
-  (newDate, oldDate) => {
+  () => {
     fetchData();
   },
   { immediate: true }

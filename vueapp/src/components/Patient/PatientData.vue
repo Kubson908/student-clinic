@@ -119,7 +119,7 @@ const submit = async (data: SubmitEvent) => {
           <v-row>
             <v-col class="py-1">
               <v-text-field
-                type="Date"
+                type="date"
                 label="Data urodzenia"
                 v-model="birthDate"
                 variant="solo"

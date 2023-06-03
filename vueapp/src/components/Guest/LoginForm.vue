@@ -293,7 +293,7 @@ const passwordRules = [
                     >
                   </v-col>
                   <v-col>
-                    <v-btn type="submit" color="blue-darken-2" class="mt-2"
+                    <v-btn @click="router.push('/')" color="blue-darken-2" class="mt-2"
                       >Zakończ</v-btn
                     >
                     <v-row justify="center">
