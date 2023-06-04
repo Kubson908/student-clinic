@@ -38,7 +38,12 @@ onBeforeMount(async () => {
               class="d-flex justify-center"
             >
               <DoctorCard
-                :img="'http://localhost:7042/StaticFiles/' + doctor.id + '.png'"
+                :img="
+                  'http://localhost:7042/StaticFiles/' +
+                  doctor.id +
+                  '.png?' +
+                  new Date().getTime()
+                "
                 :doctor="doctor"
                 :disabled="false"
               >

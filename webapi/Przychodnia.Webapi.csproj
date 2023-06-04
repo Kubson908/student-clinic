@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="StaticFiles\0331ebe8-fbc7-458c-8fca-9c8d7b3c6174.png" />
+    <Content Include="StaticFiles\52e97c43-3a30-49b3-ba28-9b761da64680.png" />
+    <Content Include="StaticFiles\ac5f2095-7c8f-49ba-9e49-55e84c68f8fe.png" />
+    <Content Include="StaticFiles\d322e36c-e0a1-4437-9910-8b7b3dcaabe9.png" />
+    <Content Include="StaticFiles\f6b40f25-006c-484e-ba37-b7e75dc3cfc8.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MailKit" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />

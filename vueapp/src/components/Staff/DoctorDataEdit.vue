@@ -44,7 +44,9 @@ onBeforeMount(async () => {
       birthDate.value = data.dateOfBirth;
       specialization.value = data.specialization;
       employeeId.value = data.id;
-      imgPath.value = `${prefix}/StaticFiles/${employeeId.value}.png`;
+      imgPath.value = `${prefix}/StaticFiles/${
+        employeeId.value
+      }.png?${new Date().getTime()}`;
     } catch (e: any) {
       console.log(e);
       snackbar.error = true;
