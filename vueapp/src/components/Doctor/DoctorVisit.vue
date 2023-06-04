@@ -50,7 +50,7 @@ const onSubmit = async () => {
       medicines: req_data.meds,
       date:
         req_data.dateDay && req_data.dateHour
-          ? `${("0" + req_data.dateDay.toLocaleDateString())
+          ? `${("0" + req_data.dateDay.toLocaleDateString("pl-PL"))
               .slice(-10)
               .split(".")
               .reverse()

@@ -95,7 +95,7 @@ const deleteAppointment = async () => {
                 appointment_data
                   ? `${new Date(
                       appointment_data.date
-                    ).toLocaleDateString()}, ${new Date(
+                    ).toLocaleDateString("pl-PL")}, ${new Date(
                       appointment_data.date
                     ).getHours()}:${(
                       "0" + new Date(appointment_data.date).getMinutes()

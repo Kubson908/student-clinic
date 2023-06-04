@@ -3,6 +3,7 @@ import { authorized, snackbar, specializations } from "@/main";
 import { ref, onBeforeMount } from "vue";
 
 const awaiting = ref<Array<any>>([]);
+let loaded = false;
 onBeforeMount(async () => {
   try {
     const res = await authorized.get("/appointment/awaiting-appointments");
@@ -12,10 +13,10 @@ onBeforeMount(async () => {
     snackbar.error = true;
     snackbar.text = "Błąd pobierania danych";
     snackbar.showing = true;
+  } finally {
+    //snackbar.showing = true;
+    loaded = true;
   }
-  // finally {
-  //   //snackbar.showing = true;
-  // }
 });
 </script>
 <template>
@@ -41,11 +42,13 @@ onBeforeMount(async () => {
             <tbody>
               <tr v-for="visit in awaiting" :key="visit.id">
                 <td>
-                  {{ new Date(visit.date).toLocaleDateString() }}
+                  {{ new Date(visit.date).toLocaleDateString("pl-PL") }}
                 </td>
                 <td>
                   {{
-                    new Date(visit.date).toLocaleTimeString().substring(0, 5)
+                    new Date(visit.date)
+                      .toLocaleTimeString("pl-PL")
+                      .substring(0, 5)
                   }}
                 </td>
                 <td>
@@ -62,7 +65,7 @@ onBeforeMount(async () => {
                     v-slot="{ navigate }"
                   >
                     <v-btn
-                      class="mt-2 mx-2 button "
+                      class="mt-2 mx-2 button"
                       color="blue-darken-2"
                       size="small"
                       :value="'/staff/appointments/' + visit.id + '/assign'"
@@ -88,6 +91,17 @@ onBeforeMount(async () => {
                       Szczegóły
                     </v-btn>
                   </router-link>
+                </td>
+              </tr>
+              <tr v-if="awaiting.length === 0">
+                <td colspan="5">
+                  <v-row no-gutters>
+                    <v-col
+                      align-self="center"
+                      class="text-grey text-center pa-4"
+                      >{{ loaded ? "Brak wizyt do przypisania" : "Wczytywanie" }}</v-col
+                    ></v-row
+                  >
                 </td>
               </tr>
             </tbody>

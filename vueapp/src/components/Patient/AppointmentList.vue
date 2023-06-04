@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authorized, specializations, router } from "@/main";
+import { authorized, specializations, router, snackbar } from "@/main";
 import { onBeforeMount, reactive, computed } from "vue";
 import { Appointments } from "../../typings";
 
@@ -7,8 +7,15 @@ let test = reactive<Appointments>({
   appointments: [],
 });
 onBeforeMount(async () => {
-  const res = await authorized.get("/Appointment/patient");
-  test.appointments = res.data.appointments[0];
+  try {
+    const res = await authorized.get("/Appointment/patient");
+    test.appointments = res.data.appointments[0];
+  } catch (error: any) {
+    console.log(error);
+    snackbar.error = true;
+    snackbar.text = "Błąd pobierania danych";
+    snackbar.showing = true;
+  }
 });
 let getDateFromString = (string: any) => {
   let date = new Date(string);
@@ -42,6 +49,12 @@ const sortedByDate = computed(() => {
         </v-card-item>
         <div class="card">
           <v-list class="d-flex flex-column justify-center align-center">
+            <v-row no-gutters v-if="test.appointments.length === 0">
+              <v-col class="text-gray">
+                Brak wizyt
+              </v-col>
+
+            </v-row>
             <v-list-item
               elevation="3"
               class="rounded-lg my-2"
@@ -145,6 +158,4 @@ const sortedByDate = computed(() => {
   position: absolute;
   bottom: 0;
 }
-
-
 </style>

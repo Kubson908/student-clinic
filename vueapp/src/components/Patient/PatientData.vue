@@ -25,16 +25,23 @@ const birthDate = ref<string>("");
 const form = ref<typeof VForm | null>(null);
 
 onBeforeMount(async () => {
-  const res = await authorized.get(`/Patient/patient-card`);
-  const data = res.data;
-  name.value = data.firstName;
-  lastName.value = data.lastName;
-  pesel.value = data.pesel;
-  email.value = data.email;
-  phone.value = data.phoneNumber;
-  birthDate.value = data.dateOfBirth;
-  allergies.value = data.allergies;
-  meds.value = data.medicines;
+  try {
+    const res = await authorized.get(`/Patient/patient-card`);
+    const data = res.data;
+    name.value = data.firstName;
+    lastName.value = data.lastName;
+    pesel.value = data.pesel;
+    email.value = data.email;
+    phone.value = data.phoneNumber;
+    birthDate.value = data.dateOfBirth;
+    allergies.value = data.allergies;
+    meds.value = data.medicines;
+  } catch (error: any) {
+    console.log(error);
+    snackbar.error = true;
+    snackbar.text = "Błąd pobierania danych";
+    snackbar.showing = true;
+  }
 });
 
 const update = async () => {
@@ -88,8 +95,8 @@ const submit = async (data: SubmitEvent) => {
     <v-card-text>
       <v-form @submit.prevent="submit" ref="form">
         <div class="cont">
-          <v-row>
-            <v-col class="py-1">
+          <v-row no-gutters>
+            <v-col class="py-1 px-2">
               <v-text-field
                 type="input"
                 v-model="name"
@@ -102,7 +109,7 @@ const submit = async (data: SubmitEvent) => {
               >
               </v-text-field>
             </v-col>
-            <v-col class="py-1">
+            <v-col class="py-1 px-2">
               <v-text-field
                 type="input"
                 v-model="lastName"
@@ -116,8 +123,8 @@ const submit = async (data: SubmitEvent) => {
               </v-text-field>
             </v-col>
           </v-row>
-          <v-row>
-            <v-col class="py-1">
+          <v-row no-gutters>
+            <v-col class="py-1 px-2">
               <v-text-field
                 type="date"
                 label="Data urodzenia"
@@ -130,7 +137,7 @@ const submit = async (data: SubmitEvent) => {
               >
               </v-text-field>
             </v-col>
-            <v-col class="py-1">
+            <v-col class="py-1 px-2">
               <v-text-field
                 type="input"
                 label="Pesel"
@@ -144,8 +151,8 @@ const submit = async (data: SubmitEvent) => {
               </v-text-field>
             </v-col>
           </v-row>
-          <v-row>
-            <v-col class="py-1">
+          <v-row no-gutters>
+            <v-col class="py-1 px-2">
               <v-text-field
                 type="email"
                 label="Email"
@@ -158,7 +165,7 @@ const submit = async (data: SubmitEvent) => {
               >
               </v-text-field>
             </v-col>
-            <v-col class="py-1">
+            <v-col class="py-1 px-2">
               <v-text-field
                 type="input"
                 label="Nr telefonu"
@@ -171,29 +178,31 @@ const submit = async (data: SubmitEvent) => {
               </v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row no-gutters>
             <v-textarea
-              variant="filled"
+              variant="solo"
               auto-grow
               label="Przyjmowane leki"
               v-model="meds"
               rows="2"
               row-height="20"
+              class="px-2"
             ></v-textarea>
           </v-row>
-          <v-row>
+          <v-row no-gutters>
             <v-textarea
-              variant="filled"
+              variant="solo"
               auto-grow
               label="Alergie"
               v-model="allergies"
               rows="2"
               row-height="20"
+              class="px-2"
             ></v-textarea>
           </v-row>
         </div>
-        <v-row justify="start">
-          <v-col align-self="center" class="text-left">
+        <v-row justify="start" no-gutters>
+          <v-col align-self="center" class="text-left px-2">
             <v-btn
               variant="outlined"
               size="large"
@@ -204,7 +213,7 @@ const submit = async (data: SubmitEvent) => {
               Wstecz
             </v-btn>
           </v-col>
-          <v-col>
+          <v-col class="d-flex justify-end px-2">
             <v-btn
               size="large"
               class="mt-2 button"
@@ -215,25 +224,23 @@ const submit = async (data: SubmitEvent) => {
             </v-btn>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col>
-            <router-link
-              to="/patient/change-password"
-              custom
-              v-slot="{ navigate }"
+        <v-row class="d-flex justify-end" no-gutters>
+          <router-link
+            to="/patient/change-password"
+            custom
+            v-slot="{ navigate }"
+          >
+            <v-btn
+              variant="text"
+              align-self="center"
+              size="small"
+              class="mt-2 button px-4"
+              value="/patient/change-password"
+              @click="navigate"
             >
-              <v-btn
-                variant="text"
-                align-self="center"
-                size="small"
-                class="mt-2 button"
-                value="/patient/change-password"
-                @click="navigate"
-              >
-                Zmień hasło
-              </v-btn>
-            </router-link>
-          </v-col>
+              Zmień hasło
+            </v-btn>
+          </router-link>
         </v-row>
       </v-form>
     </v-card-text>

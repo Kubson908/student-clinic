@@ -43,9 +43,9 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-row no-gutters
-    ><v-col cols="12" class="d-flex justify-center">
-      <v-card width="888px" elevation="5" class="rounded-lg px-8">
+  <v-row no-gutters>
+    <v-col cols="12" class="my-auto">
+      <v-card width="888px" elevation="5" class="rounded-lg px-8 ma-auto">
         <v-card-item>
           <v-container class="d-flex justify-center align-center">
             <v-card
@@ -61,7 +61,7 @@ onBeforeMount(async () => {
               ></v-icon>
             </v-card>
           </v-container>
-          <v-card-title font-size="56">Dane pacjenta</v-card-title>
+          <v-card-title font-size="56">Karta Pacjenta</v-card-title>
         </v-card-item>
         <v-spacer></v-spacer>
         <v-card-text>
@@ -113,8 +113,13 @@ onBeforeMount(async () => {
                 <p class="font-weight-bold">Lista Leków</p>
               </v-row>
               <v-row><v-divider></v-divider></v-row>
-
               <v-row>
+                <v-col
+                  v-if="medicines == null"
+                  class="text-blue-darken-1 font-weight-bold text-left"
+                >
+                  Brak leków
+                </v-col>
                 <v-col class="font-weight-bold text-blue-darken-1 text-left">
                   {{ medicines }}
                 </v-col>
@@ -126,6 +131,14 @@ onBeforeMount(async () => {
               </v-row>
               <v-row><v-divider></v-divider></v-row>
               <div class="scrollable mt-3">
+                <v-row no-gutters>
+                  <v-col
+                    class="text-blue-darken-1 font-weight-bold text-left pt-2"
+                    v-if="treatmentHistory.length === 0"
+                  >
+                    Brak Historii
+                  </v-col>
+                </v-row>
                 <v-row
                   no-gutters
                   class="history my-4"
@@ -144,9 +157,9 @@ onBeforeMount(async () => {
                   </v-col>
                   <v-col class="text-left d-flex align-center" cols="4">
                     {{
-                      ("0" + new Date(appointment.date).toLocaleString()).slice(
-                        -20
-                      )
+                      (
+                        "0" + new Date(appointment.date).toLocaleString("pl-PL")
+                      ).slice(-20)
                     }}
                   </v-col>
                   <v-col class="text-left d-flex align-center" cols="4">

@@ -223,7 +223,6 @@ namespace Przychodnia.Webapi.Websocket
             dynamic temp = JsonConvert.DeserializeObject(data) ?? "";
             string patientId = (string)temp.patientId;
             string doctorId = (string)temp.doctorId;
-            Console.WriteLine(patientId + " | " + doctorId);
             foreach (var item in connections.Where(c => c.UserId == patientId || c.UserId == doctorId))
             {
                 if (item.Connection != null && item.Connection.State != WebSocketState.Open ||

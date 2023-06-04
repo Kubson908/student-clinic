@@ -4,7 +4,7 @@ import { computed, onBeforeMount } from "vue";
 import { authorized, user, router, snackbar } from "@/main";
 const search = ref<string>("");
 const patients = ref<any>(null);
-const loading = ref<boolean>(false);
+const loading = ref<boolean>(true);
 onBeforeMount(async () => {
   try {
     const card = await authorized.get("/patient/");
@@ -64,7 +64,19 @@ const filteredPatients = computed(() => {
         </v-card-item>
         <v-card-text>
           <v-divider></v-divider>
-          <v-virtual-scroll :items="filteredPatients" height="50vh">
+          <v-row
+            no-gutters
+            v-if="filteredPatients.length === 0"
+            class="justify-center temporary-height"
+          >
+            <v-col class="ma-4 text-grey">
+              {{ loading ? "Ładowanie" : "Brak pacjentów" }}
+            </v-col>
+          </v-row>
+          <v-virtual-scroll
+            :items="filteredPatients"
+            :height="filteredPatients.length === 0 ? '40vh' : '50vh'"
+          >
             <template #default="{ item }">
               <v-list-item class="mx-8 my-4 pa-4 rounded-lg" elevation="3">
                 <template #prepend>
@@ -122,9 +134,10 @@ const filteredPatients = computed(() => {
         </v-card-text>
         <v-card-actions>
           <v-btn
+            width="20%"
             variant="outlined"
             color="blue-darken-2"
-            class="mx-8 my-2"
+            class="mt-2 mb-3 button mx-10"
             @click="router.back()"
             >Wstecz</v-btn
           >
@@ -133,4 +146,8 @@ const filteredPatients = computed(() => {
     </v-col>
   </v-row>
 </template>
-<style></style>
+<style>
+.temporary-height {
+  height: 10vh !important;
+}
+</style>

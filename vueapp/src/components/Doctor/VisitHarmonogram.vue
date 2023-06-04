@@ -86,6 +86,14 @@ watch(
   <v-row justify="center" no-gutters>
     <v-col xs="12" sm="6" md="6" align-self="center">
       <v-card elevation="5" class="rounded-lg" height="80vh">
+        <template #loader>
+          <v-progress-linear
+            :active="loading"
+            color="deep-purple"
+            height="4"
+            indeterminate
+          ></v-progress-linear>
+        </template>
         <v-card-item>
           <v-container class="d-flex justify-center align-center">
             <h1>Harmonogram wizyt</h1>
@@ -99,6 +107,7 @@ watch(
                 auto-apply
                 locale="pl-PL"
                 :disabled="loading"
+                :disabled-week-days="[0]"
               >
                 <template #trigger>
                   <v-text-field
@@ -110,7 +119,7 @@ watch(
                     label="Miesiąc i rok"
                     :disabled="loading"
                     :model-value="
-                      date ? `${date.toLocaleDateString()}` : 'Brak'
+                      date ? `${date.toLocaleDateString('pl-PL')}` : 'Brak'
                     "
                   ></v-text-field></template
               ></Datepicker>
@@ -148,7 +157,17 @@ watch(
                       <v-btn
                         color="blue-darken-2"
                         class="mt-2 mx-2 button"
-                        :disabled="appointment.finished"
+                        :disabled="
+                          appointment.finished ||
+                          !(
+                            new Date(appointment.date).getDate() ===
+                              new Date().getDate() &&
+                            new Date(appointment.date).getMonth() ===
+                              new Date().getMonth() &&
+                            new Date(appointment.date).getFullYear() ===
+                              new Date().getFullYear()
+                          ) 
+                        "
                         @click="navigate"
                         >Rozpocznij</v-btn
                       >

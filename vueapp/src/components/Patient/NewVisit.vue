@@ -20,7 +20,7 @@ const getSpecialization = () => {
 const getData = () => {
   return {
     symptoms: symptoms.value.symptoms,
-    date: `${("0" + new Date(date.value.date).toLocaleDateString()).slice(
+    date: `${("0" + new Date(date.value.date).toLocaleDateString("pl-PL")).slice(
       -10
     )}`,
     hour: date.value.select,
@@ -44,7 +44,7 @@ const submit = async () => {
     });
     if (response.status === 201) {
       snackbar.error = false;
-      snackbar.text = "Pomyślnie zarezerowano wizytę";
+      snackbar.text = "Pomyślnie wysłano wstępną rezerwację wizyty, oczekuj e-maila potwierdzającego w najbliższym czasie";
       router.push("/patient/appointments");
     }
   } catch (e: any) {
@@ -55,6 +55,8 @@ const submit = async () => {
         ? "Nie można zarezerwować wizyty - termin zajęty"
         : e.response && e.response.status === 409
         ? "Zarezerwowałeś już wizytę w tym terminie"
+        : e.response && e.response.status === 403
+        ? "Nie możesz zarezerwować więcej niż jednej wizyty będąc niezweryfikowanym"
         : "Wystąpił nieznany błąd";
   } finally {
     waiting.value = false;
@@ -64,11 +66,11 @@ const submit = async () => {
 </script>
 
 <template>
+  <v-row no-gutters class="ma-auto"><v-col class="ma-auto">
   <v-card
     width="560px"
-    location="center"
     elevation="5"
-    class="rounded-lg mt-10"
+    class="rounded-lg ma-4"
   >
     <template #loader>
       <v-progress-linear
@@ -94,11 +96,12 @@ const submit = async () => {
         <NewVisitSummary
           @page="(arg) => (page += arg)"
           :data="getData()"
-          @submit="submit"
+          @submit="submit()"
         />
       </v-window-item>
     </v-window>
   </v-card>
+</v-col></v-row>
 </template>
 
 <style>

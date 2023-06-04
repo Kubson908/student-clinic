@@ -1,4 +1,4 @@
-<script setup lang="ts">
+Truskawa nie śpij<script setup lang="ts">
 import { router, snackbar, authorized, specializations } from "@/main";
 import { onBeforeMount, ref } from "vue";
 import { notNull } from "@/validation";
@@ -115,7 +115,7 @@ const assign = async () => {
                 appointment_data
                   ? `${new Date(
                       appointment_data.date
-                    ).toLocaleDateString()}, ${new Date(
+                    ).toLocaleDateString("pl-PL")}, ${new Date(
                       appointment_data.date
                     ).getHours()}:${(
                       "0" + new Date(appointment_data.date).getMinutes()

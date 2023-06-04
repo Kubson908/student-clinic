@@ -69,14 +69,14 @@ export const router = VueRouter.createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
+router.beforeEach((to, from) => {
   if (
     to.meta.roles != null &&
     !to.meta.roles.some((e) => user.roles.includes(e))
   ) {
     return {
-      path: "/unauthorized",
-      query: { redirect: to.fullPath },
+      path: "/",
+      query: { redirect: from.fullPath },
     };
   }
 });

@@ -106,13 +106,13 @@ defineExpose({
               {{
                 loading
                   ? "Wczytywanie..."
-                  : new Date(appointmentDate as string).toLocaleDateString()
+                  : new Date(appointmentDate as string).toLocaleDateString("pl-PL")
               }},
               {{
                 loading
                   ? ""
                   : new Date(appointmentDate as string)
-                      .toLocaleTimeString()
+                      .toLocaleTimeString("pl-PL")
                       .substring(0, 5)
               }}
             </v-col>
