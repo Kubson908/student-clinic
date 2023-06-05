@@ -72,7 +72,7 @@ namespace Przychodnia.Webapi.Controllers
         {
             var slots_week = 16;
             var slots_saturday = 10;
-            var employees_count = _db.Employees.Select(x => x.Specialization == (Specialization)specialization).ToList().Count;
+            var employees_count = _db.Employees.Where(x => x.Specialization == (Specialization)specialization).Select(x => x.Specialization).ToList().Count;
             var appointments_month = (await _db.Appointments
                 .Where(a => a.Date.Year == year && a.Date.Month == month && a.Specialization == (Specialization)specialization)
                 .Select(a => new { a.Specialization, a.Date }).GroupBy(a => a.Date)
@@ -89,7 +89,7 @@ namespace Przychodnia.Webapi.Controllers
         {
             DateTime date = DateTime.Parse(receivedDate);
             //if (date == null || specialization == null) return BadRequest("Object is null");
-            var employees_count = _db.Employees.Select(x => x.Specialization == (Specialization)specialization).ToList().Count;
+            var employees_count = _db.Employees.Where(x => x.Specialization == (Specialization)specialization).Select(x => x.Specialization).ToList().Count;
             var hours = (await _db.Appointments
                 .Where(a => a.Date.Date.CompareTo(date) == 0 && a.Specialization == (Specialization)specialization)
                 .Select(a => new { a.Date.TimeOfDay }).GroupBy(a => a.TimeOfDay)

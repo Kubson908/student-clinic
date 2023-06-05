@@ -50,13 +50,14 @@ const getUnavailableHours = async () => {
       }/specialization/${props.specialization}`
     );
     unavailable_hours.value = res.data;
+    console.log(res.data)
   } catch (e) {
     console.log(e);
     snackbar.error = true;
     snackbar.text = "Wystąpił błąd przy wczytywaniu dostępnych godzin";
     snackbar.showing = true;
   } finally {
-      // if selected date is today
+    // if selected date is today
     if (
       date.value.getTime() - Date.now() < 86400000 &&
       date.value.getDate() === new Date().getDate()
@@ -240,4 +241,3 @@ watch(current_month, (newMonth, oldMonth) => {
   height: 48px;
 }
 </style>
-
