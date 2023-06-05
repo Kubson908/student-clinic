@@ -6,7 +6,7 @@ import {
   nameRules,
   surnameRules,
   dateRules,
-  peselRules,
+  getPeselRules,
   emailRules,
   phoneRules,
 } from "@/validation";
@@ -151,7 +151,7 @@ const submitData = async () => {
                     label="Pesel"
                     v-model="pesel"
                     variant="solo"
-                    :rules="peselRules"
+                    :rules="getPeselRules(new Date(birthDate))"
                     color="blue-darken-2"
                     required
                   >

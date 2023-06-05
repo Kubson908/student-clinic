@@ -2,7 +2,6 @@
 import { onBeforeMount, watch } from "vue";
 import NavBar from "./components/NavBar.vue";
 import { user, snackbar } from "./main";
-import { connect } from "./socket";
 // import FooterBar from "./components/FooterBar.vue";
 let timeout: any = null;
 
@@ -14,7 +13,6 @@ onBeforeMount(() => {
     user.isLoggedIn = false;
     user.roles = [];
   }
-  if (user.isLoggedIn) connect();
 });
 watch(
   () => snackbar.showing,
@@ -45,7 +43,7 @@ watch(
       location="top"
       class="mt-16"
       v-model="snackbar.showing"
-      timeout="3000"
+      timeout="5000"
       :color="snackbar.error ? 'error' : 'success'"
     >
       {{ snackbar.text }}

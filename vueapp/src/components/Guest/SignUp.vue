@@ -6,7 +6,7 @@ import {
   dateRules,
   nameRules,
   surnameRules,
-  peselRules,
+  getPeselRules,
   phoneRules,
   passwordRules,
   emailRules,
@@ -146,7 +146,7 @@ const repeatPasswordRules = [
                         label="Pesel"
                         v-model="pesel"
                         variant="solo"
-                        :rules="peselRules"
+                        :rules="getPeselRules(new Date(birth_date))"
                         color="blue-darken-2"
                         required
                       >

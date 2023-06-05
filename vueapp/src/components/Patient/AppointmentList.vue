@@ -28,7 +28,8 @@ const disable = (dateString: string) => {
   let pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   let date = new Date(dateString.replace(pattern, "$3-$2-$1"));
   let today = new Date();
-  if (today > date) return true;
+  let nextDay = new Date(today.getTime() + 86400000);
+  if (nextDay > date) return true;
   return false;
 };
 const sortedByDate = computed(() => {

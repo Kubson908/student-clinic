@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { user, router } from "../main";
-import { socket } from "@/socket";
 const logout = () => {
   localStorage.clear();
   user.name = "Niezalogowany";
   user.isLoggedIn = false;
   user.roles = [];
   router.push("/");
-  socket.value?.close();
   // console.log(user.roles);
 };
 const checkRole = (role: string) => {

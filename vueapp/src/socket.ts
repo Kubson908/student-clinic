@@ -1,18 +1,15 @@
-import { ref } from "vue";
-// import { websocket } from "./config";
+import { websocket } from "./config";
 
-const socket = ref<WebSocket>();
-
-const connect = () => {
-  console.log("test");
-  // socket.value = new WebSocket(websocket);
-  socket.value?.addEventListener("open", (event) => {
-    socket.value?.send(localStorage.getItem("token") as string);
+const getSocket = (message_ref: any) => {
+  const socket = new WebSocket(websocket);
+  socket.addEventListener("open", () => {
+    socket.send(localStorage.getItem("token") as string);
   });
 
-  socket.value?.addEventListener("message", (event) => {
-    console.log(event.data);
+  socket.addEventListener("message", (event) => {
+    message_ref.value = event;
   });
+  return socket;
 };
 
-export { socket, connect };
+export { getSocket };

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import Datepicker from "@vuepic/vue-datepicker";
 import { ref } from "vue";
-import { watch } from "vue";
-import { authorized, router, snackbar } from "@/main";
+import { watch, onBeforeMount, onBeforeUnmount, computed } from "vue";
+import { authorized, router, snackbar, user } from "@/main";
+import { getSocket } from "@/socket";
 
 const date = ref(new Date());
 
@@ -15,6 +16,8 @@ interface IApppointment {
 
 const appointments = ref<IApppointment[]>([]);
 const loading = ref<boolean>(true);
+const socket = ref<WebSocket | null>(null);
+const message = ref<any>(null);
 
 const fetchData = async () => {
   const id = router.currentRoute.value.params["id"] ?? null;
@@ -57,6 +60,12 @@ const fetchData = async () => {
   }
 };
 
+const sorted = computed(() => {
+  return Array.from(appointments.value).sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+});
+
 const format = (date: Date) => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
@@ -73,6 +82,26 @@ const formatTime = (date: Date) => {
   return `${hours}:${minutes}`;
 };
 
+onBeforeMount(async () => {
+  try {
+    if (user.isLoggedIn) socket.value = getSocket(message);
+  } catch (e) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = "Błąd pobierania danych";
+    snackbar.showing = true;
+  }
+});
+
+onBeforeUnmount(() => {
+  try {
+    socket.value?.close();
+    socket.value = null;
+  } catch (e: any) {
+    console.log(e);
+  }
+});
+
 watch(
   date,
   () => {
@@ -80,6 +109,43 @@ watch(
   },
   { immediate: true }
 );
+
+watch(message, (newMessage) => {
+  const parsed = JSON.parse(newMessage.data);
+  if (parsed["EventName"] === "assignedAppointment") {
+    try {
+      const a_date = new Date(parsed.Data.date.slice(0, -4));
+      if (
+        !(
+          a_date.getDate() === date.value.getDate() &&
+          a_date.getMonth() === date.value.getMonth() &&
+          a_date.getFullYear() === date.value.getFullYear()
+        )
+      )
+        return;
+      parsed.Data.date = parsed.Data.date.slice(0, -4);
+      parsed.Data.patient = `${parsed.Data.patient.firstName} ${parsed.Data.patient.lastName}`;
+      appointments.value.push(parsed.Data);
+      snackbar.error = false;
+      snackbar.text = `Przypisano nową wizytę [ID: ${parsed.Data.id}]`;
+      snackbar.showing = true;
+    } catch (error) {
+      console.log(error);
+      window.location.reload();
+    }
+  } else if (parsed["EventName"] === "deletedAppointment") {
+    try {
+      appointments.value = appointments.value.filter(
+        (appointment: any) => appointment.id !== parsed.Data.id
+      );
+      snackbar.error = true;
+      snackbar.text = `Wizyta o ID ${parsed.Data.id} została anulowana.`;
+      snackbar.showing = true;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
 </script>
 
 <template>
@@ -132,64 +198,68 @@ watch(
             <v-row no-gutters v-if="appointments.length === 0">
               <v-col class="text-grey"> Brak wizyt w tym dniu </v-col>
             </v-row>
-            <v-list-item
-              elevation="3"
-              class="rounded-lg my-2"
-              v-for="appointment in appointments"
-              :key="appointment.id"
-              width="90%"
-            >
-              <v-row>
-                <v-col xs="2" md="4">
-                  <v-container class="d-flex flex-column left">
-                    {{ formatTime(new Date(appointment.date)) }}
-                    {{ appointment.patient }}
-                    {{ format(new Date(appointment.date)) }}
-                  </v-container>
-                </v-col>
-                <v-col xs="10" md="8">
-                  <v-container class="right">
-                    <router-link
-                      :to="'/doctor/appointment/' + appointment.id + '/finish'"
-                      custom
-                      v-slot="{ navigate }"
-                    >
-                      <v-btn
-                        color="blue-darken-2"
-                        class="mt-2 mx-2 button"
-                        :disabled="
-                          appointment.finished ||
-                          !(
-                            new Date(appointment.date).getDate() ===
-                              new Date().getDate() &&
-                            new Date(appointment.date).getMonth() ===
-                              new Date().getMonth() &&
-                            new Date(appointment.date).getFullYear() ===
-                              new Date().getFullYear()
-                          )
+            <TransitionGroup name="list">
+              <v-list-item
+                elevation="3"
+                class="rounded-lg my-2"
+                v-for="appointment in sorted"
+                :key="appointment.id"
+                width="90%"
+              >
+                <v-row>
+                  <v-col xs="2" md="4">
+                    <v-container class="d-flex flex-column left">
+                      {{ formatTime(new Date(appointment.date)) }}
+                      {{ appointment.patient }}
+                      {{ format(new Date(appointment.date)) }}
+                    </v-container>
+                  </v-col>
+                  <v-col xs="10" md="8">
+                    <v-container class="right">
+                      <router-link
+                        :to="
+                          '/doctor/appointment/' + appointment.id + '/finish'
                         "
-                        @click="navigate"
-                        >Rozpocznij</v-btn
+                        custom
+                        v-slot="{ navigate }"
                       >
-                    </router-link>
-                    <router-link
-                      :to="'/doctor/appointment/' + appointment.id"
-                      custom
-                      v-slot="{ navigate }"
-                    >
-                      <v-btn
-                        color="blue-darken-2"
-                        class="mt-2 mx-2 button"
-                        variant="text"
-                        @click="navigate"
+                        <v-btn
+                          color="blue-darken-2"
+                          class="mt-2 mx-2 button"
+                          :disabled="
+                            appointment.finished ||
+                            !(
+                              new Date(appointment.date).getDate() ===
+                                new Date().getDate() &&
+                              new Date(appointment.date).getMonth() ===
+                                new Date().getMonth() &&
+                              new Date(appointment.date).getFullYear() ===
+                                new Date().getFullYear()
+                            )
+                          "
+                          @click="navigate"
+                          >Rozpocznij</v-btn
+                        >
+                      </router-link>
+                      <router-link
+                        :to="'/doctor/appointment/' + appointment.id"
+                        custom
+                        v-slot="{ navigate }"
                       >
-                        <u>Szczegóły</u>
-                      </v-btn>
-                    </router-link>
-                  </v-container>
-                </v-col>
-              </v-row>
-            </v-list-item>
+                        <v-btn
+                          color="blue-darken-2"
+                          class="mt-2 mx-2 button"
+                          variant="text"
+                          @click="navigate"
+                        >
+                          <u>Szczegóły</u>
+                        </v-btn>
+                      </router-link>
+                    </v-container>
+                  </v-col>
+                </v-row>
+              </v-list-item>
+            </TransitionGroup>
           </v-list>
         </div>
         <v-divider class="mx-4"></v-divider>

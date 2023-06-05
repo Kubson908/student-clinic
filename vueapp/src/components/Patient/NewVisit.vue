@@ -20,9 +20,9 @@ const getSpecialization = () => {
 const getData = () => {
   return {
     symptoms: symptoms.value.symptoms,
-    date: `${("0" + new Date(date.value.date).toLocaleDateString("pl-PL")).slice(
-      -10
-    )}`,
+    date: `${(
+      "0" + new Date(date.value.date).toLocaleDateString("pl-PL")
+    ).slice(-10)}`,
     hour: date.value.select,
     specialization: getSpecialization(),
     medicine: symptoms.value.medicine,
@@ -36,7 +36,7 @@ const submit = async () => {
   }:${data.hour.split(":")[1]}:00.000Z`;
   try {
     waiting.value = true;
-    const response = await authorized.post("/Appointment/create", {
+    const response = await authorized.post("/appointment/create", {
       date: datestring,
       specialization: symptoms.value.specialization,
       symptoms: data.symptoms,
@@ -44,7 +44,8 @@ const submit = async () => {
     });
     if (response.status === 201) {
       snackbar.error = false;
-      snackbar.text = "Pomyślnie wysłano wstępną rezerwację wizyty, oczekuj e-maila potwierdzającego w najbliższym czasie";
+      snackbar.text =
+        "Pomyślnie wysłano wstępną rezerwację wizyty, oczekuj e-maila potwierdzającego w najbliższym czasie";
       router.push("/patient/appointments");
     }
   } catch (e: any) {
@@ -66,42 +67,39 @@ const submit = async () => {
 </script>
 
 <template>
-  <v-row no-gutters class="ma-auto"><v-col class="ma-auto">
-  <v-card
-    width="560px"
-    elevation="5"
-    class="rounded-lg ma-4"
-  >
-    <template #loader>
-      <v-progress-linear
-        :active="waiting"
-        color="deep-purple"
-        height="4"
-        indeterminate
-      ></v-progress-linear>
-    </template>
-    <v-window v-model="page" direction="vertical" reverse :touch="false">
-      <v-window-item :value="1">
-        <NewVisitSymptoms @page="(arg) => (page += arg)" ref="symptoms" />
-      </v-window-item>
+  <v-row no-gutters class="ma-auto"
+    ><v-col class="ma-auto">
+      <v-card width="560px" elevation="5" class="rounded-lg ma-4">
+        <template #loader>
+          <v-progress-linear
+            :active="waiting"
+            color="deep-purple"
+            height="4"
+            indeterminate
+          ></v-progress-linear>
+        </template>
+        <v-window v-model="page" direction="vertical" reverse :touch="false">
+          <v-window-item :value="1">
+            <NewVisitSymptoms @page="(arg) => (page += arg)" ref="symptoms" />
+          </v-window-item>
 
-      <v-window-item :value="2">
-        <NewVisitDate
-          @page="(arg) => (page += arg)"
-          ref="date"
-          :specialization="symptoms.specialization"
-        />
-      </v-window-item>
-      <v-window-item :value="3">
-        <NewVisitSummary
-          @page="(arg) => (page += arg)"
-          :data="getData()"
-          @submit="submit()"
-        />
-      </v-window-item>
-    </v-window>
-  </v-card>
-</v-col></v-row>
+          <v-window-item :value="2">
+            <NewVisitDate
+              @page="(arg) => (page += arg)"
+              ref="date"
+              :specialization="symptoms.specialization"
+            />
+          </v-window-item>
+          <v-window-item :value="3">
+            <NewVisitSummary
+              @page="(arg) => (page += arg)"
+              :data="getData()"
+              @submit="submit()"
+            />
+          </v-window-item>
+        </v-window>
+      </v-card> </v-col
+  ></v-row>
 </template>
 
 <style>

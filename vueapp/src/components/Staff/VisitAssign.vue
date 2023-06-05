@@ -1,4 +1,5 @@
-Truskawa nie śpij<script setup lang="ts">
+Truskawa nie śpij
+<script setup lang="ts">
 import { router, snackbar, authorized, specializations } from "@/main";
 import { onBeforeMount, ref } from "vue";
 import { notNull } from "@/validation";
@@ -39,6 +40,7 @@ const getAvailableDoctors = async () => {
       },
     });
     available_doctors.value = res.data;
+    if (available_doctors.value.length === 1) selected_doctor.value = available_doctors.value[0].id;
   } catch (e: any) {
     console.log(e);
     snackbar.error = true;
@@ -48,9 +50,11 @@ const getAvailableDoctors = async () => {
   }
 };
 const assign = async () => {
-  form.value.valida
+  form.value.valida;
   try {
     loading.value = true;
+    if (available_doctors.value.length == 1)
+      selected_doctor.value = available_doctors.value[0].id;
     await authorized.patch(
       "appointment/assign-appointment/" + appointment_data.value.id,
       {
@@ -113,11 +117,9 @@ const assign = async () => {
             <v-col class="text-left">
               {{
                 appointment_data
-                  ? `${new Date(
-                      appointment_data.date
-                    ).toLocaleDateString("pl-PL")}, ${new Date(
-                      appointment_data.date
-                    ).getHours()}:${(
+                  ? `${new Date(appointment_data.date).toLocaleDateString(
+                      "pl-PL"
+                    )}, ${new Date(appointment_data.date).getHours()}:${(
                       "0" + new Date(appointment_data.date).getMinutes()
                     ).slice(-2)}`
                   : "Wczytywanie..."
@@ -207,6 +209,7 @@ const assign = async () => {
                   variant="solo"
                   item-value="id"
                   :rules="notNull"
+                  :disabled="available_doctors.length <= 1"
                   :item-title="(item) => item.firstName + ' ' + item.lastName"
                   v-model="selected_doctor"
                 >

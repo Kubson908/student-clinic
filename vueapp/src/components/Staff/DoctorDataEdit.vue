@@ -9,7 +9,7 @@ import {
   emailRules,
   phoneRules,
   dateRules,
-  peselRules,
+  getPeselRules,
   notNull,
 } from "@/validation";
 
@@ -190,7 +190,7 @@ const reloadImage = () => {
                     label="Pesel"
                     v-model="pesel"
                     variant="solo"
-                    :rules="peselRules"
+                    :rules="getPeselRules(new Date(birthDate))"
                     color="blue-darken-2"
                     required
                   >

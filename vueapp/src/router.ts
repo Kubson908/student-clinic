@@ -150,6 +150,11 @@ export const routes: Array<Route> = [
         meta: { roles: ["Staff"] },
       },
       {
+        path: "appointments/:id/cancel", // doctor - Szczegóły wizyty - z harmonogramu / doctor - Szczegóły wizyty (recipe)
+        component: PatientCancelVisit,
+        meta: { roles: ["Staff"] },
+      },
+      {
         path: "appointments/:id/assign", // recepcja - Przydziel wizytę(visitassign)
         component: VisitAssign,
         meta: { roles: ["Staff"] },

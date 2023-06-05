@@ -227,18 +227,38 @@ namespace Przychodnia.Webapi.Controllers
             return StatusCode(201, new { message = "Appointment created", data = appointment });
         }
 
+        [Authorize(Roles="Patient, Staff")]
         [HttpDelete("cancel-appointment/{id}")]
         public async Task<IActionResult> CancelAppointment([FromRoute] int id)
         {
             var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && a.PatientId == userId && !a.Finished);
-            if (appointment != null && (appointment.Date - DateTime.Now).TotalHours >= 24)
+            var claims = ((ClaimsIdentity)User.Identity!).Claims;
+            var role = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value.ToString()).ToList();
+            Appointment? appointment;
+            if (role.Contains("Patient")) appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && a.PatientId == userId && !a.Finished);
+            else appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && !a.Finished);
+            if (appointment == null) return NotFound("Appointment not found");
+            if (role.Contains("Staff") && !appointment.Finished)
             {
+                await _db.Appointments.Where(a => a.Id == id).ExecuteDeleteAsync();
+                await _db.SaveChangesAsync();
+                return Ok(new { message = "Appointment cancelled", data = new { id = id, doctorId = appointment.DoctorId } });
+            }
+            if ((appointment.Date - DateTime.Now).TotalHours >= 24 && !appointment.Finished)
+            {
+                var prevAppointment = await _db.Appointments.FirstOrDefaultAsync(a => a.AppointmentId == appointment.Id);
+                if (prevAppointment != null)
+                {
+                    _db.Entry(prevAppointment).Property("AppointmentId").CurrentValue = null;
+                    _db.Entry(prevAppointment).Property("AppointmentId").IsModified = true;
+                    await _db.SaveChangesAsync();
+                }
+                
                 await _db.Appointments.Where(a => a.Id == id && a.PatientId == userId).ExecuteDeleteAsync();
                 await _db.SaveChangesAsync();
-                return Ok(new { message = "Appointment cancelled", data = new { id = id } });
+                return Ok(new { message = "Appointment cancelled", data = new { id = id, doctorId = appointment.DoctorId } });
             } else if (appointment != null && (appointment.Date - DateTime.Now).TotalHours < 24)
-                return Conflict("The visit can be canceled at least 24 hours before the date");
+                return Conflict("Appointment can be canceled at least 24 hours before the date");
             return NotFound("Appointment not found");
         }
 
@@ -454,8 +474,8 @@ namespace Przychodnia.Webapi.Controllers
             if (dto == null) return BadRequest("Object is null");
             string? doctorId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var appointment = await _db.Appointments.FindAsync(id);
-            if (DateOnly.FromDateTime(appointment.Date).CompareTo(DateOnly.FromDateTime(DateTime.Now)) > 0) return Forbid();
             if (appointment == null) return BadRequest("Appointment not found");
+            if (DateOnly.FromDateTime(appointment.Date).CompareTo(DateOnly.FromDateTime(DateTime.Now)) > 0) return Forbid();
             if (appointment.DoctorId != doctorId) return Unauthorized("Cannot finish this appointment");
             foreach (var prop in typeof(Appointment).GetProperties())
             {

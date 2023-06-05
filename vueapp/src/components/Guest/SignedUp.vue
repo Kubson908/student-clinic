@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { unauthorized, snackbar, router, user } from "@/main";
-import { connect } from "@/socket";
 import { ref } from "vue";
 const code = ref<string>("");
 // eslint-disable-next-line
@@ -46,7 +45,6 @@ const verify = async () => {
       user.name = res.data.user;
       user.isLoggedIn = true;
       user.roles = res.data.roles;
-      connect(); // To change
       router.push("/");
     } else router.push("/login");
     snackbar.showing = true;

@@ -4,7 +4,7 @@ import { authorized, router, snackbar } from "@/main";
 import { ref, onBeforeMount } from "vue";
 import {
   dateRules,
-  peselRules,
+  getPeselRules,
   phoneRules,
   surnameRules,
   nameRules,
@@ -118,7 +118,7 @@ const submit = async (data: SubmitEvent) => {
                   type="input"
                   label="Pesel"
                   v-model="pesel"
-                  :rules="peselRules"
+                  :rules="getPeselRules(new Date(birthDate))"
                   variant="solo"
                   color="blue-darken-2"
                   required

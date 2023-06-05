@@ -104,7 +104,7 @@ namespace Przychodnia.Webapi.Controllers
         [HttpGet("available-doctors")]
         public async Task<IActionResult> GetAvailableDoctors([FromQuery] DateTime date, [FromQuery] Specialization specialization)
         {
-            if (date < DateTime.Now || date.Equals(null)) return BadRequest("Model error");
+            if (date.CompareTo(DateTime.Now) < 0 || date.Equals(null)) return BadRequest("Model error");
 
             var doctors = await _db.Employees.Where(e => e.Specialization == specialization 
                 && !e.Appointments.Select(a => a.Date).Contains(date))
