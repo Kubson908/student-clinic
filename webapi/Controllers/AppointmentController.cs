@@ -454,6 +454,7 @@ namespace Przychodnia.Webapi.Controllers
             if (dto == null) return BadRequest("Object is null");
             string? doctorId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var appointment = await _db.Appointments.FindAsync(id);
+            if (DateOnly.FromDateTime(appointment.Date).CompareTo(DateOnly.FromDateTime(DateTime.Now)) > 0) return Forbid();
             if (appointment == null) return BadRequest("Appointment not found");
             if (appointment.DoctorId != doctorId) return Unauthorized("Cannot finish this appointment");
             foreach (var prop in typeof(Appointment).GetProperties())
