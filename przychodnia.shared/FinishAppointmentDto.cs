@@ -12,6 +12,6 @@ namespace Przychodnia.Shared
         public string? Diagnosis { get; set; }
         public string? Recommendations { get; set; }
         public string? Medicines { get; set; }
-        public DateTime? Date { get; set; }
+        public DateTime? ControlDate { get; set; }
     }
 }

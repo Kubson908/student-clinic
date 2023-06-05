@@ -139,7 +139,7 @@ const getAppointmentData = async () => {
                 <v-col class="text-left">
                   {{
                     appointment_data
-                      ? appointment_data.symptoms !== ""
+                      ? appointment_data.symptoms
                         ? appointment_data.symptoms
                         : "Nie podano"
                       : "Wczytywanie..."
@@ -156,7 +156,7 @@ const getAppointmentData = async () => {
                 <v-col class="text-left">
                   {{
                     appointment_data
-                      ? appointment_data.medicines !== ""
+                      ? appointment_data.medicines
                         ? appointment_data.medicines
                         : "Nie podano"
                       : "Wczytywanie..."
@@ -180,7 +180,7 @@ const getAppointmentData = async () => {
                 </v-col>
                 <v-col class="text-left">
                   {{
-                    appointment_data.diagnosis !== ""
+                    appointment_data.diagnosis
                       ? appointment_data.diagnosis
                       : "Nie podano"
                   }}
@@ -195,7 +195,7 @@ const getAppointmentData = async () => {
                 </v-col>
                 <v-col class="text-left">
                   {{
-                    appointment_data.medicines !== ""
+                    appointment_data.medicines
                       ? appointment_data.medicines
                       : "Nie podano"
                   }}
@@ -210,7 +210,7 @@ const getAppointmentData = async () => {
                 </v-col>
                 <v-col class="text-left">
                   {{
-                    appointment_data.recommendations !== ""
+                    appointment_data.recommendations
                       ? appointment_data.recommendations
                       : "Nie podano"
                   }}

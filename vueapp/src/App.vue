@@ -12,6 +12,7 @@ onBeforeMount(() => {
     localStorage.clear();
     user.name = "Niezalogowany";
     user.isLoggedIn = false;
+    user.roles = [];
   }
   if (user.isLoggedIn) connect();
 });

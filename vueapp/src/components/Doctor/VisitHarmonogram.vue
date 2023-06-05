@@ -126,8 +126,8 @@ watch(
             </v-col>
           </v-row>
         </v-card-item>
-        <v-divider> </v-divider>
-        <div class="card">
+        <v-divider class="mx-4"> </v-divider>
+        <div class="card mx-4">
           <v-list class="d-flex flex-column justify-center align-center">
             <v-row no-gutters v-if="appointments.length === 0">
               <v-col class="text-grey"> Brak wizyt w tym dniu </v-col>
@@ -166,7 +166,7 @@ watch(
                               new Date().getMonth() &&
                             new Date(appointment.date).getFullYear() ===
                               new Date().getFullYear()
-                          ) 
+                          )
                         "
                         @click="navigate"
                         >Rozpocznij</v-btn
@@ -192,7 +192,7 @@ watch(
             </v-list-item>
           </v-list>
         </div>
-        <v-divider></v-divider>
+        <v-divider class="mx-4"></v-divider>
         <v-container class="d-flex justify-center align-center bottom">
           <div width="90%" class="space-between">
             <v-btn

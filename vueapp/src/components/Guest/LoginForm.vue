@@ -31,7 +31,7 @@ const send_mail = async () => {
   snackbar.text = "Na podany adres email wysłano link do zmiany hasła";
   snackbar.error = false;
   snackbar.showing = true;
-}; // TODO: do dokończenia
+};
 
 const submit = async (data: SubmitEvent) => {
   await data;
@@ -61,7 +61,7 @@ const submit = async (data: SubmitEvent) => {
       router.push("/");
     } catch (error: any) {
       snackbar.text =
-        error.response && error.response.data == 401
+        error.response && error.response.status == 401
           ? "Błędny e-mail lub hasło"
           : error.response && error.response.status == 403
           ? "Zweryfikuj adres email"
@@ -293,7 +293,10 @@ const passwordRules = [
                     >
                   </v-col>
                   <v-col>
-                    <v-btn @click="router.push('/')" color="blue-darken-2" class="mt-2"
+                    <v-btn
+                      @click="router.push('/')"
+                      color="blue-darken-2"
+                      class="mt-2"
                       >Zakończ</v-btn
                     >
                     <v-row justify="center">

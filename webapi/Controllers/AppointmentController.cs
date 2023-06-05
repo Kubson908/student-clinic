@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
+using NuGet.Protocol;
 using Przychodnia.Shared;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
+using System.Runtime.InteropServices.ComTypes;
 using System.Security.Claims;
 
 namespace Przychodnia.Webapi.Controllers
@@ -84,18 +86,30 @@ namespace Przychodnia.Webapi.Controllers
             return Ok(appointments_month);
         }
 
+        [Authorize(Roles = "Patient, Employee")]
+        [HttpGet("available-hours/{receivedDate}/specialization/{specialization}/{patientId}")]
         [HttpGet("available-hours/{receivedDate}/specialization/{specialization}")]
-        public async Task<IActionResult> GetAvailableHours([FromRoute] string receivedDate, [FromRoute] int specialization)
+        public async Task<IActionResult> GetAvailableHours([FromRoute] string receivedDate, [FromRoute] int specialization, [FromRoute] string? patientId)
         {
             DateTime date = DateTime.Parse(receivedDate);
             //if (date == null || specialization == null) return BadRequest("Object is null");
+            string id;
+            if (HttpContext.User.FindFirstValue(ClaimTypes.Role) == "Employee" && patientId != null)
+                id = patientId;
+            else id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var employees_count = _db.Employees.Where(x => x.Specialization == (Specialization)specialization).Select(x => x.Specialization).ToList().Count;
             var hours = (await _db.Appointments
                 .Where(a => a.Date.Date.CompareTo(date) == 0 && a.Specialization == (Specialization)specialization)
                 .Select(a => new { a.Date.TimeOfDay }).GroupBy(a => a.TimeOfDay)
                 .Select(g => new { key = g.Key, available = g.Count() < employees_count })
                 .Where(g => g.available == false).ToListAsync()).Select(h => h.key);
-            return Ok(hours);
+            var patientHours = (await _db.Appointments
+                .Where(a => a.Date.Date.CompareTo(date) == 0 && a.PatientId == id)
+                .Select(a => new { a.Date.TimeOfDay }).GroupBy(a => a.TimeOfDay)
+                .Select(g => new { key = g.Key, available = g.Count() < 1 })
+                .Where(g => g.available == false).ToListAsync()).Select(h => h.key);
+            var toReturn = hours.Union(patientHours).ToList();
+            return Ok(toReturn);
         }
 
         [HttpGet("doctor/year/{year}/month/{month}")]
@@ -217,7 +231,7 @@ namespace Przychodnia.Webapi.Controllers
         public async Task<IActionResult> CancelAppointment([FromRoute] int id)
         {
             var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && a.PatientId == userId);
+            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && a.PatientId == userId && !a.Finished);
             if (appointment != null && (appointment.Date - DateTime.Now).TotalHours >= 24)
             {
                 await _db.Appointments.Where(a => a.Id == id && a.PatientId == userId).ExecuteDeleteAsync();
@@ -235,7 +249,7 @@ namespace Przychodnia.Webapi.Controllers
             if (id == null) return NotFound("User not found");
 
             var appointments = _db.Patients.Where(p => p.Id == id).Include(p => p.Appointments)
-                .Select(p => p.Appointments.Select(a => new {
+                .Select(p => p.Appointments.Where(a => !a.Finished).Select(a => new {
                     a.Date,
                     a.Id,
                     a.Finished,
@@ -384,8 +398,8 @@ namespace Przychodnia.Webapi.Controllers
             }
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPatch("update/{id}")]
-
         public async Task<IActionResult> UpdateAppointment([FromRoute] int id, [FromBody] UpdateAppointmentDto dto)
         {
             if (dto == null) return BadRequest("Object is null");
@@ -452,9 +466,9 @@ namespace Przychodnia.Webapi.Controllers
                     _db.Entry(appointment).Property(prop.Name).IsModified = true;
                 }
             }
-            if (dto.Date is not null)
+            if (dto.ControlDate is not null)
             {
-                var newDate = DateTime.Parse(dto.Date.ToString() ?? "");
+                var newDate = DateTime.Parse(dto.ControlDate.ToString() ?? "");
                 if (newDate.Minute % 30 != 0 ||
                 (newDate.Hour >= 17 || newDate.Hour < 9
                 || newDate.DayOfWeek.Equals(0) || (newDate.Hour >= 14
@@ -541,7 +555,7 @@ namespace Przychodnia.Webapi.Controllers
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Przychodnia Studencka", mailFrom));
             message.To.Add(new MailboxAddress(email, email));
-            message.Subject = "Podsumowanie wizyty w przychodni";
+            message.Subject = "Potwierdzenie rezerwacji wizyty";
             var body = new BodyBuilder();
             body.HtmlBody = "<h3>Potwierdzenie rezerwacji wizyty</h3>" +
                 "<div style=\"color: black;\"><strong>Data wizyty:</strong> " + date + "</div><br />";

@@ -47,13 +47,11 @@ const sortedByDate = computed(() => {
             <h1>Lista wizyt</h1>
           </v-container>
         </v-card-item>
-        <div class="card">
+        <v-divider class="mx-4"></v-divider>
+        <div class="card mx-4">
           <v-list class="d-flex flex-column justify-center align-center">
             <v-row no-gutters v-if="test.appointments.length === 0">
-              <v-col class="text-gray">
-                Brak wizyt
-              </v-col>
-
+              <v-col class="text-gray"> Brak wizyt </v-col>
             </v-row>
             <v-list-item
               elevation="3"
@@ -108,6 +106,7 @@ const sortedByDate = computed(() => {
             </v-list-item>
           </v-list>
         </div>
+        <v-divider class="mx-4"></v-divider>
 
         <v-container class="d-flex justify-center align-center bottom">
           <div width="90%" class="space-between">

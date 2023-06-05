@@ -15,6 +15,7 @@ const medicines = ref<string>();
 const symptoms = ref<string>();
 const appointmentDate = ref<string>();
 const patientName = ref<string>();
+const patientId = ref<string>();
 
 const form = ref<any>();
 const meds = ref<string>();
@@ -42,6 +43,7 @@ onBeforeMount(async () => {
     symptoms.value = appointmentData.symptoms;
     medicines.value = appointmentData.medicines;
     doctorSpecialization.value = appointmentData.specialization;
+    patientId.value = appointmentData.patient.id;
   } catch (error) {
     console.log(error);
     snackbar.error = true;
@@ -68,6 +70,7 @@ defineExpose({
   select,
   doctorSpecialization,
   control_visit,
+  patientId,
 });
 </script>
 
@@ -106,7 +109,9 @@ defineExpose({
               {{
                 loading
                   ? "Wczytywanie..."
-                  : new Date(appointmentDate as string).toLocaleDateString("pl-PL")
+                  : new Date(appointmentDate as string).toLocaleDateString(
+                      "pl-PL"
+                    )
               }},
               {{
                 loading
@@ -221,13 +226,13 @@ defineExpose({
             </v-btn>
           </v-col>
         </v-row>
-        <v-row justify="center">
+        <v-row justify="center" no-gutters>
           <v-col justify="center" class="text-right">
             <v-btn
               variant="text"
               align-self="center"
               size="small"
-              class="mt-2 button"
+              class="mt-2 button pa-0"
               @click="onSaveAndExitClick()"
             >
               Zapisz i wyjdź

@@ -48,7 +48,7 @@ const onSubmit = async () => {
       diagnosis: req_data.diagnose,
       recommendations: req_data.recommendations,
       medicines: req_data.meds,
-      date:
+      controlDate:
         req_data.dateDay && req_data.dateHour
           ? `${("0" + req_data.dateDay.toLocaleDateString("pl-PL"))
               .slice(-10)
@@ -88,45 +88,44 @@ onMounted(() => {
 });
 </script>
 <template>
-  <v-card
-    width="560px"
-    location="center"
-    elevation="5"
-    class="rounded-lg mt-10 mb-10"
-  >
-    <template #loader>
-      <v-progress-linear
-        :active="loading"
-        color="deep-purple"
-        height="4"
-        indeterminate
-      ></v-progress-linear>
-    </template>
-    <v-window v-model="page" direction="vertical" reverse :touch="false">
-      <v-window-item :value="1">
-        <DoctorVisitProgress
-          @page="(arg) => (page += arg)"
-          ref="progress"
-          @loaded="loading = false"
-          @save="saveAndExit()"
-        />
-      </v-window-item>
-      <v-window-item :value="2">
-        <DoctorVisitControl
-          @page="(arg) => (page += arg)"
-          ref="control"
-          :specialization="progress.doctorSpecialization"
-        />
-      </v-window-item>
-      <v-window-item :value="3">
-        <DoctorVisitSummary
-          @page="(arg) => (page += arg)"
-          :data="getData()"
-          @submit="onSubmit()"
-        />
-      </v-window-item>
-    </v-window>
-  </v-card>
+  <v-row no-gutters class="ma-auto"
+    ><v-col class="ma-auto">
+      <v-card width="560px" elevation="5" class="rounded-lg my-4">
+        <template #loader>
+          <v-progress-linear
+            :active="loading"
+            color="deep-purple"
+            height="4"
+            indeterminate
+          ></v-progress-linear>
+        </template>
+        <v-window v-model="page" direction="vertical" reverse :touch="false">
+          <v-window-item :value="1">
+            <DoctorVisitProgress
+              @page="(arg) => (page += arg)"
+              ref="progress"
+              @loaded="loading = false"
+              @save="saveAndExit()"
+            />
+          </v-window-item>
+          <v-window-item :value="2">
+            <DoctorVisitControl
+              @page="(arg) => (page += arg)"
+              ref="control"
+              :specialization="progress.doctorSpecialization"
+              :patient_id="progress.patientId"
+            />
+          </v-window-item>
+          <v-window-item :value="3">
+            <DoctorVisitSummary
+              @page="(arg) => (page += arg)"
+              :data="getData()"
+              @submit="onSubmit()"
+            />
+          </v-window-item>
+        </v-window> </v-card
+    ></v-col>
+  </v-row>
 </template>
 
 <style>

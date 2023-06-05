@@ -15,6 +15,7 @@ const change_page = async (arg: number) => {
 // eslint-disable-next-line
 const props = defineProps({
   specialization: Number,
+  patient_id: String,
 });
 const form = ref<any>();
 
@@ -56,7 +57,7 @@ const getUnavailableHours = async () => {
     let res = await authorized.get(
       `/appointment/available-hours/${
         date.value.toISOString().split("T")[0]
-      }/specialization/${props.specialization}`
+      }/specialization/${props.specialization}/${props.patient_id}`,
     );
     unavailable_hours.value = res.data;
   } catch (e) {
@@ -70,13 +71,7 @@ const getUnavailableHours = async () => {
       date.value.getTime() - Date.now() < 86400000 &&
       date.value.getDate() === new Date().getDate()
     ) {
-      const to_slice =
-        (new Date().getHours() - 9) * 2 +
-        5 +
-        (new Date().getMinutes() >= 30 ? 1 : 0);
-      unavailable_hours.value = unavailable_hours.value.concat(
-        hours.slice(0, to_slice).map((hour) => hour + ":00")
-      );
+      unavailable_hours.value = hours;
     }
     hours_ready.value = true;
   }
@@ -222,18 +217,6 @@ watch(current_month, (newMonth, oldMonth) => {
               @click="change_page(1)"
             >
               Zakończ wizytę
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row justify="center">
-          <v-col justify="center" class="text-right">
-            <v-btn
-              variant="text"
-              align-self="center"
-              size="small"
-              class="mt-2 button"
-            >
-              Zapisz i wyjdź
             </v-btn>
           </v-col>
         </v-row>
