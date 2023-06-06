@@ -48,10 +48,10 @@ console.log(props.data?.select);
               Informacje o wizycie
             </v-col>
             <v-col class="text-left">
-              {{ new Date(props.data?.appointmentDate).toLocaleDateString() }},
+              {{ new Date(props.data?.appointmentDate).toLocaleDateString("pl-PL") }},
               {{
                 new Date(props.data?.appointmentDate)
-                  .toLocaleTimeString()
+                  .toLocaleTimeString("pl-PL")
                   .substring(0, 5)
               }}
             </v-col>
@@ -117,7 +117,7 @@ console.log(props.data?.select);
               Zalecenia
             </v-col>
             <v-col class="text-left">
-              {{ props.data?.recomendations ? props.data?.recomendations : "Nie podano" }}
+              {{ props.data?.recommendations ? props.data?.recommendations : "Nie podano" }}
             </v-col>
           </v-row>
           <v-row v-if="props.data?.dateHour && props.data.dateDay && props.data?.controlVisit">
@@ -129,7 +129,7 @@ console.log(props.data?.select);
             </v-col>
             <!-- 31.01.2023, 17:30 -->
             <v-col class="text-left">
-              {{ `${props.data?.dateDay.toLocaleDateString()}, ${props.data?.dateHour}` }}
+              {{ `${props.data?.dateDay.toLocaleDateString("pl-PL")}, ${props.data?.dateHour}` }}
             </v-col>
           </v-row>
           <v-row><v-divider></v-divider></v-row>

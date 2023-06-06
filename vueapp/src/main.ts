@@ -14,7 +14,6 @@ import { prefix } from "./config";
 import * as labsComponents from "vuetify/labs/components";
 
 export const user = reactive<User>({
-  id: 0,
   name: localStorage.getItem("user") ?? "Niezalogowany",
   isLoggedIn: localStorage.getItem("user") ? true : false,
   roles: localStorage.getItem("roles")
@@ -70,14 +69,14 @@ export const router = VueRouter.createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
+router.beforeEach((to, from) => {
   if (
     to.meta.roles != null &&
     !to.meta.roles.some((e) => user.roles.includes(e))
   ) {
     return {
-      path: "/unauthorized",
-      query: { redirect: to.fullPath },
+      path: "/",
+      query: { redirect: from.fullPath },
     };
   }
 });

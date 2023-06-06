@@ -6,7 +6,7 @@ import {
   dateRules,
   nameRules,
   surnameRules,
-  peselRules,
+  getPeselRules,
   phoneRules,
   passwordRules,
   emailRules,
@@ -69,13 +69,11 @@ const repeatPasswordRules = [
 </script>
 
 <template>
-  <v-row no-gutters>
-    <v-col>
+  <v-row no-gutters class="justify-center">
+    <v-col cols="12" sm="8" md="4" class="ma-auto">
       <v-card
-        width="40vw"
-        location="center"
         elevation="5"
-        class="rounded-lg signup"
+        class="rounded-lg signup ma-auto"
       >
         <v-window v-model="page" direction="vertical" reverse>
           <v-window-item :value="0">
@@ -146,7 +144,7 @@ const repeatPasswordRules = [
                         label="Pesel"
                         v-model="pesel"
                         variant="solo"
-                        :rules="peselRules"
+                        :rules="getPeselRules(new Date(birth_date))"
                         color="blue-darken-2"
                         required
                       >

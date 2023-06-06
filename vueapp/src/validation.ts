@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 const passwordRules = [
   (value: string) => {
     if (value) return true;
@@ -102,10 +103,45 @@ const dateRules = [
 ];
 const notNull = [
   (value: any) => {
-    if (value !== null && value !== undefined) return true;
+    if (value !== null && value !== undefined && value !== "") return true;
     else return "Pole jest wymagane";
   },
 ];
+const max1000 = [
+  (value: string) => {
+    if (value.length <= 1000) return true;
+    else return "Za dużo znaków";
+  },
+];
+const symptomsRules = [
+  notNull[0],
+  max1000[0]
+]
+const getPeselRules = (birthDate: any) => {
+  return [
+    notNull[0],
+    (value: string) => {
+      if (!/\D/.test(value) && value.length === 11) return true;
+      else return "Pesel musi składać się z 11 cyfr";
+    },
+    (value: string) => {
+      if (birthDate === "Invalid Date") return true;
+      const to_add = birthDate.getFullYear() <= 1899 ? 80 : birthDate.getFullYear() <= 1999 ? 0 : birthDate.getFullYear() <= 2099 ? 20 : birthDate.getFullYear() <= 2199 ? 40 : 60; 
+      if (birthDate.getYear() % 100 === parseInt(value.substr(0, 2)) && birthDate.getMonth() + 1 + to_add === parseInt(value.substr(2, 2)) && birthDate.getDate() === parseInt(value.substr(4, 2))) return true;
+      else return "Błędny pesel"
+    },
+    (value: string) => {
+      if (birthDate === "Invalid Date") return true;
+      const multipliers = [1, 3, 7, 9]
+      let sum = 0;
+      for (let i = 0; i < 10; i++) {
+        sum += (multipliers[i % 4] * parseInt(value[i])) % 10;
+      }
+      if (10 - (sum % 10) === parseInt(value[10])) return true;
+      else return "Błędny pesel";
+    }
+  ]
+}
 export {
   nameRules,
   surnameRules,
@@ -113,6 +149,8 @@ export {
   emailRules,
   phoneRules,
   dateRules,
-  peselRules,
   notNull,
+  max1000,
+  symptomsRules,
+  getPeselRules,
 };

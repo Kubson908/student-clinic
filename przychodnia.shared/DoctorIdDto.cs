@@ -9,5 +9,6 @@ namespace Przychodnia.Shared
     public class DoctorIdDto
     {
         public string DoctorId { get; set; } = string.Empty;
+        public DateTime? Date { get; set; }
     }
 }

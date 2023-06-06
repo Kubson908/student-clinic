@@ -2,7 +2,6 @@
 import { onBeforeMount, watch } from "vue";
 import NavBar from "./components/NavBar.vue";
 import { user, snackbar } from "./main";
-import { connect } from "./socket";
 // import FooterBar from "./components/FooterBar.vue";
 let timeout: any = null;
 
@@ -12,8 +11,8 @@ onBeforeMount(() => {
     localStorage.clear();
     user.name = "Niezalogowany";
     user.isLoggedIn = false;
+    user.roles = [];
   }
-  if (user.isLoggedIn) connect();
 });
 watch(
   () => snackbar.showing,
@@ -36,7 +35,7 @@ watch(
     <NavBar />
     <router-view v-slot="{ Component }">
       <v-fade-transition mode="out-in">
-        <component :is="Component"
+        <component class="mt-12" :is="Component"
       /></v-fade-transition>
     </router-view>
     <!-- <FooterBar class="align-end"/> -->
@@ -44,7 +43,7 @@ watch(
       location="top"
       class="mt-16"
       v-model="snackbar.showing"
-      timeout="3000"
+      timeout="5000"
       :color="snackbar.error ? 'error' : 'success'"
     >
       {{ snackbar.text }}
@@ -62,6 +61,9 @@ watch(
 :root {
   --secondary: #fff;
   --primary: rgb(89, 126, 221);
+  scrollbar-width: thin;
+  scrollbar-color: #888;
+  scrollbar-track-color: #f1f1f1;
 }
 
 .body {
@@ -105,5 +107,34 @@ watch(
 
 .list-leave-active {
   position: absolute;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+  display: none;
+}
+
+div::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  display: block;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }
 </style>

@@ -6,6 +6,8 @@ using Przychodnia.Webapi.Models;
 using Przychodnia.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using NuGet.Protocol;
+using System;
 
 namespace Przychodnia.Webapi.Controllers
 {
@@ -15,11 +17,13 @@ namespace Przychodnia.Webapi.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<Employee> _userManager;
+        private readonly IWebHostEnvironment _environment;
         
-        public EmployeeController(ApplicationDbContext db, UserManager<Employee> userManager)
+        public EmployeeController(ApplicationDbContext db, UserManager<Employee> userManager, IWebHostEnvironment environment)
         {
             _db = db;
             _userManager = userManager;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -68,20 +72,17 @@ namespace Przychodnia.Webapi.Controllers
             {
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null) return BadRequest("User not found");
-/*                user.Email = dto.Email;
-                user.NormalizedEmail = dto.Email.Normalize();
-                user.UserName = dto.Email;
-                user.NormalizedEmail = dto.Email.Normalize();
-                user.FirstName = dto.FirstName;
-                user.LastName = dto.LastName;
-                user.PhoneNumber = dto.PhoneNumber;
-                user.DateOfBirth = dto.DateOfBirth;
-                user.Specialization = dto.Specialization;
-                user.Pesel = dto.Pesel;
-
-                var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded) return Ok("Updated");*/
                 foreach (var prop in typeof(Employee).GetProperties())
+                {
+                    var fromProp = typeof(UpdateEmployeeDto).GetProperty(prop.Name);
+                    var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;
+                    if (toValue != null)
+                    {
+                        prop.SetValue(user, toValue, null);
+                        _db.Entry(user).Property(prop.Name).IsModified = true;
+                    }
+                }
+                foreach (var prop in typeof(IdentityUser).GetProperties())
                 {
                     var fromProp = typeof(UpdateEmployeeDto).GetProperty(prop.Name);
                     var toValue = fromProp != null ? fromProp.GetValue(dto, null) : null;
@@ -103,7 +104,7 @@ namespace Przychodnia.Webapi.Controllers
         [HttpGet("available-doctors")]
         public async Task<IActionResult> GetAvailableDoctors([FromQuery] DateTime date, [FromQuery] Specialization specialization)
         {
-            if (date < DateTime.Now || date.Equals(null)) return BadRequest("Model error");
+            if (date.CompareTo(DateTime.Now) < 0 || date.Equals(null)) return BadRequest("Model error");
 
             var doctors = await _db.Employees.Where(e => e.Specialization == specialization 
                 && !e.Appointments.Select(a => a.Date).Contains(date))
@@ -116,6 +117,27 @@ namespace Przychodnia.Webapi.Controllers
 
             /*var test = _db.Employees.Select(e => e.Appointments.Select(a => a.Date));*/
             return Ok(doctors);
+        }
+
+        [Authorize(Roles = "Staff, Employee")]
+        [HttpPost("upload-image/{doctorId}")]
+        public async Task<IActionResult> UploadImage([FromRoute] string? doctorId, [FromForm] IFormFile postedFile)
+        {
+            if (postedFile == null) return BadRequest("File is null");
+            string fileName;
+            if (doctorId != null) fileName = doctorId + ".png";
+            else fileName = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)! + ".png";
+            string path = Path.Combine(_environment.ContentRootPath, "StaticFiles");
+            if (postedFile.Length > 0)
+            {
+                string upload = Path.Combine(path, fileName);
+                using (Stream fileStream = new FileStream(upload, FileMode.Create))
+                {
+                    await postedFile.CopyToAsync(fileStream);
+                }
+                return Ok("Image updated");
+            }
+            return BadRequest("File is empty");
         }
     }
 }

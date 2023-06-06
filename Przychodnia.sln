@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Przychodnia.Webapi", "webap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Przychodnia.Shared", "przychodnia.shared\Przychodnia.Shared.csproj", "{7742D6BD-4B67-4764-9D86-5F9D8B829D05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Przychodnia.Tests.NUnit", "Przychodnia.Tests.NUnit\Przychodnia.Tests.NUnit.csproj", "{9C263239-79F2-4356-9919-8DEFB6CB0EB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{7742D6BD-4B67-4764-9D86-5F9D8B829D05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7742D6BD-4B67-4764-9D86-5F9D8B829D05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7742D6BD-4B67-4764-9D86-5F9D8B829D05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C263239-79F2-4356-9919-8DEFB6CB0EB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C263239-79F2-4356-9919-8DEFB6CB0EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C263239-79F2-4356-9919-8DEFB6CB0EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C263239-79F2-4356-9919-8DEFB6CB0EB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

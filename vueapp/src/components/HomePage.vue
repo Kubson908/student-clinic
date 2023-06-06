@@ -251,7 +251,7 @@ import HomePageCard from "./HomePageCard.vue";
                   class="rounded-lg"
                   height="100%"
                   cover
-                  src="https://media.istockphoto.com/id/183796231/photo/newer-white-office-building-from-street-view.jpg?s=612x612&w=0&k=20&c=a2zfzSUbsYzj_bmCc_yw2oTK02T7VJhaypehiQg4Htw="
+                  src="tabs.jpeg"
                 ></v-img>
               </v-col>
             </v-row>
@@ -289,7 +289,7 @@ import HomePageCard from "./HomePageCard.vue";
                         <span class="font-weight-medium"
                           >Poniedziałek - Piątek:
                         </span>
-                        8:00 - 200
+                        8:00 - 20:00
                       </p>
                       <p>
                         <span class="font-weight-medium">Sobota: </span> 9:00 -

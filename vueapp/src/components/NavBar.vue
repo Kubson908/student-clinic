@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { user, router } from "../main";
-import { socket } from "@/socket";
 const logout = () => {
   localStorage.clear();
   user.name = "Niezalogowany";
   user.isLoggedIn = false;
   user.roles = [];
   router.push("/");
-  socket.value?.close();
   // console.log(user.roles);
 };
 const checkRole = (role: string) => {
@@ -28,10 +26,12 @@ const checkRole = (role: string) => {
         </v-app-bar-nav-icon
       ></router-link>
 
-      <div v-if="checkRole('Patient')">
+
         <v-tabs
           :mandatory="false"
           :model-value="router.currentRoute.value.path"
+          class="w-100 overflow-auto"
+          v-if="checkRole('Patient')"
         >
           <router-link to="/patient/appointments" custom v-slot="{ navigate }">
             <v-tab value="/patient/appointments" @click="navigate"
@@ -44,11 +44,12 @@ const checkRole = (role: string) => {
             >
           </router-link>
         </v-tabs>
-      </div>
-      <div v-else-if="checkRole('Staff')">
+
         <v-tabs
           :mandatory="false"
           :model-value="router.currentRoute.value.path"
+          class="overflow-auto"
+          v-else-if="checkRole('Staff')"
         >
           <router-link
             to="/staff/appointments/awaiting"
@@ -71,11 +72,11 @@ const checkRole = (role: string) => {
             >
           </router-link>
         </v-tabs>
-      </div>
-      <div v-else-if="checkRole('Employee')">
         <v-tabs
           :mandatory="false"
           :model-value="router.currentRoute.value.path"
+          class="w-100 overflow-auto"
+          v-else-if="checkRole('Employee')"
         >
           <router-link to="/doctor/harmonogram" custom v-slot="{ navigate }">
             <v-tab value="/doctor/harmonogram" @click="navigate">Wizyty</v-tab>
@@ -84,7 +85,6 @@ const checkRole = (role: string) => {
             <v-tab value="/doctor/patients" @click="navigate">Pacjenci</v-tab>
           </router-link>
         </v-tabs>
-      </div>
     </template>
 
     <span class="d-inline-block link">

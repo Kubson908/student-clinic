@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
 import { passwordRules } from "@/validation";
-import { authorized, router, snackbar } from "@/main";
+import { authorized, router, snackbar, user } from "@/main";
 
 const form = ref<typeof VForm | null>(null);
 const oldPassword = ref<string>("");
@@ -21,6 +21,11 @@ const submit = async (data: SubmitEvent) => {
     });
     snackbar.text = "Hasło zostało zmienione";
     snackbar.error = false;
+    localStorage.clear();
+    user.name = "Niezalogowany";
+    user.isLoggedIn = false;
+    user.roles = [];
+    router.push("/login");
   } catch (error: any) {
     console.log(error);
     snackbar.text =

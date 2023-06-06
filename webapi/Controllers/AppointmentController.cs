@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MimeKit;
 using Przychodnia.Shared;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
@@ -13,18 +15,18 @@ namespace Przychodnia.Webapi.Controllers
     public class AppointmentController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly IConfiguration _configuration;
+        private readonly UserManager<Patient> _patientManager;
 
-        public AppointmentController(ApplicationDbContext db, IConfiguration configuration)
+        public AppointmentController(ApplicationDbContext db, UserManager<Patient> patientManager)
         {
             _db = db;
-            _configuration = configuration;
+            _patientManager = patientManager;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var appointments = await _db.Appointments.Include(a => a.Doctor ).Include(a => a.Patient)
+            var appointments = await _db.Appointments.Include(a => a.Doctor).Include(a => a.Patient)
                 .Select(a => new
                 {
                     a.Id,
@@ -35,6 +37,7 @@ namespace Przychodnia.Webapi.Controllers
                     a.Diagnosis,
                     a.Recommendations,
                     a.Finished,
+                    a.Meds,
                     Patient = a.Patient != null ? new
                     {
                         a.Patient.Id,
@@ -48,6 +51,18 @@ namespace Przychodnia.Webapi.Controllers
                         a.Doctor.FirstName,
                         a.Doctor.LastName,
                         a.Doctor.Specialization
+                    } : null,
+                    a.AppointmentId,
+                    ControlAppointment = a.AppointmentId != null ? new
+                    {
+                        a.ControlAppointment!.Date,
+                        a.ControlAppointment.Id,
+                        a.ControlAppointment.Finished,
+                        a.ControlAppointment.Medicines,
+                        a.ControlAppointment.Recommendations,
+                        a.ControlAppointment.Symptoms,
+                        a.PatientId,
+                        a.ControlAppointment.DoctorId,
                     } : null
                 }).ToListAsync();
             return Ok(appointments);
@@ -58,32 +73,44 @@ namespace Przychodnia.Webapi.Controllers
         {
             var slots_week = 16;
             var slots_saturday = 10;
-            var employees_count = _db.Employees.Select(x => x.Specialization == (Specialization) specialization).ToList().Count;
+            var employees_count = _db.Employees.Where(x => x.Specialization == (Specialization)specialization).Select(x => x.Specialization).ToList().Count;
             var appointments_month = (await _db.Appointments
-                .Where(a => a.Date.Year == year && a.Date.Month == month && a.Specialization == (Specialization) specialization)
+                .Where(a => a.Date.Year == year && a.Date.Month == month && a.Specialization == (Specialization)specialization)
                 .Select(a => new { a.Specialization, a.Date }).GroupBy(a => a.Date)
-                .Select(g => new { key = DateOnly.FromDateTime(g.Key), available = 
-                    g.Key.DayOfWeek == DayOfWeek.Saturday ? g.Count() < slots_saturday*employees_count : 
+                .Select(g => new { key = DateOnly.FromDateTime(g.Key), available =
+                    g.Key.DayOfWeek == DayOfWeek.Saturday ? g.Count() < slots_saturday * employees_count :
                     g.Key.DayOfWeek == DayOfWeek.Sunday ? false :
-                    g.Count() < slots_week*employees_count}).ToListAsync())
+                    g.Count() < slots_week * employees_count }).ToListAsync())
                     .Where(a => a.available == false).Select(a => a.key);
             return Ok(appointments_month);
         }
 
+        [Authorize(Roles = "Patient, Employee")]
+        [HttpGet("available-hours/{receivedDate}/specialization/{specialization}/{patientId}")]
         [HttpGet("available-hours/{receivedDate}/specialization/{specialization}")]
-        public async Task<IActionResult> GetAvailableHours([FromRoute] string receivedDate, [FromRoute] int specialization)
+        public async Task<IActionResult> GetAvailableHours([FromRoute] string receivedDate, [FromRoute] int specialization, [FromRoute] string? patientId)
         {
             DateTime date = DateTime.Parse(receivedDate);
             //if (date == null || specialization == null) return BadRequest("Object is null");
-            var employees_count = _db.Employees.Select(x => x.Specialization == (Specialization)specialization).ToList().Count;
+            string id;
+            if (HttpContext.User.FindFirstValue(ClaimTypes.Role) == "Employee" && patientId != null)
+                id = patientId;
+            else id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var employees_count = _db.Employees.Where(x => x.Specialization == (Specialization)specialization).Select(x => x.Specialization).ToList().Count;
             var hours = (await _db.Appointments
                 .Where(a => a.Date.Date.CompareTo(date) == 0 && a.Specialization == (Specialization)specialization)
                 .Select(a => new { a.Date.TimeOfDay }).GroupBy(a => a.TimeOfDay)
                 .Select(g => new { key = g.Key, available = g.Count() < employees_count })
                 .Where(g => g.available == false).ToListAsync()).Select(h => h.key);
-            return Ok(hours);
+            var patientHours = (await _db.Appointments
+                .Where(a => a.Date.Date.CompareTo(date) == 0 && a.PatientId == id)
+                .Select(a => new { a.Date.TimeOfDay }).GroupBy(a => a.TimeOfDay)
+                .Select(g => new { key = g.Key, available = g.Count() < 1 })
+                .Where(g => g.available == false).ToListAsync()).Select(h => h.key);
+            var toReturn = hours.Union(patientHours).ToList();
+            return Ok(toReturn);
         }
-        
+
         [HttpGet("doctor/year/{year}/month/{month}")]
         public async Task<IActionResult> GetAvailableDaysInMonthByDoctor([FromRoute] int year, [FromRoute] int month)
         {
@@ -93,8 +120,8 @@ namespace Przychodnia.Webapi.Controllers
             var appointments_month = (await _db.Appointments
                 .Where(a => a.Date.Year == year && a.Date.Month == month && a.DoctorId == doctorId)
                 .Select(a => new { a.Specialization, a.Date }).GroupBy(a => a.Date)
-                .Select(g => new { key = DateOnly.FromDateTime(g.Key), available = 
-                    g.Key.DayOfWeek == DayOfWeek.Saturday ? g.Count() < slots_saturday : 
+                .Select(g => new { key = DateOnly.FromDateTime(g.Key), available =
+                    g.Key.DayOfWeek == DayOfWeek.Saturday ? g.Count() < slots_saturday :
                     g.Key.DayOfWeek == DayOfWeek.Sunday ? false :
                     g.Count() < slots_week }).ToListAsync())
                     .Where(a => a.available == false).Select(a => a.key);
@@ -141,7 +168,19 @@ namespace Przychodnia.Webapi.Controllers
                 a.Symptoms,
                 a.Diagnosis,
                 a.Recommendations,
-                a.ControlAppointment
+                a.Meds,
+                a.AppointmentId,
+                ControlAppointment = a.AppointmentId != null ? new
+                {
+                    a.ControlAppointment!.Date,
+                    a.ControlAppointment.Id,
+                    a.ControlAppointment.Finished,
+                    a.ControlAppointment.Medicines,
+                    a.ControlAppointment.Recommendations,
+                    a.ControlAppointment.Symptoms,
+                    a.PatientId,
+                    a.ControlAppointment.DoctorId,
+                } : null
             }).FirstOrDefaultAsync(a => a.Id == id);
             return appointment == null ? NotFound() : Ok(appointment);
         }
@@ -150,6 +189,17 @@ namespace Przychodnia.Webapi.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] CreateAppointmentDto dto)
         {
+            var patient = await _db.Patients.Select(p => new
+            {
+                p.Id,
+                p.Verified,
+                Appointments = new
+                {
+                    List = p.Appointments.Select(a => a.Id).ToList()
+                }
+            }).FirstOrDefaultAsync(p => p.Id == HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (patient != null && !patient.Verified && patient.Appointments.List.Count() >= 1)
+                return Forbid();
             // Poniedziałek-piątek 9:00-17:00, Sobota 9:00-14:00
             if (dto.Date.Minute % 30 != 0 ||
                 (dto.Date.Hour >= 17 || dto.Date.Hour < 9
@@ -174,21 +224,41 @@ namespace Przychodnia.Webapi.Controllers
 
             await _db.Appointments.AddAsync(appointment);
             await _db.SaveChangesAsync();
-            return StatusCode(201, new { message =  "Appointment created", data = appointment });
+            return StatusCode(201, new { message = "Appointment created", data = appointment });
         }
 
+        [Authorize(Roles="Patient, Staff")]
         [HttpDelete("cancel-appointment/{id}")]
         public async Task<IActionResult> CancelAppointment([FromRoute] int id)
         {
             var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && a.PatientId == userId);
-            if (appointment != null && (appointment.Date - DateTime.Now).TotalHours >= 24)
+            var claims = ((ClaimsIdentity)User.Identity!).Claims;
+            var role = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value.ToString()).ToList();
+            Appointment? appointment;
+            if (role.Contains("Patient")) appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && a.PatientId == userId && !a.Finished);
+            else appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id && !a.Finished);
+            if (appointment == null) return NotFound("Appointment not found");
+            if (role.Contains("Staff") && !appointment.Finished)
             {
+                await _db.Appointments.Where(a => a.Id == id).ExecuteDeleteAsync();
+                await _db.SaveChangesAsync();
+                return Ok(new { message = "Appointment cancelled", data = new { id = id, doctorId = appointment.DoctorId } });
+            }
+            if ((appointment.Date - DateTime.Now).TotalHours >= 24 && !appointment.Finished)
+            {
+                var prevAppointment = await _db.Appointments.FirstOrDefaultAsync(a => a.AppointmentId == appointment.Id);
+                if (prevAppointment != null)
+                {
+                    _db.Entry(prevAppointment).Property("AppointmentId").CurrentValue = null;
+                    _db.Entry(prevAppointment).Property("AppointmentId").IsModified = true;
+                    await _db.SaveChangesAsync();
+                }
+                
                 await _db.Appointments.Where(a => a.Id == id && a.PatientId == userId).ExecuteDeleteAsync();
                 await _db.SaveChangesAsync();
-                return Ok(new { message = "Appointment cancelled", data = new { id = id } });
-            } else if (appointment != null && (appointment.Date - DateTime.Now).TotalHours < 24) 
-                return Conflict("The visit can be canceled at least 24 hours before the date");
+                return Ok(new { message = "Appointment cancelled", data = new { id = id, doctorId = appointment.DoctorId } });
+            } else if (appointment != null && (appointment.Date - DateTime.Now).TotalHours < 24)
+                return Conflict("Appointment can be canceled at least 24 hours before the date");
             return NotFound("Appointment not found");
         }
 
@@ -199,7 +269,7 @@ namespace Przychodnia.Webapi.Controllers
             if (id == null) return NotFound("User not found");
 
             var appointments = _db.Patients.Where(p => p.Id == id).Include(p => p.Appointments)
-                .Select(p => p.Appointments.Select(a => new {
+                .Select(p => p.Appointments.Where(a => !a.Finished).Select(a => new {
                     a.Date,
                     a.Id,
                     a.Finished,
@@ -212,6 +282,7 @@ namespace Przychodnia.Webapi.Controllers
                     } : null,
                     a.Medicines,
                     a.Recommendations,
+                    a.Meds,
                     a.Symptoms,
                     a.ControlAppointment
                 })).ToList();
@@ -245,23 +316,43 @@ namespace Przychodnia.Webapi.Controllers
                         a.Medicines,
                         a.Recommendations,
                         a.Symptoms,
-                        a.ControlAppointment
+                        ControlAppointment = a.AppointmentId != null ? new
+                        {
+                            a.ControlAppointment!.Date,
+                            a.ControlAppointment.Id,
+                            a.ControlAppointment.Finished,
+                            a.ControlAppointment.Medicines,
+                            a.ControlAppointment.Recommendations,
+                            a.ControlAppointment.Symptoms,
+                            a.PatientId,
+                            a.ControlAppointment.DoctorId,
+                        } : null
                     }).ToListAsync(); // chyba działa
                 return Ok(appointments);
             }
             else
             {
                 var appointments = await _db.Appointments.Where(a => a.DoctorId == id).Select(a => new
-                   {
-                       Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
-                       a.Date,
-                       a.Id,
-                       a.Finished,
-                       a.Medicines,
-                       a.Recommendations,
-                       a.Symptoms,
-                       a.ControlAppointment
-                   }).ToListAsync(); // chyba działa
+                {
+                    Patient = a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : null,
+                    a.Date,
+                    a.Id,
+                    a.Finished,
+                    a.Medicines,
+                    a.Recommendations,
+                    a.Symptoms,
+                    ControlAppointment = a.AppointmentId != null ? new
+                    {
+                        a.ControlAppointment!.Date,
+                        a.ControlAppointment.Id,
+                        a.ControlAppointment.Finished,
+                        a.ControlAppointment.Medicines,
+                        a.ControlAppointment.Recommendations,
+                        a.ControlAppointment.Symptoms,
+                        a.PatientId,
+                        a.ControlAppointment.DoctorId,
+                    } : null
+                }).ToListAsync(); // chyba działa
                 return Ok(appointments);
             }
         }
@@ -296,7 +387,7 @@ namespace Przychodnia.Webapi.Controllers
                         a.PatientId,
                         a.ControlAppointment.DoctorId,
                     } : null
-                }).ToListAsync(); 
+                }).ToListAsync();
                 return Ok(appointments);
             }
             else
@@ -323,13 +414,13 @@ namespace Przychodnia.Webapi.Controllers
                         a.PatientId,
                         a.ControlAppointment.DoctorId,
                     } : null
-                }).ToListAsync(); 
+                }).ToListAsync();
                 return Ok(appointments);
             }
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPatch("update/{id}")]
-
         public async Task<IActionResult> UpdateAppointment([FromRoute] int id, [FromBody] UpdateAppointmentDto dto)
         {
             if (dto == null) return BadRequest("Object is null");
@@ -365,12 +456,17 @@ namespace Przychodnia.Webapi.Controllers
             if (doctorId == null) return BadRequest("Doctor id is null");
             var doctor = await _db.Employees.FindAsync(doctorId.DoctorId);
             if (doctor == null) return NotFound("Doctor not found");
-            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == Int32.Parse(appointmentId));
+            var appointment = await _db.Appointments.Include(a => a.Patient).FirstOrDefaultAsync(a => a.Id == Int32.Parse(appointmentId));
             if (appointment == null) return NotFound("Appointment not found");
             if (appointment.Specialization != doctor.Specialization) return Conflict("Cannot assign this appointment to this doctor");
+            if (appointment.DoctorId != null) return Conflict("This appointment has already been assigned");
             appointment.DoctorId = doctorId.DoctorId;
+            if (doctorId.Date.HasValue) appointment.Date = (DateTime)doctorId.Date;
             _db.Entry(appointment).Property(p => p.DoctorId).IsModified = true;
             await _db.SaveChangesAsync();
+            await SendAppointmentConfirmation(appointment.Patient!.Email!,
+                DateOnly.FromDateTime(appointment.Date) + ", " + appointment.Date.TimeOfDay, 
+                doctor.FirstName + " " + doctor.LastName, (Specialization)doctor.Specialization);
             return Ok(new { message = "Appointment assigned", data = appointment });
         }
 
@@ -381,6 +477,7 @@ namespace Przychodnia.Webapi.Controllers
             string? doctorId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var appointment = await _db.Appointments.FindAsync(id);
             if (appointment == null) return BadRequest("Appointment not found");
+            if (DateOnly.FromDateTime(appointment.Date).CompareTo(DateOnly.FromDateTime(DateTime.Now)) > 0) return Forbid();
             if (appointment.DoctorId != doctorId) return Unauthorized("Cannot finish this appointment");
             foreach (var prop in typeof(Appointment).GetProperties())
             {
@@ -392,9 +489,9 @@ namespace Przychodnia.Webapi.Controllers
                     _db.Entry(appointment).Property(prop.Name).IsModified = true;
                 }
             }
-            if (dto.Date is not null)
+            if (dto.ControlDate is not null)
             {
-                var newDate = DateTime.Parse(dto.Date.ToString() ?? "");
+                var newDate = DateTime.Parse(dto.ControlDate.ToString() ?? "");
                 if (newDate.Minute % 30 != 0 ||
                 (newDate.Hour >= 17 || newDate.Hour < 9
                 || newDate.DayOfWeek.Equals(0) || (newDate.Hour >= 14
@@ -416,13 +513,24 @@ namespace Przychodnia.Webapi.Controllers
                     Date = date,
                     AppointmentId = appointment.Id,
                     Specialization = appointment.Specialization,
-                    Medicines = appointment.Medicines,
+                    Medicines = dto.Meds,
                     Symptoms = appointment.Symptoms,
                 };
+                appointment.ControlAppointment = controlAppointment;
 
                 await _db.Appointments.AddAsync(controlAppointment);
             }
             await _db.SaveChangesAsync();
+            string? email = (await _patientManager.FindByIdAsync(appointment.PatientId))!.Email;
+            await SendRecommendations(new RecommendationsMailDto()
+            {
+                Email = email!,
+                Diagnosis = appointment.Diagnosis,
+                Recommendations = appointment.Recommendations,
+                Medicines = appointment.Medicines,
+                ControlAppointmentDate = appointment.ControlAppointment != null ? (DateOnly.FromDateTime(appointment.ControlAppointment.Date) + ", " + appointment.ControlAppointment.Date.TimeOfDay) : string.Empty,
+                AppointmentDate = DateOnly.FromDateTime(appointment.Date) + ", " + appointment.Date.TimeOfDay,
+            });
             return Ok("Appointment finished");
         }
 
@@ -432,6 +540,59 @@ namespace Przychodnia.Webapi.Controllers
             var appointments = await _db.Appointments.Where(a => a.Date.Year == year && a.Date.Month == month).ToListAsync();
             if (appointments.Count() == 0) return NoContent();
             return Ok(appointments);
+        }
+
+        private static async Task SendRecommendations(RecommendationsMailDto dto)
+        {
+            string mailFrom = "przychodniaspaghettimafia@gmail.com";
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Przychodnia Studencka", mailFrom));
+            message.To.Add(new MailboxAddress(dto.Email, dto.Email));
+            message.Subject = "Podsumowanie wizyty w przychodni";
+            var body = new BodyBuilder();
+            body.HtmlBody = "<h3>Podsumowanie wizyty</h3>" +
+                "<div style=\"color: black; display: inline\"><strong>Data wizyty:</strong></div><div style=\"width: 450px; color: black; display: inline\"> " + dto.AppointmentDate + "</div><br /><br />";
+            if(dto.Diagnosis != string.Empty)
+                body.HtmlBody += "<div style=\"color: black; display: inline\"><strong>Diagnoza:</strong></div><div style=\"color: black; display: inline\"><div style=\"width: 450px;\"> " + dto.Diagnosis + "</div></div><br /><br />";
+            if(dto.Medicines != string.Empty)
+                body.HtmlBody += "<div style=\"color: black; display: inline\"><strong>Leki:</strong></div><div style=\"color: black; display: inline\"><div style=\"width: 450px;\"> " + dto.Medicines + "</div></div><br /><br />";
+            if(dto.Recommendations != string.Empty)
+                body.HtmlBody += "<div style=\"color: black; display: inline\"><strong>Zalecenia:</strong></div><div style=\"color: black; display: inline\"><div style=\"width: 450px;\"> " + dto.Recommendations + "</div></div><br /><br />";
+            if(dto.ControlAppointmentDate != string.Empty)
+                body.HtmlBody += "<div style=\"color: black; display: inline\"><strong>Data wizyty kontrolnej:</strong></div><div style=\"color: black; display: inline\"> " + dto.ControlAppointmentDate + "</div><br /><br />";
+            message.Body = body.ToMessageBody();
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                await client.ConnectAsync("smtp.gmail.com", 587, false);
+                client.Authenticate(mailFrom, "fegdvxpcrnsjwlvn");
+                client.Send(message);
+                client.Disconnect(true);
+            }
+            return;
+        }
+
+        private static async Task SendAppointmentConfirmation(string email, string date, string doctor, Specialization spec)
+        {
+            var specialization = new List<string>{ "Internista", "Pulmonolog", "Okulista", "Gastrolog" };
+            string mailFrom = "przychodniaspaghettimafia@gmail.com";
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Przychodnia Studencka", mailFrom));
+            message.To.Add(new MailboxAddress(email, email));
+            message.Subject = "Potwierdzenie rezerwacji wizyty";
+            var body = new BodyBuilder();
+            body.HtmlBody = "<h3>Potwierdzenie rezerwacji wizyty</h3>" +
+                "<div style=\"color: black;\"><strong>Data wizyty:</strong> " + date + "</div><br />";
+            body.HtmlBody += "<div style=\"color: black;\"><strong>Specjalizacja:</strong> " + specialization[((int)spec)] + "</div><br />";
+            body.HtmlBody += "<div style=\"color: black;\"><strong>Doktor:</strong> " + doctor + "</div><br />";
+            message.Body = body.ToMessageBody();
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                await client.ConnectAsync("smtp.gmail.com", 587, false);
+                client.Authenticate(mailFrom, "fegdvxpcrnsjwlvn");
+                client.Send(message);
+                client.Disconnect(true);
+            }
+            return;
         }
     }
 }

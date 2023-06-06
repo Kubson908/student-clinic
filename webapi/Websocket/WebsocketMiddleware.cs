@@ -34,6 +34,7 @@ namespace Przychodnia.Webapi.Websocket
         public async Task InvokeAsync(HttpContext context)
         {
             CancellationToken ct = context.RequestAborted;
+            Console.WriteLine(context.Response);
             if (endpoints.Any(e => context.Request.Path.ToString().Contains(e))  
                 && context.Response.Body != null)
             {
@@ -50,6 +51,7 @@ namespace Przychodnia.Webapi.Websocket
 
                     await memoryBodyStream.CopyToAsync(originalBody);
                     if (context.Response.StatusCode >= 300) return;
+                    if (body == string.Empty || body == null) return;
                     JObject json = JObject.Parse(body);
 
                     switch (json["message"]?.ToString())
@@ -59,7 +61,7 @@ namespace Przychodnia.Webapi.Websocket
                             break;
 
                         case "Appointment cancelled": // ???
-                            await SendEventAsync(new List<string> {"Staff"}, json["data"]?.ToString() ?? "", "deletedAppointment", ct);
+                            await SendEventAsync(new List<string> {"Staff", "Patient"}, json["data"]?.ToString() ?? "", "deletedAppointment", ct);
                             break;
                         
                         case "Appointment assigned": // ???
@@ -209,6 +211,19 @@ namespace Przychodnia.Webapi.Websocket
 
                 await item.Connection.SendAsync(segment, WebSocketMessageType.Text, true, ct);
             }
+
+            if (eventName == "deletedAppointment")
+            {
+                dynamic tmp = JsonConvert.DeserializeObject(obj.Data.ToString()!)!;
+                Console.WriteLine(tmp);
+                var doctor = connections.FirstOrDefault(d => d.UserId == (string)tmp.doctorId);
+                if (doctor == null || doctor.Connection != null && doctor.Connection.State != WebSocketState.Open ||
+                    doctor.Connection == null)
+                {
+                    return;
+                }
+                await doctor.Connection.SendAsync(segment, WebSocketMessageType.Text, true, ct);
+            }
         }
 
         public async Task SendAssignedAppointment(string data, string eventName, CancellationToken ct = default)
@@ -223,8 +238,7 @@ namespace Przychodnia.Webapi.Websocket
             dynamic temp = JsonConvert.DeserializeObject(data) ?? "";
             string patientId = (string)temp.patientId;
             string doctorId = (string)temp.doctorId;
-            Console.WriteLine(patientId + " | " + doctorId);
-            foreach (var item in connections.Where(c => c.UserId == patientId || c.UserId == doctorId))
+            foreach (var item in connections.Where(c => c.UserId == patientId || c.UserId == doctorId || (c.Role != null && c.Role.Contains("Staff"))))
             {
                 if (item.Connection != null && item.Connection.State != WebSocketState.Open ||
                     item.Connection == null)

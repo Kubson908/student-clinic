@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import UploadImage from "./UploadImage.vue";
+import { ref, onBeforeMount } from "vue";
 import { authorized, snackbar, specializations, router } from "@/main";
-import { onBeforeMount } from "vue";
+import { prefix } from "@/config";
 import {
   nameRules,
   surnameRules,
   emailRules,
   phoneRules,
   dateRules,
-  peselRules,
+  getPeselRules,
   notNull,
 } from "@/validation";
+
 const name = ref<string>("");
 const lastName = ref<string>("");
 const email = ref<string>("");
@@ -20,27 +22,56 @@ const birthDate = ref<string>("");
 const specialization = ref<number>(0);
 const employeeId = ref<string>("");
 const waiting = ref(false);
-
+const uploadImage = ref(false);
 const form = ref<any>();
+const imgPath = ref<string>("");
 // eslint-disable-next-line
-const props = defineProps({
-  id: Number,
-});
+// const props = defineProps({
+//   id: Number,
+// });
 //const specialization = ref<string>("");
 onBeforeMount(async () => {
   const id = router.currentRoute.value.params["id"] ?? null;
-  const res = id
-    ? await authorized.get("/employee/" + id)
-    : await authorized.get(`/employee/account`);
-  const data = res.data;
-  name.value = data.firstName;
-  lastName.value = data.lastName;
-  pesel.value = data.pesel;
-  email.value = data.email;
-  phone.value = data.phoneNumber;
-  birthDate.value = data.dateOfBirth;
-  specialization.value = data.specialization;
-  employeeId.value = data.id;
+  if (id !== null) {
+    try {
+      const res = await authorized.get("/employee/" + id);
+      const data = res.data;
+      name.value = data.firstName;
+      lastName.value = data.lastName;
+      pesel.value = data.pesel;
+      email.value = data.email;
+      phone.value = data.phoneNumber;
+      birthDate.value = data.dateOfBirth;
+      specialization.value = data.specialization;
+      employeeId.value = data.id;
+      imgPath.value = `${prefix}/StaticFiles/${
+        employeeId.value
+      }.png?${new Date().getTime()}`;
+    } catch (e: any) {
+      console.log(e);
+      snackbar.error = true;
+      snackbar.text = "Wystąpił błąd podczas pobierania danych";
+      snackbar.showing = true;
+    }
+  } else {
+    try {
+      const res = await authorized.get("/employee/account");
+      const data = res.data;
+      name.value = data.firstName;
+      lastName.value = data.lastName;
+      pesel.value = data.pesel;
+      email.value = data.email;
+      phone.value = data.phoneNumber;
+      birthDate.value = data.dateOfBirth;
+      specialization.value = data.specialization;
+      employeeId.value = data.id;
+    } catch (e: any) {
+      console.log(e);
+      snackbar.error = true;
+      snackbar.text = "Wystąpił błąd podczas pobierania danych";
+      snackbar.showing = true;
+    }
+  }
 });
 
 const submitData = async () => {
@@ -62,6 +93,7 @@ const submitData = async () => {
     );
     if (res.status === 200) snackbar.error = false;
     snackbar.text = "Pomyślnie zaktualizowano dane";
+    router.push("/staff/doctors");
   } catch (e) {
     snackbar.error = true;
     snackbar.text = "Wystąpił błąd podczas edycji";
@@ -69,6 +101,12 @@ const submitData = async () => {
     waiting.value = false;
     snackbar.showing = true;
   }
+};
+
+const reloadImage = () => {
+  imgPath.value = `${prefix}/StaticFiles/${
+    employeeId.value
+  }.png?${new Date().getTime()}`;
 };
 </script>
 
@@ -92,22 +130,32 @@ const submitData = async () => {
         <v-container>
           <v-row>
             <v-col align="center">
-              <v-img
-                height="200"
-                src="https://st2.depositphotos.com/1010683/5848/i/950/depositphotos_58482379-stock-photo-male-asian-doctor.jpg"
-              >
-              </v-img>
+              <v-img height="200" :src="imgPath"> </v-img>
             </v-col>
           </v-row>
-          <v-btn
-            variant="text"
-            align-self="center"
-            size="small"
-            color="blue-darken-2"
-            class="mt-2 button"
-          >
-            Edytuj zdjęcie
-          </v-btn>
+          <v-dialog v-model="uploadImage">
+            <template #activator>
+              <v-btn
+                variant="text"
+                align-self="center"
+                size="small"
+                color="blue-darken-2"
+                class="mt-2 button"
+                @click="uploadImage = true"
+              >
+                Edytuj zdjęcie
+              </v-btn>
+            </template>
+            <v-row no-gutters>
+              <v-col class="d-flex justify-center">
+                <UploadImage
+                  @back="uploadImage = false"
+                  :id="router.currentRoute.value.params['id'] as string ?? null"
+                  @reload="reloadImage()"
+                />
+              </v-col>
+            </v-row>
+          </v-dialog>
           <v-card-text>
             <v-form ref="form">
               <v-row>
@@ -143,7 +191,7 @@ const submitData = async () => {
                     label="Pesel"
                     v-model="pesel"
                     variant="solo"
-                    :rules="peselRules"
+                    :rules="getPeselRules(new Date(birthDate))"
                     color="blue-darken-2"
                     required
                   >
@@ -214,7 +262,7 @@ const submitData = async () => {
               text="blue-darken"
               color="blue-darken-2"
               class="mt-2 button"
-              @click="router.back()"
+              @click="router.push('/staff/doctors')"
             >
               Wstecz
             </v-btn>
@@ -232,7 +280,8 @@ const submitData = async () => {
             </v-row>
             <v-row no-gutters>
               <router-link
-                to="/staff/passwordreset"
+                v-if="employeeId"
+                :to="`/staff/password/${employeeId}/reset`"
                 custom
                 v-slot="{ navigate }"
               >

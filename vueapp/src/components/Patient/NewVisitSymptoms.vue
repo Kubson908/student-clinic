@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { specializations, router } from "@/main";
-import { notNull } from "../../validation";
+import { notNull, max1000, symptomsRules } from "../../validation";
 // eslint-disable-next-line
 const emit = defineEmits(["page"]);
 const change_page = async (arg: number) => {
@@ -55,11 +55,13 @@ defineExpose({
           label="Objawy"
           variant="solo"
           v-model="symptoms"
+          :rules="symptomsRules"
         ></v-textarea>
         <v-textarea
           label="Stosowane leki"
           variant="solo"
           v-model="medicine"
+          :rules="max1000"
         ></v-textarea>
         <v-row justify="center">
           <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">

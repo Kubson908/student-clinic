@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Przychodnia.Webapi.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
-using Przychodnia.Webapi.CustomTokenProviders;
 using System.Security.Claims;
 
 namespace Przychodnia.Webapi.Controllers

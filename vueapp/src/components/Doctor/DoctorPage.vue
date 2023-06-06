@@ -29,6 +29,7 @@ onBeforeMount(async () => {
         </v-card-item>
         <v-card-text>
           <v-row class="pa-8" v-if="!loading">
+            <TransitionGroup name="list">
             <v-col
               v-for="doctor in doctors"
               :key="doctor.id"
@@ -38,12 +39,18 @@ onBeforeMount(async () => {
               class="d-flex justify-center"
             >
               <DoctorCard
-                img="https://img.favpng.com/24/11/9/physician-medicine-stock-photography-health-care-clinic-png-favpng-U8PcYt9GTDcuyNQMGgUhAhivX.jpg"
+                :img="
+                  'http://localhost:7042/StaticFiles/' +
+                  doctor.id +
+                  '.png?' +
+                  new Date().getTime()
+                "
                 :doctor="doctor"
                 :disabled="false"
               >
               </DoctorCard>
             </v-col>
+          </TransitionGroup>
           </v-row>
           <v-row v-else>
             <v-col

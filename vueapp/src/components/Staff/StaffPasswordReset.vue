@@ -12,17 +12,19 @@ const passRepeat = ref<string>("");
 const form = ref<any>();
 const visible = ref<boolean>(false);
 const visibleRepeat = ref<boolean>(false);
-const loading = ref<boolean>(false);
-// const props = defineProps({
-// id: Number,
-// });
+const loading = ref<boolean>(true);
+const doctor_id = router.currentRoute.value.params["id"] ?? null;
 onBeforeMount(async () => {
-  const doc = await authorized.get(
-    `/Employee/${"52e97c43-3a30-49b3-ba28-9b761da64680"}`
-  );
-  const data = doc.data;
-  name.value = data.firstName;
-  lastName.value = data.lastName;
+  try {
+    const doc = await authorized.get(`/Employee/${doctor_id}`);
+    const data = doc.data;
+    name.value = data.firstName;
+    lastName.value = data.lastName;
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loading.value = false;
+  }
 });
 
 const repeatPasswordRules = [
@@ -45,7 +47,7 @@ const submitData = async () => {
       `http://localhost:7042/api/auth/employee-reset-password`,
 
       {
-        id: "52e97c43-3a30-49b3-ba28-9b761da64680",
+        id: doctor_id,
         password: pass.value,
       }
     );
@@ -53,6 +55,7 @@ const submitData = async () => {
       snackbar.error = false;
       snackbar.text = "Pomyślnie zmieniono hasło";
     }
+    router.push(`/staff/doctors/profile/${doctor_id}`);
   } catch (e) {
     snackbar.error = true;
     snackbar.text = "Wystąpił błąd podczas zmiany hasła";
@@ -104,6 +107,7 @@ const submitData = async () => {
             @click:append-inner="() => (visible = !visible)"
             :rules="passwordRules"
             class="py-1"
+            :disabled="loading"
             color="blue-darken-2"
             required
           >
@@ -118,6 +122,7 @@ const submitData = async () => {
             :rules="repeatPasswordRules"
             class="py-1"
             color="blue-darken-2"
+            :disabled="loading"
             required
           >
           </v-text-field>
