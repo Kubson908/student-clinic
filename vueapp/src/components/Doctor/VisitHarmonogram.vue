@@ -66,13 +66,13 @@ const sorted = computed(() => {
   );
 });
 
-const format = (date: Date) => {
+/*const format = (date: Date) => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
 
   return `${day}/${month}/${year}`;
-};
+};*/
 const formatTime = (date: Date) => {
   const hours = date.getHours();
   const minutes = date.getMinutes();
@@ -151,7 +151,7 @@ watch(message, (newMessage) => {
 <template>
   <v-row justify="center" no-gutters>
     <v-col xs="12" sm="6" md="6" align-self="center">
-      <v-card elevation="5" class="rounded-lg" height="80vh">
+      <v-card elevation="5" class="rounded-lg">
         <template #loader>
           <v-progress-linear
             :active="loading"
@@ -173,6 +173,7 @@ watch(message, (newMessage) => {
                 auto-apply
                 locale="pl-PL"
                 :disabled="loading"
+                calendar-cell-class-name="big-cell text-body-1 rounded-lg"
                 :disabled-week-days="[0]"
               >
                 <template #trigger>
@@ -193,7 +194,7 @@ watch(message, (newMessage) => {
           </v-row>
         </v-card-item>
         <v-divider class="mx-4"> </v-divider>
-        <div class="card mx-4">
+        <div class="visit-card mx-4">
           <v-list class="d-flex flex-column justify-center align-center">
             <v-row no-gutters v-if="appointments.length === 0">
               <v-col class="text-grey"> Brak wizyt w tym dniu </v-col>
@@ -208,11 +209,11 @@ watch(message, (newMessage) => {
               >
                 <v-row>
                   <v-col xs="2" md="4">
-                    <v-container class="d-flex flex-column left">
-                      {{ formatTime(new Date(appointment.date)) }}
-                      {{ appointment.patient }}
-                      {{ format(new Date(appointment.date)) }}
-                    </v-container>
+                      <v-container class="d-flex flex-column left">
+                          {{ formatTime(new Date(appointment.date)) }}
+                          {{ appointment.patient }}
+
+                      </v-container>
                   </v-col>
                   <v-col xs="10" md="8">
                     <v-container class="right">
@@ -263,7 +264,7 @@ watch(message, (newMessage) => {
           </v-list>
         </div>
         <v-divider class="mx-4"></v-divider>
-        <v-container class="d-flex justify-center align-center bottom">
+        <v-container class="d-flex justify-center align-center">
           <div width="90%" class="space-between">
             <v-btn
               width="20%"
@@ -281,9 +282,9 @@ watch(message, (newMessage) => {
 </template>
 
 <style>
-.card {
+.visit-card {
   overflow: auto !important;
-  height: 55%;
+  height: 50vh;
 }
 .button {
   max-width: fit-content !important;

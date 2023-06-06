@@ -45,7 +45,7 @@ const sortedByDate = computed(() => {
 <template>
   <v-row justify="center" no-gutters>
     <v-col xs="12" sm="9" md="6" align-self="center">
-      <v-card elevation="5" class="rounded-lg" height="70vh">
+      <v-card elevation="5" class="rounded-lg">
         <template #loader>
           <v-progress-linear
             :active="loading"
@@ -63,7 +63,7 @@ const sortedByDate = computed(() => {
         <div class="card-app mx-4">
           <v-list class="d-flex flex-column justify-center align-center py-6">
             <v-row no-gutters v-if="test.appointments.length === 0 && !loading">
-              <v-col class="text-gray"> Brak wizyt </v-col>
+              <v-col class="text-grey"> Brak wizyt </v-col>
             </v-row>
             <TransitionGroup name="list">
               <v-list-item
@@ -126,7 +126,7 @@ const sortedByDate = computed(() => {
         </div>
         <v-divider class="mx-4"></v-divider>
 
-        <v-container class="d-flex justify-center align-center bottom">
+        <v-container class="d-flex justify-center align-center">
           <div width="90%" class="space-between">
             <v-btn
               width="20%"

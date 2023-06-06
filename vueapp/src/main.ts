@@ -40,7 +40,7 @@ export const getToken = () => {
 
 export const authorized = axios.create({
   baseURL: `${prefix}/api`,
-  timeout: 5000,
+  timeout: 10000,
 });
 
 authorized.interceptors.request.use((config) => {
@@ -50,7 +50,7 @@ authorized.interceptors.request.use((config) => {
 
 export const unauthorized = axios.create({
   baseURL: `${prefix}/api`,
-  timeout: 5000,
+  timeout: 10000,
 });
 
 export const snackbar = reactive<Snackbar>({

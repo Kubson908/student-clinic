@@ -34,7 +34,6 @@ namespace Przychodnia.Webapi.Websocket
         public async Task InvokeAsync(HttpContext context)
         {
             CancellationToken ct = context.RequestAborted;
-            Console.WriteLine(context.Response);
             if (endpoints.Any(e => context.Request.Path.ToString().Contains(e))  
                 && context.Response.Body != null)
             {
@@ -71,7 +70,7 @@ namespace Przychodnia.Webapi.Websocket
                         
                     return;
 
-                }
+                } catch (WebSocketException) { }
                 finally
                 {
                     context.Response.Body = originalBody;

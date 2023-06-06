@@ -45,7 +45,7 @@ const submit = async () => {
     if (response.status === 201) {
       snackbar.error = false;
       snackbar.text =
-        "Pomyślnie wysłano wstępną rezerwację wizyty, oczekuj e-maila potwierdzającego w najbliższym czasie";
+        "Pomyślnie wysłano wstępną rezerwację wizyty, oczekuj e-maila potwierdzającego";
       router.push("/patient/appointments");
     }
   } catch (e: any) {

@@ -36,7 +36,7 @@ const filteredPatients = computed(() => {
 </script>
 <template>
   <v-row justify="center" no-gutters>
-    <v-col cols="12" sm="6" md="6" align-self="center">
+    <v-col cols="12" sm="9" md="6" align-self="center">
       <v-card elevation="5" class="rounded-lg">
         <template #loader>
           <v-progress-linear
