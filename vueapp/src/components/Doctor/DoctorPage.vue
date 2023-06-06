@@ -29,6 +29,7 @@ onBeforeMount(async () => {
         </v-card-item>
         <v-card-text>
           <v-row class="pa-8" v-if="!loading">
+            <TransitionGroup name="list">
             <v-col
               v-for="doctor in doctors"
               :key="doctor.id"
@@ -49,6 +50,7 @@ onBeforeMount(async () => {
               >
               </DoctorCard>
             </v-col>
+          </TransitionGroup>
           </v-row>
           <v-row v-else>
             <v-col

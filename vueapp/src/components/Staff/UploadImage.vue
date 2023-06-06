@@ -17,7 +17,6 @@ const src = ref<string>("");
 watch(file, () => {
   if (file.value.length !== 0) src.value = URL.createObjectURL(file.value[0]);
   urlFile.value = file.value[0];
-  console.log(file.value[0].arrayBuffer);
 });
 watch(urlFile, () => {
   if (file.value.length !== 0) src.value = URL.createObjectURL(file.value[0]);
@@ -52,7 +51,6 @@ const load = async () => {
     // eslint-disable-next-line
     urlFile.value = new File([res.data as BlobPart], "Plik");
     file.value[0] = urlFile.value;
-    console.log(file.value);
   } catch (error: any) {
     console.log(error);
     snackbar.error = true;

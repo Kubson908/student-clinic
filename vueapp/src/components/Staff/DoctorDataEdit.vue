@@ -93,6 +93,7 @@ const submitData = async () => {
     );
     if (res.status === 200) snackbar.error = false;
     snackbar.text = "Pomyślnie zaktualizowano dane";
+    router.push("/staff/doctors");
   } catch (e) {
     snackbar.error = true;
     snackbar.text = "Wystąpił błąd podczas edycji";
@@ -261,7 +262,7 @@ const reloadImage = () => {
               text="blue-darken"
               color="blue-darken-2"
               class="mt-2 button"
-              @click="router.back()"
+              @click="router.push('/staff/doctors')"
             >
               Wstecz
             </v-btn>
@@ -279,7 +280,8 @@ const reloadImage = () => {
             </v-row>
             <v-row no-gutters>
               <router-link
-                to="/staff/passwordreset"
+                v-if="employeeId"
+                :to="`/staff/password/${employeeId}/reset`"
                 custom
                 v-slot="{ navigate }"
               >

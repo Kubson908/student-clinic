@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
-using NuGet.Protocol;
 using Przychodnia.Shared;
 using Przychodnia.Webapi.Data;
 using Przychodnia.Webapi.Models;
-using System.Runtime.InteropServices.ComTypes;
 using System.Security.Claims;
 
 namespace Przychodnia.Webapi.Controllers
@@ -39,6 +37,7 @@ namespace Przychodnia.Webapi.Controllers
                     a.Diagnosis,
                     a.Recommendations,
                     a.Finished,
+                    a.Meds,
                     Patient = a.Patient != null ? new
                     {
                         a.Patient.Id,
@@ -169,6 +168,7 @@ namespace Przychodnia.Webapi.Controllers
                 a.Symptoms,
                 a.Diagnosis,
                 a.Recommendations,
+                a.Meds,
                 a.AppointmentId,
                 ControlAppointment = a.AppointmentId != null ? new
                 {
@@ -282,6 +282,7 @@ namespace Przychodnia.Webapi.Controllers
                     } : null,
                     a.Medicines,
                     a.Recommendations,
+                    a.Meds,
                     a.Symptoms,
                     a.ControlAppointment
                 })).ToList();
@@ -458,6 +459,7 @@ namespace Przychodnia.Webapi.Controllers
             var appointment = await _db.Appointments.Include(a => a.Patient).FirstOrDefaultAsync(a => a.Id == Int32.Parse(appointmentId));
             if (appointment == null) return NotFound("Appointment not found");
             if (appointment.Specialization != doctor.Specialization) return Conflict("Cannot assign this appointment to this doctor");
+            if (appointment.DoctorId != null) return Conflict("This appointment has already been assigned");
             appointment.DoctorId = doctorId.DoctorId;
             if (doctorId.Date.HasValue) appointment.Date = (DateTime)doctorId.Date;
             _db.Entry(appointment).Property(p => p.DoctorId).IsModified = true;
@@ -511,7 +513,7 @@ namespace Przychodnia.Webapi.Controllers
                     Date = date,
                     AppointmentId = appointment.Id,
                     Specialization = appointment.Specialization,
-                    Medicines = appointment.Medicines,
+                    Medicines = dto.Meds,
                     Symptoms = appointment.Symptoms,
                 };
                 appointment.ControlAppointment = controlAppointment;

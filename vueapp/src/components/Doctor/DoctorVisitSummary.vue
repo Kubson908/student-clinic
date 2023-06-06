@@ -117,7 +117,7 @@ console.log(props.data?.select);
               Zalecenia
             </v-col>
             <v-col class="text-left">
-              {{ props.data?.recomendations ? props.data?.recomendations : "Nie podano" }}
+              {{ props.data?.recommendations ? props.data?.recommendations : "Nie podano" }}
             </v-col>
           </v-row>
           <v-row v-if="props.data?.dateHour && props.data.dateDay && props.data?.controlVisit">

@@ -114,7 +114,7 @@ watch(message, (newMessage) => {
   const parsed = JSON.parse(newMessage.data);
   if (parsed["EventName"] === "assignedAppointment") {
     try {
-      const a_date = new Date(parsed.Data.date.slice(0, -4));
+      const a_date = new Date(parsed.Data.date.slice(0, -4) + "Z");
       if (
         !(
           a_date.getDate() === date.value.getDate() &&
@@ -123,7 +123,7 @@ watch(message, (newMessage) => {
         )
       )
         return;
-      parsed.Data.date = parsed.Data.date.slice(0, -4);
+      parsed.Data.date = a_date.toISOString();
       parsed.Data.patient = `${parsed.Data.patient.firstName} ${parsed.Data.patient.lastName}`;
       appointments.value.push(parsed.Data);
       snackbar.error = false;

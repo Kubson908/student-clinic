@@ -49,7 +49,11 @@ builder.Services.AddIdentityCore<Patient>(config =>
     .AddTokenProvider<PasswordResetTokenProvider<Patient>>("passwordReset")
     .AddTokenProvider<EmailConfirmationTokenProvider<Patient>>(nameof(EmailConfirmationTokenProvider<Patient>))
     .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddIdentityCore<Employee>()
+builder.Services.AddIdentityCore<Employee>(config =>
+{
+    config.Tokens.PasswordResetTokenProvider = "passwordReset";
+})
+    .AddTokenProvider<PasswordResetTokenProvider<Employee>>("passwordReset")
     .AddTokenProvider<PasswordResetTokenProvider<Employee>>(nameof(PasswordResetTokenProvider<Employee>))
     .AddDefaultTokenProviders().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 

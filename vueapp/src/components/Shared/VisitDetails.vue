@@ -29,11 +29,7 @@ const getAppointmentData = async () => {
 <template>
   <v-row no-gutters class="ma-auto"
     ><v-col class="ma-auto">
-      <v-card
-        width="560px"
-        elevation="5"
-        class="rounded-lg ma-4"
-      >
+      <v-card width="560px" elevation="5" class="rounded-lg ma-4">
         <template #loader>
           <v-progress-linear
             :active="waiting"
@@ -191,13 +187,11 @@ const getAppointmentData = async () => {
                   class="font-weight-bold text-blue-darken-1 text-left"
                   cols="4"
                 >
-                  Leki
+                  Przepisane leki
                 </v-col>
                 <v-col class="text-left">
                   {{
-                    appointment_data.medicines
-                      ? appointment_data.medicines
-                      : "Nie podano"
+                    appointment_data.meds ? appointment_data.meds : "Nie podano"
                   }}
                 </v-col>
               </v-row>

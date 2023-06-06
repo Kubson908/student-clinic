@@ -240,4 +240,16 @@ watch(current_month, (newMonth, oldMonth) => {
   width: 64px;
   height: 48px;
 }
+@media screen and (max-width: 1300px) {
+  .big-cell {
+    width: 48px;
+    height: 48px;
+  }
+}
+@media screen and (max-width: 600px) {
+  .big-cell {
+    width: 40px;
+    height: 40px;
+  }
+}
 </style>

@@ -25,6 +25,7 @@ const submit = async (data: SubmitEvent) => {
     user.name = "Niezalogowany";
     user.isLoggedIn = false;
     user.roles = [];
+    router.push("/login");
   } catch (error: any) {
     console.log(error);
     snackbar.text =

@@ -73,6 +73,7 @@ const filteredPatients = computed(() => {
               {{ loading ? "Ładowanie" : "Brak pacjentów" }}
             </v-col>
           </v-row>
+          <TransitionGroup name="list">
           <v-virtual-scroll
             :items="filteredPatients"
             :height="filteredPatients.length === 0 ? '40vh' : '50vh'"
@@ -130,6 +131,7 @@ const filteredPatients = computed(() => {
               </v-list-item>
             </template>
           </v-virtual-scroll>
+        </TransitionGroup>
           <v-divider></v-divider>
         </v-card-text>
         <v-card-actions>

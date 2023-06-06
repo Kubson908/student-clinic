@@ -2,7 +2,7 @@
 import { router, authorized, snackbar } from "@/main";
 import { ref, onBeforeMount } from "vue";
 // eslint-disable-next-line
-const emit = defineEmits(["page", "loaded", "save"]);
+const emit = defineEmits(["page", "loaded", "save", "redirect"]);
 const change_page = async (arg: number) => {
   if (arg > 0) {
     const valid = ((await form.value.validate()) as any).valid;
@@ -57,6 +57,9 @@ onBeforeMount(async () => {
 
 const select = ref<any>();
 const date = ref<any>(new Date());
+const redirect = () => {
+  emit("redirect");
+};
 // eslint-disable-next-line
 defineExpose({
   appointmentDate,
@@ -131,6 +134,12 @@ defineExpose({
             </v-col>
             <v-col class="text-left">
               {{ loading ? "Wczytywanie" : patientName }}
+              <v-icon
+                v-if="!loading"
+                icon="mdi-file-document-arrow-right-outline"
+                color="blue-darken-2"
+                @click="redirect()"
+              ></v-icon>
             </v-col>
           </v-row>
           <v-row>

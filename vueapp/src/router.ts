@@ -117,11 +117,11 @@ export const routes: Array<Route> = [
         component: DoctorPage,
         meta: { roles: ["Employee"] },
       }, // recepcja - Panel admina - recepcja
-      {
-        path: "profile/edit", // recepcja - Dane lekarza - recepcjonista
-        component: DoctorDataEdit,
-        meta: { roles: ["Employee"] },
-      },
+      // {
+      //   path: "profile/edit", // recepcja - Dane lekarza - recepcjonista
+      //   component: DoctorDataEdit,
+      //   meta: { roles: ["Employee"] },
+      // },
       {
         path: "appointment/:id", // doctor - Szczegóły wizyty - z harmonogramu / doctor - Szczegóły wizyty (recipe)
         component: VisitDetails,
@@ -180,7 +180,7 @@ export const routes: Array<Route> = [
         meta: { roles: ["Staff"] },
       },
       {
-        path: "passwordreset", // recepcja - Zmień hasło - recepcjonista
+        path: "password/:id/reset", // recepcja - Zmień hasło - recepcjonista
         component: StaffPasswordReset,
         meta: { roles: ["Staff"] },
       },

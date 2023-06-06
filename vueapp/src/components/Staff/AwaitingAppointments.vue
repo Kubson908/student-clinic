@@ -6,6 +6,7 @@ import { getSocket } from "@/socket";
 const awaiting = ref<Array<any>>([]);
 const socket = ref<WebSocket | null>(null);
 const message = ref<any>(null);
+const loading = ref<boolean>(true);
 let loaded = false;
 const sorted = computed(() =>
   Array.from(awaiting.value).sort(
@@ -25,6 +26,7 @@ onBeforeMount(async () => {
   } finally {
     //snackbar.showing = true;
     loaded = true;
+    loading.value = false;
   }
 });
 
@@ -79,6 +81,14 @@ watch(message, (newMessage) => {
   <v-row justify="center" no-gutters>
     <v-col cols="12" sm="8" xl="6" xxl="4" align-self="center">
       <v-card elevation="5" class="rounded-lg">
+        <template #loader>
+          <v-progress-linear
+            :active="loading"
+            color="deep-purple"
+            height="4"
+            indeterminate
+          ></v-progress-linear>
+        </template>
         <v-card-item>
           <v-container class="d-flex justify-center align-center">
             <h1>Oczekujące wizyty</h1>

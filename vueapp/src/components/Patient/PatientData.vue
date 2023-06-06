@@ -71,11 +71,10 @@ const submit = async (data: SubmitEvent) => {
 </script>
 
 <template>
+  <v-row no-gutters class="justify-center"><v-col class="ma-auto" cols="12" sm="8" md="4">
   <v-card
-    width="40vw"
-    location="center"
     elevation="5"
-    class="rounded-lg signup"
+    class="rounded-lg signup ma-auto"
   >
     <v-card-item>
       <v-container class="d-flex justify-center align-center">
@@ -220,7 +219,7 @@ const submit = async (data: SubmitEvent) => {
               color="blue-darken-2"
               type="submit"
             >
-              zapisz
+              Zapisz
             </v-btn>
           </v-col>
         </v-row>
@@ -245,6 +244,7 @@ const submit = async (data: SubmitEvent) => {
       </v-form>
     </v-card-text>
   </v-card>
+</v-col></v-row>
 </template>
 
 <style>

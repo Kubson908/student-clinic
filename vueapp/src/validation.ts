@@ -134,10 +134,10 @@ const getPeselRules = (birthDate: any) => {
       if (birthDate === "Invalid Date") return true;
       const multipliers = [1, 3, 7, 9]
       let sum = 0;
-      for (let i = 0; i < 11; i++) {
+      for (let i = 0; i < 10; i++) {
         sum += (multipliers[i % 4] * parseInt(value[i])) % 10;
       }
-      if (sum % 10 === parseInt(value[10])) return true;
+      if (10 - (sum % 10) === parseInt(value[10])) return true;
       else return "Błędny pesel";
     }
   ]

@@ -34,7 +34,6 @@ const deleteAppointment = async () => {
     if (res.status === 200) {
       snackbar.error = false;
       snackbar.text = "Pomyślnie anulowano wizytę";
-      router.push("/patient/appointments");
       if (user.roles.includes("Patient")) router.push("/patient/appointments");
       else router.push("/staff/appointments/awaiting");
     }
@@ -42,7 +41,7 @@ const deleteAppointment = async () => {
     console.log(e);
     snackbar.error = true;
     snackbar.text =
-      e.response.status === 409
+      e.response && e.response.status === 409
         ? "Nie można anulować wizyty 24h przed nią"
         : "Wystąpił błąd przy anulowaniu wizyty";
   } finally {

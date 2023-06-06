@@ -15,7 +15,6 @@ const form = ref<any>();
 onBeforeMount(async () => {
   appointment_id = router.currentRoute.value.params["id"] as string;
   await getAppointmentData();
-  console.log(appointment_data.value);
   await getAvailableDoctors();
 });
 

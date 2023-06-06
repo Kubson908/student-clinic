@@ -65,6 +65,7 @@ const submitData = async () => {
     );
     if (res.status === 200) snackbar.error = false;
     snackbar.text = "Pomyślnie zaktualizowano dane";
+    router.push("/staff/doctors");
   } catch (e) {
     console.log(e);
     snackbar.error = true;
@@ -85,29 +86,31 @@ const submitData = async () => {
         class="rounded-lg ma-4"
         v-if="checkRole('Staff')"
       >
+      
         <v-card-item>
-          <!-- <v-card-title font-size="32">Twoje dane</v-card-title> -->
-          <p class="font-weight-bold text-h4">Twoje dane</p>
-        </v-card-item>
-        <v-spacer></v-spacer>
+        <v-container class="d-flex justify-center align-center">
+          <v-card
+            height="64"
+            width="64"
+            color="#36BFF1"
+            class="d-flex justify-center align-center"
+          >
+            <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
+          </v-card>
+        </v-container>
+        <v-card-title>Twoje dane</v-card-title>
+        <v-card-subtitle>Edytuj dane</v-card-subtitle>
+      </v-card-item>
+      <v-spacer></v-spacer>
         <v-card-text>
           <v-form @submit.prevent ref="form">
             <v-container>
-              <v-row>
-                <v-col align="center">
-                  <v-img
-                    height="200"
-                    :src="`${prefix}/StaticFiles/${employeeId}.png`"
-                  >
-                  </v-img>
-                </v-col>
-              </v-row>
-              <v-row>
+              <v-row no-gutters>
                 <p class="font-weight-bold">Dane osobowe</p>
               </v-row>
-              <v-row><v-divider></v-divider></v-row>
-              <v-row>
-                <v-col class="py-1">
+              <v-row no-gutters><v-divider></v-divider></v-row>
+              <v-row no-gutters>
+                <v-col class="mt-4">
                   <v-text-field
                     type="input"
                     v-model="name"
@@ -115,11 +118,12 @@ const submitData = async () => {
                     variant="solo"
                     :rules="nameRules"
                     color="blue-darken-2"
+                    class="mx-2"
                     required
                   >
                   </v-text-field>
                 </v-col>
-                <v-col class="py-1">
+                <v-col class="mt-4">
                   <v-text-field
                     type="input"
                     v-model="lastName"
@@ -127,13 +131,14 @@ const submitData = async () => {
                     variant="solo"
                     :rules="surnameRules"
                     color="blue-darken-2"
+                    class="mx-2"
                     required
                   >
                   </v-text-field>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col class="py-1">
+              <v-row no-gutters>
+                <v-col>
                   <v-text-field
                     type="Date"
                     label="Data urodzenia"
@@ -141,11 +146,12 @@ const submitData = async () => {
                     variant="solo"
                     :rules="dateRules"
                     color="blue-darken-2"
+                    class="mx-2"
                     required
                   >
                   </v-text-field>
                 </v-col>
-                <v-col class="py-1">
+                <v-col>
                   <v-text-field
                     type="input"
                     label="Pesel"
@@ -153,13 +159,14 @@ const submitData = async () => {
                     variant="solo"
                     :rules="getPeselRules(new Date(birthDate))"
                     color="blue-darken-2"
+                    class="mx-2"
                     required
                   >
                   </v-text-field>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col class="py-1">
+              <v-row no-gutters>
+                <v-col>
                   <v-text-field
                     type="email"
                     label="Email"
@@ -167,11 +174,12 @@ const submitData = async () => {
                     variant="solo"
                     :rules="emailRules"
                     color="blue-darken-2"
+                    class="mx-2"
                     required
                   >
                   </v-text-field>
                 </v-col>
-                <v-col class="py-1">
+                <v-col>
                   <v-text-field
                     type="input"
                     label="Nr telefonu"
@@ -179,15 +187,16 @@ const submitData = async () => {
                     variant="solo"
                     :rules="phoneRules"
                     color="blue-darken-2"
+                    class="mx-2"
                     required
                   >
                   </v-text-field>
                 </v-col>
               </v-row>
-              <v-row><v-divider></v-divider></v-row>
+              <v-row no-gutters><v-divider></v-divider></v-row>
             </v-container>
 
-            <v-row justify="start">
+            <v-row no-gutters justify="start">
               <v-col
                 xs="12"
                 sm="6"
@@ -216,7 +225,7 @@ const submitData = async () => {
                 </v-btn>
               </v-col>
             </v-row>
-            <v-row>
+            <v-row no-gutters>
               <v-col class="text-right">
                 <router-link
                   to="/doctor/change-password"
@@ -255,8 +264,9 @@ const submitData = async () => {
           <v-form @submit.prevent>
             <v-container>
               <v-row>
-                <v-col align="center">
+                <v-col align="center" class="img-static-height">
                   <v-img
+                    v-if="employeeId"
                     height="200"
                     :src="`${prefix}/StaticFiles/${employeeId}.png`"
                   >
@@ -371,5 +381,8 @@ const submitData = async () => {
 <style>
 .button {
   text-transform: unset !important;
+}
+.img-static-height {
+  height: 200px !important;
 }
 </style>

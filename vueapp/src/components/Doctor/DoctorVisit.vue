@@ -47,7 +47,7 @@ const onSubmit = async () => {
       finished: true,
       diagnosis: req_data.diagnose,
       recommendations: req_data.recommendations,
-      medicines: req_data.meds,
+      meds: req_data.meds,
       controlDate:
         req_data.dateDay && req_data.dateHour
           ? `${("0" + req_data.dateDay.toLocaleDateString("pl-PL"))
@@ -76,6 +76,20 @@ const onSubmit = async () => {
   }
 };
 const page = ref<number>(1);
+
+const onRedirect = () => {
+  const data = getData();
+  sessionStorage.setItem(
+    appointment_id,
+    JSON.stringify({
+      meds: data.meds,
+      recommendations: data.recommendations,
+      diagnose: data.diagnose,
+    })
+  );
+  router.push(`/doctor/patient/${progress.value.patientId}/card`)
+}
+
 onMounted(() => {
   const saved = sessionStorage.getItem(appointment_id);
   if (saved !== null) {
@@ -106,6 +120,7 @@ onMounted(() => {
               ref="progress"
               @loaded="loading = false"
               @save="saveAndExit()"
+              @redirect="onRedirect()"
             />
           </v-window-item>
           <v-window-item :value="2">

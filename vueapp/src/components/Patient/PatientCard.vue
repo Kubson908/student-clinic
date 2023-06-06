@@ -8,6 +8,7 @@ import { ref } from "vue";
 const name = ref<string>("");
 const lastName = ref<string>("");
 const medicines = ref<string>("");
+const allergies = ref<string>("");
 const phoneNumber = ref<string>("");
 const email = ref<string>("");
 const pesel = ref<string>("");
@@ -33,6 +34,7 @@ onBeforeMount(async () => {
     pesel.value = data.pesel;
     dateOfBirth.value = data.dateOfBirth;
     treatmentHistory.value = data.treatmentHistory;
+    allergies.value = data.allergies;
   } catch (error: any) {
     console.log(error);
     snackbar.error = true;
@@ -122,6 +124,23 @@ onBeforeMount(async () => {
                 </v-col>
                 <v-col class="font-weight-bold text-blue-darken-1 text-left">
                   {{ medicines }}
+                </v-col>
+              </v-row>
+            </v-container>
+            <v-container>
+              <v-row>
+                <p class="font-weight-bold">Alergie</p>
+              </v-row>
+              <v-row><v-divider></v-divider></v-row>
+              <v-row>
+                <v-col
+                  v-if="allergies == null"
+                  class="text-blue-darken-1 font-weight-bold text-left"
+                >
+                  Brak alergii
+                </v-col>
+                <v-col class="font-weight-bold text-blue-darken-1 text-left">
+                  {{ allergies }}
                 </v-col>
               </v-row>
             </v-container>

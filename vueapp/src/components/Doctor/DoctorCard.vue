@@ -9,7 +9,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <v-card width="288" height="192" class="round-lg" :class="disabled">
+  <v-card width="288" height="192" class="round-lg" :class="disabled" elevation="4">
     <v-row no-gutters class="fill-height">
       <v-col cols="6" class="fill-height max-height">
         <v-img cover class="fill-height max-height" :src="img" />

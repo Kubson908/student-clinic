@@ -67,9 +67,9 @@ const submit = async () => {
 </script>
 
 <template>
-  <v-row no-gutters class="ma-auto"
-    ><v-col class="ma-auto">
-      <v-card width="560px" elevation="5" class="rounded-lg ma-4">
+  <v-row no-gutters class="justify-center"
+    ><v-col class="ma-auto" cols="12" sm="8" :md="page === 3 ? 3 : 4">
+      <v-card elevation="5" class="rounded-lg my-4">
         <template #loader>
           <v-progress-linear
             :active="waiting"

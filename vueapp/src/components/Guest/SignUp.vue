@@ -69,13 +69,11 @@ const repeatPasswordRules = [
 </script>
 
 <template>
-  <v-row no-gutters>
-    <v-col>
+  <v-row no-gutters class="justify-center">
+    <v-col cols="12" sm="8" md="4" class="ma-auto">
       <v-card
-        width="40vw"
-        location="center"
         elevation="5"
-        class="rounded-lg signup"
+        class="rounded-lg signup ma-auto"
       >
         <v-window v-model="page" direction="vertical" reverse>
           <v-window-item :value="0">
