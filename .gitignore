@@ -61,6 +61,7 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+appsettings.json
 
 # Tye
 .tye/
@@ -478,7 +479,7 @@ $RECYCLE.BIN/
 
 .DS_Store
 node_modules
-/dist
+dist
 
 .vs/
 

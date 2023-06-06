@@ -1,32 +1,22 @@
 <script setup lang="ts">
 import DoctorCard from "./DoctorCard.vue";
-const doctors: Array<any> = [
-  {
-    id: 1,
-    name: "Tomasz Problem",
-    profession: "Pulmonolog",
-  },
-  {
-    id: 2,
-    name: "Jan Testowy",
-    profession: "Gastrolog",
-  },
-  {
-    id: 3,
-    name: "Tomasz Problem",
-    profession: "Pulmonolog",
-  },
-  {
-    id: 4,
-    name: "Jan Testowy",
-    profession: "Gastrolog",
-  },
-  {
-    id: 5,
-    name: "Tomasz Problem",
-    profession: "Pulmonolog",
-  },
-];
+import { ref } from "vue";
+import { onBeforeMount } from "vue";
+import { authorized } from "@/main";
+
+const doctors = ref<any[]>();
+const loading = ref<boolean>(true);
+onBeforeMount(async () => {
+  try {
+    const card = await authorized.get("/employee/");
+    doctors.value = card.data.filter((emp: any) => emp.specialization !== null);
+    loading.value = false;
+  } catch (e) {
+    console.log(e);
+  } finally {
+    ("");
+  }
+});
 </script>
 <template>
   <v-row no-gutters justify="center">
@@ -38,7 +28,8 @@ const doctors: Array<any> = [
           </v-container>
         </v-card-item>
         <v-card-text>
-          <v-row class="pa-8">
+          <v-row class="pa-8" v-if="!loading">
+            <TransitionGroup name="list">
             <v-col
               v-for="doctor in doctors"
               :key="doctor.id"
@@ -48,11 +39,30 @@ const doctors: Array<any> = [
               class="d-flex justify-center"
             >
               <DoctorCard
-                img="https://img.favpng.com/24/11/9/physician-medicine-stock-photography-health-care-clinic-png-favpng-U8PcYt9GTDcuyNQMGgUhAhivX.jpg"
+                :img="
+                  'http://localhost:7042/StaticFiles/' +
+                  doctor.id +
+                  '.png?' +
+                  new Date().getTime()
+                "
                 :doctor="doctor"
                 :disabled="false"
               >
               </DoctorCard>
+            </v-col>
+          </TransitionGroup>
+          </v-row>
+          <v-row v-else>
+            <v-col
+              v-for="elem in Array(6)"
+              :key="elem"
+              cols="12"
+              sm="6"
+              md="4"
+              class="d-flex justify-center"
+            >
+              <v-skeleton-loader type="card-avatar" width="288">
+              </v-skeleton-loader>
             </v-col>
           </v-row>
         </v-card-text>

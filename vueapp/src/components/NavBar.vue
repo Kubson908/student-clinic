@@ -4,9 +4,14 @@ const logout = () => {
   localStorage.clear();
   user.name = "Niezalogowany";
   user.isLoggedIn = false;
-  user.role = undefined;
+  user.roles = [];
+  router.push("/");
+  // console.log(user.roles);
 };
-console.log(router.currentRoute.value)
+const checkRole = (role: string) => {
+  const roles = user.roles!;
+  return roles.includes(role);
+};
 </script>
 <template>
   <v-app-bar color="#597EDD" density="compact" theme="dark">
@@ -20,37 +25,117 @@ console.log(router.currentRoute.value)
         >
         </v-app-bar-nav-icon
       ></router-link>
-        
-      <div v-if="user.role == 'Patient'">
+
+
         <v-tabs
-        mandatory="false"
-        :model-value="router.currentRoute.value.path"
+          :mandatory="false"
+          :model-value="router.currentRoute.value.path"
+          class="w-100 overflow-auto"
+          v-if="checkRole('Patient')"
         >
-          <router-link to="/appointments" custom v-slot="{ navigate }">
-            <v-tab value="/appointments" @click="navigate">Wizyty</v-tab>
+          <router-link to="/patient/appointments" custom v-slot="{ navigate }">
+            <v-tab value="/patient/appointments" @click="navigate"
+              >Wizyty</v-tab
+            >
           </router-link>
-          <router-link to="/patientcard" custom v-slot="{ navigate }">
-            <v-tab value="/patientcard" @click="navigate">Pacjenci</v-tab>
+          <router-link to="/patient/card" custom v-slot="{ navigate }">
+            <v-tab value="/patient/card" @click="navigate"
+              >Karta Pacjenta</v-tab
+            >
           </router-link>
         </v-tabs>
-      </div>
-      <div v-else-if="user.role == 'Employee'">
+
         <v-tabs
-        mandatory="false"
-        :model-value="router.currentRoute.value.path"
+          :mandatory="false"
+          :model-value="router.currentRoute.value.path"
+          class="overflow-auto"
+          v-else-if="checkRole('Staff')"
         >
-          <router-link to="/appointments" custom v-slot="{ navigate }">
-            <v-tab value="/appointments" @click="navigate">Wizyty</v-tab>
+          <router-link
+            to="/staff/appointments/awaiting"
+            custom
+            v-slot="{ navigate }"
+          >
+            <v-tab value="/staff/appointments/awaiting" @click="navigate"
+              >Wizyty</v-tab
+            >
           </router-link>
-          <router-link to="/patientcard" custom v-slot="{ navigate }">
-            <v-tab value="/patientcard" @click="navigate">Pacjenci</v-tab>
+          <router-link to="/staff/patients" custom v-slot="{ navigate }">
+            <v-tab value="/staff/patients" @click="navigate">Pacjenci</v-tab>
+          </router-link>
+          <router-link to="/staff/doctors" custom v-slot="{ navigate }">
+            <v-tab value="/staff/doctors" @click="navigate">Lekarze</v-tab>
+          </router-link>
+          <router-link to="/staff/statistics" custom v-slot="{ navigate }">
+            <v-tab value="/staff/statistics" @click="navigate"
+              >Statystyka</v-tab
+            >
           </router-link>
         </v-tabs>
-      </div>
+        <v-tabs
+          :mandatory="false"
+          :model-value="router.currentRoute.value.path"
+          class="w-100 overflow-auto"
+          v-else-if="checkRole('Employee')"
+        >
+          <router-link to="/doctor/harmonogram" custom v-slot="{ navigate }">
+            <v-tab value="/doctor/harmonogram" @click="navigate">Wizyty</v-tab>
+          </router-link>
+          <router-link to="/doctor/patients" custom v-slot="{ navigate }">
+            <v-tab value="/doctor/patients" @click="navigate">Pacjenci</v-tab>
+          </router-link>
+        </v-tabs>
     </template>
-      <span class="d-inline-block link">
-        {{ user.name }}
-      </span>
+
+    <span class="d-inline-block link">
+      {{ user.name }}
+      <router-link
+        v-if="checkRole('Patient')"
+        to="/patient/profile"
+        custom
+        v-slot="{ navigate }"
+      >
+        <v-app-bar-nav-icon
+          size="50"
+          icon="mdi-account-circle-outline"
+          class="icon"
+          link
+          @click="navigate"
+        >
+        </v-app-bar-nav-icon>
+      </router-link>
+      <router-link
+        v-else-if="checkRole('Staff')"
+        to="/staff/profile"
+        custom
+        v-slot="{ navigate }"
+      >
+        <v-app-bar-nav-icon
+          size="50"
+          icon="mdi-hospital-building"
+          class="icon"
+          link
+          @click="navigate"
+        >
+        </v-app-bar-nav-icon>
+      </router-link>
+      <router-link
+        v-else-if="checkRole('Employee')"
+        to="/doctor/profile"
+        custom
+        v-slot="{ navigate }"
+      >
+        <v-app-bar-nav-icon
+          size="50"
+          icon="mdi-doctor"
+          class="icon"
+          link
+          @click="navigate"
+        >
+        </v-app-bar-nav-icon>
+      </router-link>
+    </span>
+
     <v-menu>
       <template v-slot:activator="{ props }">
         <v-app-bar-nav-icon v-bind="props" class="icon"> </v-app-bar-nav-icon>
@@ -85,9 +170,9 @@ console.log(router.currentRoute.value)
 .icon {
   color: var(--font-primary-color) !important;
 }
-.link{
-  
-  width: 150px; 
+.link {
+  width: 300px;
   color: white;
+  text-align: right;
 }
 </style>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import axios from "axios";
-import { ref } from "vue";
+import SignedUp from "./SignedUp.vue";
+import { unauthorized } from "../../main";
+import { ref, onBeforeMount } from "vue";
 import { VForm } from "vuetify/lib/components/index";
-import { prefix } from "../../config";
 import { router, user } from "../../main";
+import { snackbar } from "../../main";
 
 const visible = ref(false);
 const loading = ref<boolean>(false);
@@ -12,25 +13,37 @@ const form_reset = ref<typeof VForm | null>(null);
 
 const email = ref<string>("");
 const pass = ref<string>("");
-const email_reset = ref<string>("");
 const remember_me = ref<boolean>(false);
-
+const email_to_confirm = ref<string>("");
+const passProp = ref<string>("");
+const remember_meProp = ref<boolean>(false);
 const page = ref<number>(1);
 
-const send_mail = () => {};
+onBeforeMount(() => {
+  if (user.isLoggedIn) router.push("/");
+});
+
+const send_mail = async () => {
+  await unauthorized.post("/auth/send-reset-link", {
+    email: email_to_confirm.value,
+  });
+  snackbar.text = "Na podany adres email wysłano link do zmiany hasła";
+  snackbar.error = false;
+  snackbar.showing = true;
+};
 
 const submit = async (data: SubmitEvent) => {
   await data;
   const login = await form_login.value?.validate();
-  const reset = await form_reset.value?.validate();
-  loading.value = true;
   if (login && login.valid) {
     try {
-      const res = await axios.post(`${prefix}/api/auth/login`, {
+      loading.value = true;
+      const res = await unauthorized.post("/auth/login", {
         email: email.value,
         password: pass.value,
       });
-      localStorage.setItem("token", res.data.accessToken);
+
+      await localStorage.setItem("token", res.data.accessToken);
       if (remember_me.value)
         localStorage.setItem("expireDate", res.data.expireDate);
       else {
@@ -39,30 +52,57 @@ const submit = async (data: SubmitEvent) => {
         localStorage.setItem("expireDate", time.toString());
       }
       localStorage.setItem("user", res.data.user);
-      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("roles", JSON.stringify(res.data.roles));
       user.name = res.data.user;
       user.isLoggedIn = true;
-      user.role = res.data.role;
-      console.log(user);
-
+      user.roles = res.data.roles;
       router.push("/");
-    } catch (error) {
-      alert("Błędny e-mail lub hasło");
-      console.log(error);
+    } catch (error: any) {
+      console.log(error)
+      snackbar.text =
+        error.response && error.response.status == 401
+          ? "Błędny e-mail lub hasło"
+          : error.response && error.response.status == 403
+          ? "Zweryfikuj adres email"
+          : "Wystąpił nieznany błąd";
+      snackbar.error = true;
+      snackbar.showing = true;
+      if (error.response && error.response.status == 403) page.value = 4;
+    } finally {
+      loading.value = false;
     }
-
     form_reset.value?.reset();
     form_login.value?.reset();
   }
+};
+
+const reset = async (data: SubmitEvent) => {
+  await data;
+  const reset = await form_reset.value?.validate();
+  passProp.value = pass.value;
+  email_to_confirm.value = email.value;
+  remember_meProp.value = remember_me.value;
+  console.log(reset.valid);
   if (reset && reset.valid) {
     loading.value = true;
-    alert(`E-mail: ${email_reset.value}`);
-    page.value++;
-    loading.value = false;
+    try {
+      await send_mail();
+      page.value++;
+      loading.value = false;
+    } catch (error: any) {
+      console.log(error);
+      snackbar.text =
+        error.response && error.response.data == "User not found"
+          ? "Błędny adres email"
+          : "Wystąpił nieznany błąd";
+      snackbar.error = true;
+      snackbar.showing = true;
+    } finally {
+      loading.value = false;
+    }
     form_reset.value?.reset();
     form_login.value?.reset();
   }
-  loading.value = false;
 };
 
 const emailRules = [
@@ -88,7 +128,7 @@ const passwordRules = [
 </script>
 
 <template>
-  <v-row justify="center" class="mx-2">
+  <v-row no-gutters justify="center" class="mx-2">
     <v-col xs="12" sm="6" md="3" align-self="center">
       <v-card elevation="5" class="rounded-lg" :loading="loading">
         <template v-slot:loader="{ isActive }">
@@ -183,14 +223,14 @@ const passwordRules = [
                   ></v-icon>
                 </v-card>
               </v-container>
-              <v-card-title>Przypomnij hasło</v-card-title>
+              <v-card-title>Nie pamiętam hasła</v-card-title>
               <v-card-subtitle>Podaj e-mail</v-card-subtitle>
             </v-card-item>
             <v-spacer></v-spacer>
             <v-card-text>
-              <v-form ref="form_reset" @submit.prevent="submit">
+              <v-form ref="form_reset" @submit.prevent="reset">
                 <v-text-field
-                  v-model="email_reset"
+                  v-model="email"
                   type="email"
                   label="E-mail"
                   variant="solo"
@@ -235,12 +275,12 @@ const passwordRules = [
                   ></v-icon>
                 </v-card>
               </v-container>
-              <v-card-title>Przypomnij hasło</v-card-title>
+              <v-card-title>Nie pamiętam hasła</v-card-title>
               <v-card-subtitle>Na podany e-mail przesłano link</v-card-subtitle>
             </v-card-item>
             <v-spacer></v-spacer>
             <v-card-text>
-              <v-form ref="form_reset" @submit.prevent="submit">
+              <v-form ref="form_reset" @submit.prevent="reset">
                 <v-row>
                   <v-col>
                     <v-btn
@@ -252,15 +292,18 @@ const passwordRules = [
                     >
                   </v-col>
                   <v-col>
-                    <v-btn type="submit" color="blue-darken-2" class="mt-2"
+                    <v-btn
+                      @click="router.push('/')"
+                      color="blue-darken-2"
+                      class="mt-2"
                       >Zakończ</v-btn
                     >
                     <v-row justify="center">
                       <v-btn
+                        @click="send_mail"
                         variant="text"
                         size="small"
                         class="mt-4"
-                        @click="send_mail"
                         >Wyślij e-mail ponownie</v-btn
                       >
                     </v-row>
@@ -268,6 +311,13 @@ const passwordRules = [
                 </v-row>
               </v-form>
             </v-card-text>
+          </v-window-item>
+          <v-window-item :value="4">
+            <SignedUp
+              :email_to_confirm="email_to_confirm"
+              :password="passProp"
+              :remember_me="remember_meProp"
+            />
           </v-window-item>
         </v-window>
       </v-card>

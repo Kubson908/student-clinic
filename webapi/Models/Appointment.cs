@@ -14,6 +14,8 @@ namespace Przychodnia.Webapi.Models
         public Specialization Specialization { get; set; }
         public string? Symptoms { get; set; }
         public string? Medicines { get; set; }
+        public string? Diagnosis { get; set; }
+        public string? Meds { get; set; }
         public string? Recommendations { get; set; }
         [Required]
         public bool Finished { get; set; } = false;
@@ -21,8 +23,8 @@ namespace Przychodnia.Webapi.Models
         //Navigation Properties
         [Required]
         [ForeignKey("Patient")]
-        public string PatientId { get; set; }
-        public Patient? Patient { get; set; }
+        public string PatientId { get; set; } = string.Empty;
+        public virtual Patient? Patient { get; set; }
 
         [ForeignKey("Doctor")]
         public string? DoctorId { get; set; }

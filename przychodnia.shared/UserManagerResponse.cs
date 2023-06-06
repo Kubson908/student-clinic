@@ -2,12 +2,12 @@
 {
     public class UserManagerResponse
     {
-        public string Message { get; set; }
-        public bool IsSuccess { get; set; }
-        public IEnumerable<string> Errors { get; set; }
-        public string? AccessToken { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public bool IsSuccess { get; set; } = false;
+        public IEnumerable<string> Errors { get; set; } = Enumerable.Empty<string>();
+        public string? AccessToken { get; set; } = string.Empty;
         public DateTime? ExpireDate { get; set; }
-        public string? User { get; set; }
-        public string Role { get; set; }
+        public string? User { get; set; } = string.Empty;
+        public IList<string> Roles { get; set; } = new List<string>();
     }
 }

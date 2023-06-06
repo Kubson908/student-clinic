@@ -5,7 +5,7 @@
     <v-card-item class="text-left">
       <slot name="header"></slot>
     </v-card-item>
-    <v-card-text class="text-justify">
+    <v-card-text class="text-left">
       <slot> </slot>
     </v-card-text>
   </v-card>

@@ -1,6 +1,17 @@
 <script lang="ts" setup>
+import SignedUp from "./SignedUp.vue";
 import { ref } from "vue";
 import { VForm } from "vuetify/lib/components/index";
+import {
+  dateRules,
+  nameRules,
+  surnameRules,
+  getPeselRules,
+  phoneRules,
+  passwordRules,
+  emailRules,
+} from "@/validation";
+import { snackbar, unauthorized } from "@/main";
 const visible = ref(false);
 const visible2 = ref(false);
 
@@ -13,88 +24,38 @@ const email = ref<string>("");
 const phone = ref<string>("");
 const pass = ref<string>("");
 const rpass = ref<string>("");
+const page = ref<number>(0);
 
+const email_to_confirm = ref<string>("");
 const submit = async (data: SubmitEvent) => {
   const valid = ((await data) as any).valid;
   if (!valid) return;
-  alert(
-    `Imię: ${name.value}\nNazwisko: ${surname.value}\nData urodzenia: ${birth_date.value}\nPesel: ${pesel.value}\nHasło: ${pass.value}\nPowtórzone hasło: ${rpass.value}\n`
-  );
+  try {
+    await unauthorized.post("/auth/register", {
+      firstName: name.value,
+      lastName: surname.value,
+      dateOfBirth: birth_date.value,
+      pesel: pesel.value,
+      email: email.value,
+      password: pass.value,
+      confirmPassword: rpass.value,
+      phoneNumber: phone.value,
+    });
+    email_to_confirm.value = email.value;
+    page.value = 1;
+    snackbar.text = "Na e-mail podany w rejestracji wysłano link weryfikacyjny";
+    snackbar.error = false;
+  } catch (e) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text = "Błąd podczas rejestracji";
+  } finally {
+    snackbar.showing = true;
+  }
+
   form.value?.reset();
 };
 
-const passwordRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (value.toLowerCase() !== value && /\d/.test(value) && value.length >= 8)
-      return true;
-    else
-      return "Hasło musi zawierać przynajmniej 8 znaków, małą literę, dużą literę i cyfrę";
-  },
-];
-const nameRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (
-      value[0].toLowerCase() !== value[0] &&
-      value.slice(1).toLowerCase() === value.slice(1)
-    )
-      return true;
-    else return "Imię powinno zaczynać się od wielkiej litery";
-  },
-  (value: string) => {
-    if (
-      !/\d/.test(value) &&
-      !/[^a-zA-Z0-9\u0118\u0119\u00F3\u00D3\u0141\u0142\u0104\u0105\u017B\u017C\u017A\u0179\u0106\u0107\u0143\u0144\u015A\u015B]/.test(
-        value
-      ) &&
-      !/_/.test(value)
-    )
-      return true;
-    else return "Imię może zawierać tylko litery";
-  },
-];
-const surnameRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (
-      value[0].toLowerCase() !== value[0] &&
-      value.slice(1).toLowerCase() === value.slice(1)
-    )
-      return true;
-    else return "Nazwisko powinno zaczynać się od wielkiej litery";
-  },
-  (value: string) => {
-    if (
-      !/\d/.test(value) &&
-      !/[^a-zA-Z0-9\u0118\u0119\u00F3\u00D3\u0141\u0142\u0104\u0105\u017B\u017C\u017A\u0179\u0106\u0107\u0143\u0144\u015A\u015B]/.test(
-        value
-      ) &&
-      !/_/.test(value)
-    )
-      return true;
-    else return "Nazwisko może zawierać tylko litery";
-  },
-];
-const peselRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (!/\D/.test(value) && value.length === 11) return true;
-    else return "Pesel musi składać się z 11 cyfr";
-  },
-];
 const repeatPasswordRules = [
   (value: string) => {
     if (value) return true;
@@ -105,190 +66,177 @@ const repeatPasswordRules = [
     else return "Hasła muszą się zgadzać";
   },
 ];
-const emailRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) =>
-    /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-    "Nieprawidłowy e-mail",
-];
-const phoneRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    if (!/\D/.test(value) && value.length === 9) return true;
-    else return "Numer telefonu musi składać się z cyfr";
-  },
-];
-const dateRules = [
-  (value: string) => {
-    if (value) return true;
-    else return "Pole jest wymagane";
-  },
-  (value: string) => {
-    const dateFromValue: Date = new Date(value);
-    if (dateFromValue < new Date()) return true;
-    else return "Podaj prawidłową datę";
-  },
-];
 </script>
 
 <template>
-  <v-row no-gutters>
-    <v-col>
+  <v-row no-gutters class="justify-center">
+    <v-col cols="12" sm="8" md="4" class="ma-auto">
       <v-card
-        width="40vw"
-        location="center"
         elevation="5"
-        class="rounded-lg signup"
+        class="rounded-lg signup ma-auto"
       >
-      <v-card-item>
-        <v-container class="d-flex justify-center align-center">
-          <v-card
-            height="64"
-            width="64"
-            color="#36BFF1"
-            class="d-flex justify-center align-center"
-          >
-            <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
-          </v-card>
-        </v-container>
-        <v-card-title>Zarejestruj się</v-card-title>
-        <v-card-subtitle>Podaj dane rejestracji</v-card-subtitle>
-      </v-card-item>
-      <v-spacer></v-spacer>
-      <v-card-text>
-        <v-form @submit.prevent="submit" ref="form">
-          <div class="cont">
-            <v-row>
-              <v-col class="py-1">
-                <v-text-field
-                  type="input"
-                  v-model="name"
-                  label="Imię"
-                  variant="solo"
-                  :rules="nameRules"
-                  color="blue-darken-2"
-                  required
+        <v-window v-model="page" direction="vertical" reverse>
+          <v-window-item :value="0">
+            <v-card-item>
+              <v-container class="d-flex justify-center align-center">
+                <v-card
+                  height="64"
+                  width="64"
+                  color="#36BFF1"
+                  class="d-flex justify-center align-center"
                 >
-                </v-text-field>
-              </v-col>
-              <v-col class="py-1">
-                <v-text-field
-                  type="input"
-                  v-model="surname"
-                  label="Nazwisko"
-                  variant="solo"
-                  :rules="surnameRules"
-                  color="blue-darken-2"
-                  required
-                >
-                </v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="py-1">
-                <v-text-field
-                  type="Date"
-                  label="Data urodzenia"
-                  v-model="birth_date"
-                  variant="solo"
-                  :rules="dateRules"
-                  color="blue-darken-2"
-                  required
-                >
-                </v-text-field>
-              </v-col>
-              <v-col class="py-1">
-                <v-text-field
-                  type="input"
-                  label="Pesel"
-                  v-model="pesel"
-                  variant="solo"
-                  :rules="peselRules"
-                  color="blue-darken-2"
-                  required
-                >
-                </v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="py-1">
-                <v-text-field
-                  type="email"
-                  label="Email"
-                  v-model="email"
-                  variant="solo"
-                  :rules="emailRules"
-                  color="blue-darken-2"
-                  required
-                >
-                </v-text-field>
-              </v-col>
-              <v-col class="py-1">
-                <v-text-field
-                  type="input"
-                  label="Nr telefonu"
-                  v-model="phone"
-                  variant="solo"
-                  :rules="phoneRules"
-                  color="blue-darken-2"
-                  required
-                >
-                </v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-text-field
-                label="Hasło"
-                v-model="pass"
-                variant="solo"
-                :type="visible ? 'text' : 'password'"
-                :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-                @click:append-inner="() => (visible = !visible)"
-                :rules="passwordRules"
-                class="px-3 py-1"
-                color="blue-darken-2"
-                required
-              >
-              </v-text-field>
-            </v-row>
-            <v-row>
-              <v-text-field
-                label="Powtórz hasło"
-                v-model="rpass"
-                variant="solo"
-                :type="visible2 ? 'text' : 'password'"
-                :append-inner-icon="visible2 ? 'mdi-eye-off' : 'mdi-eye'"
-                @click:append-inner="() => (visible2 = !visible2)"
-                :rules="repeatPasswordRules"
-                class="px-3 py-1"
-                height="10px"
-                color="blue-darken-2"
-                required
-              >
-              </v-text-field>
-            </v-row>
-          </div>
-          <v-row justify="center">
-            <v-btn type="submit" color="blue-darken-2" class="mt-2 button"
-              >Zarejestruj się</v-btn
-            >
-          </v-row>
-          <v-row justify="center">
-            <v-btn variant="text" size="small" class="mt-2 button"
-              >Mam już konto</v-btn
-            >
-          </v-row>
-        </v-form>
-      </v-card-text>
-    </v-card>
-  </v-col>
-</v-row>
+                  <v-icon
+                    icon="mdi-hospital-building"
+                    size="48"
+                    color="white"
+                  ></v-icon>
+                </v-card>
+              </v-container>
+              <v-card-title>Zarejestruj się</v-card-title>
+              <v-card-subtitle>Podaj dane rejestracji</v-card-subtitle>
+            </v-card-item>
+            <v-spacer></v-spacer>
+            <v-card-text>
+              <v-form @submit.prevent="submit" ref="form">
+                <div class="cont">
+                  <v-row>
+                    <v-col class="py-1">
+                      <v-text-field
+                        type="input"
+                        v-model="name"
+                        label="Imię"
+                        variant="solo"
+                        :rules="nameRules"
+                        color="blue-darken-2"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col class="py-1">
+                      <v-text-field
+                        type="input"
+                        v-model="surname"
+                        label="Nazwisko"
+                        variant="solo"
+                        :rules="surnameRules"
+                        color="blue-darken-2"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col class="py-1">
+                      <v-text-field
+                        type="Date"
+                        label="Data urodzenia"
+                        v-model="birth_date"
+                        variant="solo"
+                        :rules="dateRules"
+                        color="blue-darken-2"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col class="py-1">
+                      <v-text-field
+                        type="input"
+                        label="Pesel"
+                        v-model="pesel"
+                        variant="solo"
+                        :rules="getPeselRules(new Date(birth_date))"
+                        color="blue-darken-2"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col class="py-1">
+                      <v-text-field
+                        type="email"
+                        label="Email"
+                        v-model="email"
+                        variant="solo"
+                        :rules="emailRules"
+                        color="blue-darken-2"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col class="py-1">
+                      <v-text-field
+                        type="input"
+                        label="Nr telefonu"
+                        v-model="phone"
+                        variant="solo"
+                        :rules="phoneRules"
+                        color="blue-darken-2"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-text-field
+                      label="Hasło"
+                      v-model="pass"
+                      variant="solo"
+                      :type="visible ? 'text' : 'password'"
+                      :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+                      @click:append-inner="() => (visible = !visible)"
+                      :rules="passwordRules"
+                      class="px-3 py-1"
+                      color="blue-darken-2"
+                      required
+                    >
+                    </v-text-field>
+                  </v-row>
+                  <v-row>
+                    <v-text-field
+                      label="Powtórz hasło"
+                      v-model="rpass"
+                      variant="solo"
+                      :type="visible2 ? 'text' : 'password'"
+                      :append-inner-icon="visible2 ? 'mdi-eye-off' : 'mdi-eye'"
+                      @click:append-inner="() => (visible2 = !visible2)"
+                      :rules="repeatPasswordRules"
+                      class="px-3 py-1"
+                      height="10px"
+                      color="blue-darken-2"
+                      required
+                    >
+                    </v-text-field>
+                  </v-row>
+                </div>
+                <v-row justify="center">
+                  <v-btn type="submit" color="blue-darken-2" class="mt-2 button"
+                    >Zarejestruj się</v-btn
+                  >
+                </v-row>
+                <v-row justify="center">
+                  <router-link to="/login" custom v-slot="{ navigate }">
+                    <v-btn
+                      variant="text"
+                      size="small"
+                      class="mt-2 button"
+                      @click="navigate"
+                      role="link"
+                    >
+                      Mam już konto
+                    </v-btn>
+                  </router-link>
+                </v-row>
+              </v-form>
+            </v-card-text>
+          </v-window-item>
+          <v-window-item :value="1">
+            <SignedUp :email_to_confirm="email_to_confirm" />
+          </v-window-item>
+        </v-window>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <style>

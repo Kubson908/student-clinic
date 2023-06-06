@@ -1,59 +1,105 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { ref } from "vue";
+import { authorized, specializations, snackbar, router } from "../../main";
+import NewVisitSymptoms from "./NewVisitSymptoms.vue";
+import NewVisitDate from "./NewVisitDate.vue";
+import NewVisitSummary from "./NewVisitSummary.vue";
+
+const page = ref<number>(1);
+const symptoms = ref<any>();
+const date = ref<any>();
+const waiting = ref<boolean>(false);
+
+const getSpecialization = () => {
+  const specialization = specializations.find(
+    (elem: any) => elem.value === symptoms.value.specialization
+  );
+  if (specialization) return specialization.title;
+  else return "Błąd";
+};
+const getData = () => {
+  return {
+    symptoms: symptoms.value.symptoms,
+    date: `${(
+      "0" + new Date(date.value.date).toLocaleDateString("pl-PL")
+    ).slice(-10)}`,
+    hour: date.value.select,
+    specialization: getSpecialization(),
+    medicine: symptoms.value.medicine,
+  };
+};
+
+const submit = async () => {
+  const data = getData();
+  const datestring = `${data.date.split(".").reverse().join("-")}T${
+    data.hour.split(":")[0]
+  }:${data.hour.split(":")[1]}:00.000Z`;
+  try {
+    waiting.value = true;
+    const response = await authorized.post("/appointment/create", {
+      date: datestring,
+      specialization: symptoms.value.specialization,
+      symptoms: data.symptoms,
+      medicines: data.medicine,
+    });
+    if (response.status === 201) {
+      snackbar.error = false;
+      snackbar.text =
+        "Pomyślnie wysłano wstępną rezerwację wizyty, oczekuj e-maila potwierdzającego w najbliższym czasie";
+      router.push("/patient/appointments");
+    }
+  } catch (e: any) {
+    console.log(e);
+    snackbar.error = true;
+    snackbar.text =
+      e.response && e.response.status === 406
+        ? "Nie można zarezerwować wizyty - termin zajęty"
+        : e.response && e.response.status === 409
+        ? "Zarezerwowałeś już wizytę w tym terminie"
+        : e.response && e.response.status === 403
+        ? "Nie możesz zarezerwować więcej niż jednej wizyty będąc niezweryfikowanym"
+        : "Wystąpił nieznany błąd";
+  } finally {
+    waiting.value = false;
+    snackbar.showing = true;
+  }
+};
+</script>
 
 <template>
-  <v-card width="560px" location="center" elevation="5" class="rounded-lg">
-    <v-card-item>
-      <v-container class="d-flex justify-center align-center">
-        <v-card
-          height="64"
-          width="64"
-          color="#36BFF1"
-          class="d-flex justify-center align-center"
-        >
-          <v-icon icon="mdi-hospital-building" size="48" color="white"></v-icon>
-        </v-card>
-      </v-container>
-      <v-card-title font-size="56">Nowa wizyta</v-card-title>
-      <v-card-subtitle>Wpisz szczegóły</v-card-subtitle>
-    </v-card-item>
-    <v-spacer></v-spacer>
-    <v-card-text>
-      <v-form @submit.prevent>
-        <v-select
-          label="Wybierz specjalistów"
-          :items="['Internista', 'Pulmonolog', 'Okulista']"
-          variant="solo"
-        ></v-select>
-        <v-textarea label="Objawy" variant="solo"></v-textarea>
-        <v-textarea label="Stosowane leki" variant="solo"></v-textarea>
-        <v-row justify="center">
-          <v-col xs="12" sm="6" md="3" align-self="center" class="text-left">
-            <v-btn
-              variant="outlined"
-              size="large"
-              class="mt-2 button"
-              color="blue-darken-2"
-            >
-              Wstecz
-            </v-btn>
-          </v-col>
-          <v-col justify="center" class="text-right">
-            <v-btn
-              xs="12"
-              sm="6"
-              md="3"
-              align-self="center"
-              size="large"
-              class="mt-2 button"
-              color="blue-darken-2"
-            >
-              Dalej
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-form>
-    </v-card-text>
-  </v-card>
+  <v-row no-gutters class="justify-center"
+    ><v-col class="ma-auto" cols="12" sm="8" :md="page === 3 ? 3 : 4">
+      <v-card elevation="5" class="rounded-lg my-4">
+        <template #loader>
+          <v-progress-linear
+            :active="waiting"
+            color="deep-purple"
+            height="4"
+            indeterminate
+          ></v-progress-linear>
+        </template>
+        <v-window v-model="page" direction="vertical" reverse :touch="false">
+          <v-window-item :value="1">
+            <NewVisitSymptoms @page="(arg) => (page += arg)" ref="symptoms" />
+          </v-window-item>
+
+          <v-window-item :value="2">
+            <NewVisitDate
+              @page="(arg) => (page += arg)"
+              ref="date"
+              :specialization="symptoms.specialization"
+            />
+          </v-window-item>
+          <v-window-item :value="3">
+            <NewVisitSummary
+              @page="(arg) => (page += arg)"
+              :data="getData()"
+              @submit="submit()"
+            />
+          </v-window-item>
+        </v-window>
+      </v-card> </v-col
+  ></v-row>
 </template>
 
 <style>

@@ -240,6 +240,9 @@ namespace Przychodnia.Webapi.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Diagnosis")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DoctorId")
                         .HasColumnType("nvarchar(450)");
 
@@ -247,6 +250,9 @@ namespace Przychodnia.Webapi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Medicines")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Meds")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PatientId")
@@ -294,8 +300,12 @@ namespace Przychodnia.Webapi.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<int>("Specialization")
+                    b.Property<int?>("Specialization")
                         .HasColumnType("int");
+
+                    b.HasIndex("Pesel")
+                        .IsUnique()
+                        .HasFilter("[Pesel] IS NOT NULL");
 
                     b.ToTable("Employees", (string)null);
                 });
@@ -303,6 +313,9 @@ namespace Przychodnia.Webapi.Migrations
             modelBuilder.Entity("Przychodnia.Webapi.Models.Patient", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("Allergies")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DateOfBirth")
                         .IsRequired()
@@ -316,10 +329,20 @@ namespace Przychodnia.Webapi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Medicines")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Pesel")
                         .IsRequired()
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
+
+                    b.Property<bool>("Verified")
+                        .HasColumnType("bit");
+
+                    b.HasIndex("Pesel")
+                        .IsUnique()
+                        .HasFilter("[Pesel] IS NOT NULL");
 
                     b.ToTable("Patients", (string)null);
                 });
@@ -382,7 +405,7 @@ namespace Przychodnia.Webapi.Migrations
                         .HasForeignKey("AppointmentId");
 
                     b.HasOne("Przychodnia.Webapi.Models.Employee", "Doctor")
-                        .WithMany()
+                        .WithMany("Appointments")
                         .HasForeignKey("DoctorId");
 
                     b.HasOne("Przychodnia.Webapi.Models.Patient", "Patient")
@@ -414,6 +437,11 @@ namespace Przychodnia.Webapi.Migrations
                         .HasForeignKey("Przychodnia.Webapi.Models.Patient", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Przychodnia.Webapi.Models.Employee", b =>
+                {
+                    b.Navigation("Appointments");
                 });
 
             modelBuilder.Entity("Przychodnia.Webapi.Models.Patient", b =>

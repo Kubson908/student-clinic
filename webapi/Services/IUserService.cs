@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Przychodnia.Shared;
+using Przychodnia.Webapi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -11,6 +12,8 @@ namespace Przychodnia.Webapi.Services
     {
         Task<UserManagerResponse> RegisterUserAsync(R dto);
         Task<UserManagerResponse> LoginUserAsync(L dto);
+        Task<UserManagerResponse> DeleteUserAsync(string patientId);
+        Task SendEmailConfirmationCode(Patient user);
     }
 
     /*public class UserService : IUserService<RegisterDto, LoginDto>

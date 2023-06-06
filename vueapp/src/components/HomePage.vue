@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import HomePageCard from "./HomePageCard.vue";
+// Linki do pobrania zdjec z karuzeli
+// https://pixabay.com/pl/illustrations/lekarz-szpital-opieki-zdrowotnej-6701410/
+// https://pixabay.com/pl/photos/test-tube-covid-19-mask-maska-5065426/
+// https://pixabay.com/pl/photos/poziom-cukru-we-krwi-glukometr-r%c4%99ka-3310318/
 </script>
 <template>
   <v-row no-gutters>
@@ -16,7 +20,7 @@ import HomePageCard from "./HomePageCard.vue";
             <v-carousel-item>
               <v-parallax
                 height="100%"
-                src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+                src="https://cdn.pixabay.com/photo/2021/10/11/17/37/doctor-6701410_960_720.jpg"
               >
               </v-parallax>
             </v-carousel-item>
@@ -24,17 +28,13 @@ import HomePageCard from "./HomePageCard.vue";
             <v-carousel-item>
               <v-parallax
                 height="100%"
-                src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
+                src="https://cdn.pixabay.com/photo/2020/04/19/20/10/test-tube-5065426_960_720.jpg"
               >
               </v-parallax>
             </v-carousel-item>
 
             <v-carousel-item>
-              <v-parallax
-                height="100%"
-                src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-              >
-              </v-parallax>
+              <v-parallax height="100%" src="slider1.png"> </v-parallax>
             </v-carousel-item>
           </v-carousel>
         </v-col>
@@ -251,7 +251,7 @@ import HomePageCard from "./HomePageCard.vue";
                   class="rounded-lg"
                   height="100%"
                   cover
-                  src="https://media.istockphoto.com/id/183796231/photo/newer-white-office-building-from-street-view.jpg?s=612x612&w=0&k=20&c=a2zfzSUbsYzj_bmCc_yw2oTK02T7VJhaypehiQg4Htw="
+                  src="tabs.jpeg"
                 ></v-img>
               </v-col>
             </v-row>
@@ -289,7 +289,7 @@ import HomePageCard from "./HomePageCard.vue";
                         <span class="font-weight-medium"
                           >Poniedziałek - Piątek:
                         </span>
-                        8:00 - 200
+                        8:00 - 20:00
                       </p>
                       <p>
                         <span class="font-weight-medium">Sobota: </span> 9:00 -
