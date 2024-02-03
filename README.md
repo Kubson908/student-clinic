@@ -3,7 +3,7 @@
   <h1 align="center">⚕️ Application for a medical clinic ⚕️</h1>
 
   <p align="center">
-    The project was developed for facultative subject at the university.
+    The project was developed for a faculty subject at the university.
     <br />
     
   </p>
@@ -12,16 +12,17 @@
 
 ## About the project
 <div align="justify">
-The project was made by a group of students. The system consists of a frontend application and a REST web API. 
-The application allows:
-<ul>
-  <li>booking appointments,</li>
-  <li>managing appointments,</li>
-  <li>managing user account,</li>
-  <li>sending an e-mail reminder,</li>
-  <li>chart summary of the month.</li>
-</ul>
-
+  The project was created by a group of students. The system consists of a frontend application and a web API. 
+  Designed to simplify the process for patients to schedule doctor's appointments and for clinic staff to efficiently manage visits. <br />
+  Main functionalities:
+  <ul>
+    <li>booking appointments,</li>
+    <li>managing appointments,</li>
+    <li>managing user account,</li>
+    <li>sending an e-mail reminder,</li>
+    <li>chart summary of the month.</li>
+    <li>managing the profiles of doctors</li>
+  </ul>
 </div>
 
 ## Built with
@@ -41,3 +42,14 @@ The application allows:
 [MSSQLServer-url]: https://www.microsoft.com/en-us/sql-server
 [Azure]: https://img.shields.io/badge/Microsoft_Azure-0089D6?style=for-the-badge&logo=microsoft-azure&logoColor=white
 [Azure-url]:https://azure.microsoft.com/
+
+## Screenshots
+<div align="center">
+  <img src="screenshots/submit_appointment.png" />
+  <img src="screenshots/appointment_details.png" />
+  <img src="screenshots/awaiting_appointments.png" />
+  <img src="screenshots/doctors.png" />
+  <img src="screenshots/doctor_data.png" />
+  <img src="screenshots/profile.png" />
+  <img src="screenshots/stats.png" />
+</div>
